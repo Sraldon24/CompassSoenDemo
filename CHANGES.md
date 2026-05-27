@@ -6,6 +6,38 @@
 
 ---
 
+## Phase 2 — Core Planner
+
+### 2026-05-27 — Phase 2.11 (end-user Excel import UI) deferred to Phase 3
+
+Reason: dev seed pipeline (`scripts/seed-user-plan.ts`) already covers the testing surface needed for Checkpoint B. A polished end-user drag-drop import experience with preview/error handling is closer to a Phase 3 polish task. Move was a velocity call; the import infrastructure (xlsx parser, JSON schema, Server Action surface) is all in place — only the UI is missing.
+
+### 2026-05-27 — Onboarding wizard shipped as 3 steps, not 5
+
+PRD §20 specifies 5 steps (Welcome, Profile, Interests, Existing-data, Done). v1 ships 3 (Welcome, Profile, Done).
+Reason: Interests + Existing-data steps are blocked by features that don't exist yet (AI recommendations need Phase 3 AI; Excel import UI is deferred — see above). Shipping a working 3-step flow now is more valuable than a half-broken 5-step flow.
+The DB column `profiles.onboardingStep` is still 5-step-aware so it's a small backfill when those features land.
+
+### 2026-05-27 — Onboarding redirect uses layout-level DB check, not middleware
+
+PRD §7.1 implies a middleware redirect. Implemented in `src/app/(dashboard)/layout.tsx` instead.
+Reason: middleware can't do DB queries cheaply (it runs on every request, would need to hit Postgres or maintain a session cookie cache). Layout-level check fires once per protected route render and is already inside a Server Component that needs the session anyway. Trade-off: unauthed users still go through middleware → /login (no DB hit needed); authed-but-not-onboarded users get the DB check on every protected nav, but it's a single indexed lookup on `profiles.user_id` (PK).
+
+### 2026-05-27 — Course catalog seeded from user's hand-curated Excel, not Concordia scraper
+
+PRD §15 specifies a Phase 4 Crawlee scraper as the catalog source. We're shipping seed data from `~/Downloads/Concordia_SOEN_Degree_Planner_v6.xlsx` instead for v1.
+Reason: the user's Excel is hand-verified against the Concordia 2025-26 calendar + ConU Course Planner API. Better than a half-implemented scraper. The scraper can replace this in Phase 4 when course data needs auto-updating. 61 courses extracted, 36 with prereqs.
+
+### 2026-05-27 — Prereq derivation: Notes column + Unlocks inversion (lossy)
+
+Excel's prereqs are spread across two places:
+1. The Term Plan's `Notes` column: "Needs MATH 205", "Needs SOEN 341+ENCS 282", etc.
+2. The Prereq Map's `Unlocks` column: "MATH 205 → ENGR 213, ENGR 233"
+
+The parser handles both. But: when a course's prereq isn't mentioned in EITHER place, it ends up with empty prereqs. Example: COMP 352 actually requires both COMP 232 and COMP 249, but the spreadsheet only documents COMP 232 in the Unlocks column for that course. **Acceptable limitation for v1.** The scraper will backfill these in Phase 4.
+
+---
+
 ## Phase 1 — Foundation
 
 ### 2026-05-27 — Email/password Better Auth ships first

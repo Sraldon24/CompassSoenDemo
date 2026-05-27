@@ -1,19 +1,48 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
+import { getUserPlanSnapshot } from "@/lib/db/queries/plan";
 import { getSession } from "@/lib/get-session";
+import { computeCategoryProgress, totalDegreeProgress } from "@/lib/requirements";
 import { Calendar, Clock, GraduationCap, Sparkles, TrendingUp } from "lucide-react";
+import Link from "next/link";
+import { redirect } from "next/navigation";
 
 export default async function DashboardPage(): Promise<React.ReactElement> {
   const session = await getSession();
-  const name = session?.user.name?.split(/\s+/)[0] ?? "there";
+  if (!session) redirect("/login");
+  const name = session.user.name?.split(/\s+/)[0] ?? "there";
 
-  // Phase 2 will replace these placeholder values with real DB queries.
+  const { userPlan, catalog } = await getUserPlanSnapshot(session.user.id);
+  const progress = computeCategoryProgress(userPlan, catalog);
+  const degree = totalDegreeProgress(progress);
+  const pct = Math.min(100, Math.round(((degree.done + degree.inProgress) / degree.total) * 100));
+
+  // Tally stat-grid counts from the real plan (course counts, not credits).
+  const counts = {
+    completed: 0,
+    enrolled: 0,
+    planned: 0,
+    deficiencies: 0,
+  };
+  for (const p of userPlan) {
+    if (p.status === "transferred" || p.status === "completed") counts.completed += 1;
+    else if (p.status === "enrolled") counts.enrolled += 1;
+    else if (p.status === "planned") counts.planned += 1;
+  }
+  const defProgress = progress.find((c) => c.spec.key === "deficiency");
+  counts.deficiencies = defProgress?.courses.length ?? 0;
+
+  const remainingCredits = Math.max(
+    0,
+    degree.total - degree.done - degree.inProgress - degree.planned,
+  );
+
   const stats = [
-    { label: "Completed", value: 0, color: "var(--color-success)" },
-    { label: "In Progress", value: 0, color: "var(--color-accent)" },
-    { label: "Planned", value: 0, color: "var(--color-text-muted)" },
-    { label: "Remaining", value: 120, color: "var(--color-text-muted)" },
-    { label: "Deficiencies", value: 0, color: "var(--color-warning)" },
+    { label: "Completed", value: counts.completed, color: "var(--color-success)" },
+    { label: "In Progress", value: counts.enrolled, color: "var(--color-accent)" },
+    { label: "Planned", value: counts.planned, color: "var(--color-text-muted)" },
+    { label: "Remaining (cr)", value: remainingCredits, color: "var(--color-text-muted)" },
+    { label: "Deficiencies", value: counts.deficiencies, color: "var(--color-warning)" },
   ];
 
   return (
@@ -25,17 +54,22 @@ export default async function DashboardPage(): Promise<React.ReactElement> {
         </h1>
         <div className="flex items-end justify-between gap-3 flex-wrap">
           <p className="text-sm" style={{ color: "var(--color-text-muted)" }}>
-            Phase 2 will fill these widgets with your real plan and deadlines.
+            {userPlan.length === 0
+              ? "Your plan is empty. Head to My Plan to start adding courses, or import from Excel (coming soon)."
+              : `Tracking ${userPlan.length} courses across your plan.`}
           </p>
           <p className="text-sm mono tnum" style={{ color: "var(--color-text-muted)" }}>
-            0 / 120 credits
+            {degree.done + degree.inProgress} / {degree.total} credits ({pct}%)
           </p>
         </div>
         <div
           className="h-2 w-full rounded-full overflow-hidden"
           style={{ background: "var(--color-surface-2)" }}
         >
-          <div className="h-full w-0 rounded-full" style={{ background: "var(--color-accent)" }} />
+          <div
+            className="h-full rounded-full transition-[width] duration-300"
+            style={{ background: "var(--color-accent)", width: `${pct}%` }}
+          />
         </div>
       </section>
 
@@ -135,19 +169,26 @@ export default async function DashboardPage(): Promise<React.ReactElement> {
         </Card>
       </section>
 
-      {/* Quick links */}
+      {/* Quick link to planner */}
       <section
         className="rounded-lg border p-5"
         style={{ background: "var(--color-surface-2)", borderColor: "var(--color-border)" }}
       >
         <div className="flex items-start gap-3">
           <Calendar className="h-5 w-5 mt-0.5 shrink-0" style={{ color: "var(--color-accent)" }} />
-          <div className="space-y-1">
-            <h3 className="text-sm font-semibold">Build your plan</h3>
+          <div className="space-y-2 flex-1">
+            <h3 className="text-sm font-semibold">Open your planner</h3>
             <p className="text-sm" style={{ color: "var(--color-text-muted)" }}>
-              In Phase 2 you&apos;ll drag-and-drop courses between terms, see real-time prereq
-              warnings, and get workload predictions.
+              Drag courses between terms, watch prereq violations light up, and check workload
+              before registration.
             </p>
+            <Link
+              href="/plan"
+              className="inline-flex items-center text-sm font-medium underline-offset-4 hover:underline"
+              style={{ color: "var(--color-accent)" }}
+            >
+              Go to My Plan →
+            </Link>
           </div>
         </div>
       </section>

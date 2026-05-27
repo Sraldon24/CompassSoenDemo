@@ -15,14 +15,25 @@ export interface UserPlanSnapshot {
   catalog: Map<string, CourseCatalogEntry>;
 }
 
+/** Same as `PlannedCourse` but carries the DB row id so the UI can drive moves. */
+export interface UserPlanRow extends PlannedCourse {
+  id: string;
+}
+
+export interface UserPlanSnapshotWithIds {
+  userPlan: UserPlanRow[];
+  catalog: Map<string, CourseCatalogEntry>;
+}
+
 /**
  * Fetch a user's entire planned + enrolled + completed course list, plus the
- * course catalog entries for everything they reference. One round-trip would
- * be ideal, but we keep two simple queries here for readability.
+ * course catalog entries for everything they reference. Returns the row ids
+ * so the planner UI can drive moves via Server Actions.
  */
-export async function getUserPlanSnapshot(userId: string): Promise<UserPlanSnapshot> {
+export async function getUserPlanSnapshot(userId: string): Promise<UserPlanSnapshotWithIds> {
   const userRows = await db
     .select({
+      id: userCourses.id,
       courseCode: userCourses.courseCode,
       term: userCourses.term,
       status: userCourses.status,
@@ -32,7 +43,8 @@ export async function getUserPlanSnapshot(userId: string): Promise<UserPlanSnaps
     .where(eq(userCourses.userId, userId))
     .orderBy(asc(userCourses.term), asc(userCourses.courseCode));
 
-  const userPlan: PlannedCourse[] = userRows.map((r) => ({
+  const userPlan: UserPlanRow[] = userRows.map((r) => ({
+    id: r.id,
     courseCode: r.courseCode,
     term: r.term ?? "",
     status: r.status,
