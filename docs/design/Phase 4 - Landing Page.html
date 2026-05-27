@@ -1,0 +1,638 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>SOEN Compass — Plan your Software Engineering degree the smart way</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@400;500;600&family=Geist:wght@400;500;600&display=swap" rel="stylesheet" />
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+  /* ----------------- LOCKED TOKENS ------------------ */
+  :root {
+    --font-sans: "Geist", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    --font-mono: "Geist Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+    --r-sm:6px; --r-md:8px; --r-lg:12px; --r-xl:16px; --r-full:9999px;
+    --shadow-sm: 0 1px 2px rgba(0,0,0,.06), 0 1px 1px rgba(0,0,0,.04);
+    --shadow-md: 0 4px 12px rgba(0,0,0,.06), 0 2px 4px rgba(0,0,0,.04);
+    --shadow-lg: 0 18px 40px rgba(0,0,0,.10), 0 4px 12px rgba(0,0,0,.06);
+    --h-sm:28px; --h-md:36px; --h-lg:40px;
+  }
+  .theme-graphite {
+    --bg:           oklch(0.990 0.002 240);
+    --surface:      oklch(0.980 0.002 240);
+    --surface-2:    oklch(0.965 0.003 240);
+    --border:       oklch(0.910 0.004 240);
+    --border-strong:oklch(0.840 0.005 240);
+    --text:         oklch(0.180 0.005 240);
+    --text-muted:   oklch(0.500 0.005 240);
+    --text-subtle:  oklch(0.630 0.005 240);
+    --primary:      oklch(0.220 0.010 240);
+    --primary-hover:oklch(0.150 0.010 240);
+    --primary-fg:   oklch(0.985 0.002 240);
+    --accent:       oklch(0.580 0.150 155);
+    --accent-hover: oklch(0.510 0.160 155);
+    --accent-soft:  oklch(0.957 0.035 155);
+    --success:      oklch(0.595 0.130 158);
+    --success-soft: oklch(0.955 0.025 158);
+    --warning:      oklch(0.720 0.140 75);
+    --warning-soft: oklch(0.965 0.030 80);
+    --danger:       oklch(0.580 0.195 25);
+    --danger-soft:  oklch(0.960 0.025 25);
+  }
+  .theme-graphite.dark {
+    --bg:           oklch(0.150 0.004 240);
+    --surface:      oklch(0.190 0.005 240);
+    --surface-2:    oklch(0.225 0.005 240);
+    --border:       oklch(0.280 0.006 240);
+    --border-strong:oklch(0.360 0.007 240);
+    --text:         oklch(0.975 0.003 240);
+    --text-muted:   oklch(0.700 0.005 240);
+    --text-subtle:  oklch(0.570 0.005 240);
+    --primary:      oklch(0.975 0.003 240);
+    --primary-hover:oklch(0.900 0.004 240);
+    --primary-fg:   oklch(0.150 0.004 240);
+    --accent:       oklch(0.725 0.150 155);
+    --accent-hover: oklch(0.780 0.145 155);
+    --accent-soft:  oklch(0.278 0.060 155);
+    --success:      oklch(0.720 0.135 158);
+    --success-soft: oklch(0.265 0.050 158);
+    --warning:      oklch(0.800 0.135 75);
+    --warning-soft: oklch(0.290 0.055 80);
+    --danger:       oklch(0.700 0.175 25);
+    --danger-soft:  oklch(0.290 0.070 25);
+  }
+
+  html, body { font-family: var(--font-sans); -webkit-font-smoothing: antialiased; }
+  body { background: var(--bg); color: var(--text); }
+  .mono { font-family: var(--font-mono); font-feature-settings: "ss01","cv01"; }
+  .tnum { font-variant-numeric: tabular-nums slashed-zero; }
+  .eyebrow { font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--text-subtle); }
+
+  /* type */
+  .h-hero { font-size: clamp(36px, 5.5vw, 64px); line-height: 1.04; letter-spacing: -0.035em; font-weight: 600; }
+  .h2 { font-size: clamp(28px, 3.2vw, 38px); line-height: 1.08; letter-spacing: -0.03em; font-weight: 600; }
+  .h3 { font-size: 22px; line-height: 1.2; letter-spacing: -0.015em; font-weight: 600; }
+  .h4 { font-size: 17px; line-height: 1.3; letter-spacing: -0.005em; font-weight: 600; }
+  .lead { font-size: 18px; line-height: 1.55; }
+  .body { font-size: 15px; line-height: 1.55; }
+  .body-sm { font-size: 13.5px; line-height: 1.5; }
+  .caption { font-size: 12px; line-height: 1.4; color: var(--text-muted); }
+
+  .hairline { border: 1px solid var(--border); }
+  .surface  { background: var(--surface); border: 1px solid var(--border); }
+  .surface-2{ background: var(--surface-2); border: 1px solid var(--border); }
+
+  /* focus */
+  .focus-ring:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: inherit; }
+
+  /* btns */
+  .btn { display:inline-flex; align-items:center; justify-content:center; gap:8px; font-weight: 500; white-space:nowrap; transition: background 120ms ease, border-color 120ms ease, color 120ms ease, transform 120ms ease; user-select: none; }
+  .btn:active { transform: translateY(1px); }
+  .btn-sm { height: var(--h-sm); padding: 0 12px; font-size: 12px; border-radius: var(--r-sm); }
+  .btn-md { height: var(--h-md); padding: 0 16px; font-size: 13px; border-radius: var(--r-md); }
+  .btn-lg { height: var(--h-lg); padding: 0 22px; font-size: 14px; border-radius: var(--r-md); }
+  .btn-primary { background: var(--primary); color: var(--primary-fg); }
+  .btn-primary:hover { background: var(--primary-hover); }
+  .btn-secondary { background: var(--surface); color: var(--text); border: 1px solid var(--border); }
+  .btn-secondary:hover { border-color: var(--border-strong); background: var(--surface-2); }
+  .btn-ghost { background: transparent; color: var(--text-muted); }
+  .btn-ghost:hover { color: var(--text); background: var(--surface-2); }
+  .btn-accent { background: var(--accent); color: var(--primary-fg); }
+  .dark .btn-accent { color: oklch(0.150 0.004 240); }
+  .btn-accent:hover { background: var(--accent-hover); }
+
+  /* pill toggle */
+  .pill { display:inline-flex; padding:3px; border-radius: var(--r-full); background: var(--surface-2); border: 1px solid var(--border); }
+  .pill button { padding: 4px 12px; font-size: 12px; font-weight: 500; border-radius: var(--r-full); color: var(--text-muted); }
+  .pill button[aria-pressed="true"] { background: var(--surface); color: var(--text); box-shadow: var(--shadow-sm); }
+
+  /* badge */
+  .badge { display:inline-flex; align-items:center; gap:6px; height:22px; padding: 0 8px; font-size: 11px; font-weight: 500; border-radius: var(--r-full); white-space:nowrap; }
+  .badge-dot { width: 6px; height: 6px; border-radius: var(--r-full); }
+
+  /* code */
+  code.inline { font-family: var(--font-mono); font-size: 0.9em; padding: 1px 5px; border-radius: var(--r-sm); background: var(--accent-soft); color: var(--accent-hover); font-feature-settings: "ss01","cv01"; }
+  .dark code.inline { color: var(--accent); }
+
+  /* CourseCard (mini) */
+  .cc { position: relative; display:flex; background: var(--surface); border: 1px solid var(--border); border-radius: var(--r-lg); overflow:hidden; }
+  .cc-bar { width: 3px; flex-shrink: 0; }
+  .cc-body { flex: 1; padding: 12px 14px; }
+  .cc-code { font-family: var(--font-mono); font-size: 11px; color: var(--text-subtle); font-variant-numeric: tabular-nums slashed-zero; letter-spacing: 0.02em; }
+  .cc-title { margin-top: 2px; font-size: 13.5px; font-weight: 500; line-height: 1.25; letter-spacing: -0.005em; }
+  .cc-meta { margin-top: 6px; font-size: 11px; color: var(--text-muted); }
+  .cc-planned .cc-bar { background: var(--border-strong); }
+  .cc-enrolled .cc-bar { background: var(--accent); }
+  .cc-warn .cc-bar { background: var(--warning); }
+  .cc-done .cc-bar { background: var(--text-subtle); }
+
+  /* TermColumn (mini) */
+  .term-mini { display:flex; flex-direction: column; gap: 8px; width: 280px; }
+  .term-head { background: var(--surface); border: 1px solid var(--border); border-radius: var(--r-lg); padding: 12px 14px; }
+  .term-head-row { display:flex; align-items:center; justify-content: space-between; }
+  .term-name { font-size: 12px; font-weight: 600; }
+  .term-meta { display:flex; align-items:center; gap: 6px; margin-top: 4px; font-size: 11px; color: var(--text-muted); }
+
+  /* workload pill */
+  .wl { display: inline-flex; align-items: center; gap: 8px; height: 24px; padding: 0 9px; border-radius: var(--r-full); border: 1px solid var(--border); background: var(--surface); }
+  .wl-label { font-size: 10.5px; font-weight: 500; color: var(--text); white-space: nowrap; }
+  .wl-meter { display: inline-flex; gap: 2px; }
+  .wl-bar { width: 3px; height: 7px; border-radius: 1px; background: var(--surface-2); }
+  .wl-bar.on { background: var(--text-muted); }
+  .wl-heavy .wl-bar.on { background: var(--warning); }
+
+  /* Floating insight callout */
+  .insight {
+    position: absolute;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--r-lg);
+    padding: 14px 16px;
+    box-shadow: var(--shadow-lg);
+    width: 280px;
+    z-index: 5;
+  }
+  .insight-head { display: flex; align-items: center; gap: 8px; font-size: 11px; font-weight: 500; letter-spacing: 0.04em; text-transform: uppercase; }
+  .insight-dot { width: 18px; height: 18px; border-radius: var(--r-full); background: var(--accent); color: var(--primary-fg); display: inline-flex; align-items: center; justify-content: center; font-family: var(--font-mono); font-size: 10px; font-weight: 600; }
+  .insight-body { margin-top: 8px; font-size: 13px; line-height: 1.5; color: var(--text); }
+
+  /* radial backdrop for hero */
+  .hero-bg {
+    position: absolute; inset: 0; pointer-events: none; overflow: hidden;
+    background:
+      radial-gradient(ellipse 1000px 600px at 80% -10%, color-mix(in oklch, var(--accent) 8%, transparent), transparent 60%),
+      radial-gradient(ellipse 1000px 600px at 0% 0%, color-mix(in oklch, var(--primary) 4%, transparent), transparent 60%);
+    z-index: 0;
+  }
+  /* subtle dot grid */
+  .hero-grid {
+    position: absolute; inset: 0;
+    background-image: radial-gradient(var(--border) 1px, transparent 1px);
+    background-size: 28px 28px;
+    background-position: 14px 14px;
+    mask: linear-gradient(180deg, rgba(0,0,0,.4) 0%, rgba(0,0,0,.1) 60%, transparent 100%);
+    -webkit-mask: linear-gradient(180deg, rgba(0,0,0,.4) 0%, rgba(0,0,0,.1) 60%, transparent 100%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* feature card */
+  .feat { background: var(--surface); border: 1px solid var(--border); border-radius: var(--r-lg); padding: 24px; transition: border-color 150ms ease, transform 150ms ease; }
+  .feat:hover { border-color: var(--border-strong); transform: translateY(-1px); }
+  .feat-mark { width: 32px; height: 32px; border-radius: var(--r-md); display: inline-flex; align-items: center; justify-content: center; background: var(--surface-2); color: var(--text); border: 1px solid var(--border); }
+  .feat-mark.accent { background: var(--accent-soft); border-color: color-mix(in oklch, var(--accent) 25%, var(--border)); color: var(--accent-hover); }
+  .dark .feat-mark.accent { color: var(--accent); }
+
+  /* divider */
+  .hr { height: 1px; background: var(--border); border: 0; }
+
+  /* nav */
+  .nav-link { font-size: 13px; color: var(--text-muted); font-weight: 500; transition: color 120ms ease; }
+  .nav-link:hover { color: var(--text); }
+
+  /* step number */
+  .step-num { width: 28px; height: 28px; border-radius: var(--r-full); background: var(--surface-2); border: 1px solid var(--border); display: inline-flex; align-items: center; justify-content: center; font-family: var(--font-mono); font-size: 12px; font-weight: 600; color: var(--text); }
+
+  /* "live" pulse dot */
+  @keyframes pulse-soft { 0%, 100% { box-shadow: 0 0 0 0 color-mix(in oklch, var(--accent) 30%, transparent); } 50% { box-shadow: 0 0 0 6px color-mix(in oklch, var(--accent) 0%, transparent); } }
+  .live-dot { width: 8px; height: 8px; border-radius: var(--r-full); background: var(--accent); animation: pulse-soft 2s ease-out infinite; }
+
+  /* CTA strip backing */
+  .cta-card {
+    background:
+      radial-gradient(ellipse 600px 300px at 30% 0%, color-mix(in oklch, var(--accent) 14%, transparent), transparent 70%),
+      var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--r-xl);
+  }
+
+  /* mobile nav drawer */
+  @media (max-width: 720px) {
+    .nav-desktop { display: none; }
+    .hero-mockup { display: none; }
+  }
+  @media (min-width: 721px) {
+    .nav-mobile-btn { display: none; }
+  }
+</style>
+</head>
+<body class="theme-graphite">
+
+<!-- ====================== NAV ====================== -->
+<nav class="border-b sticky top-0 z-30" style="border-color: var(--border); background: color-mix(in oklch, var(--bg) 85%, transparent); backdrop-filter: blur(8px);">
+  <div class="mx-auto max-w-[1240px] px-6 sm:px-8 h-14 flex items-center justify-between">
+    <a href="#" class="flex items-center gap-2.5 focus-ring rounded-md">
+      <svg width="24" height="24" viewBox="0 0 96 96" aria-hidden="true" style="flex-shrink:0;"><circle cx="48" cy="48" r="44" fill="var(--primary)"/><g transform="translate(48 48) rotate(35)"><path d="M 0 -28 L 7 0 L 0 28 L -7 0 Z" fill="var(--primary-fg)"/><path d="M 0 -28 L 7 0 L -7 0 Z" fill="var(--accent)"/><circle r="3.2" fill="var(--primary-fg)"/></g></svg>
+      <span class="font-semibold tracking-tight" style="font-size:15px;">Compass</span>
+      <span class="eyebrow hidden sm:inline" style="margin-left:6px;">soen</span>
+    </a>
+
+    <div class="nav-desktop flex items-center gap-7">
+      <a class="nav-link focus-ring rounded-sm" href="#features">Features</a>
+      <a class="nav-link focus-ring rounded-sm" href="#how">How it works</a>
+      <a class="nav-link focus-ring rounded-sm" href="#">Changelog</a>
+      <a class="nav-link focus-ring rounded-sm" href="#">GitHub</a>
+    </div>
+
+    <div class="flex items-center gap-2.5">
+      <div class="pill hidden sm:inline-flex">
+        <button id="modeLight" aria-pressed="true"  class="focus-ring">Light</button>
+        <button id="modeDark"  aria-pressed="false" class="focus-ring">Dark</button>
+      </div>
+      <a href="#" class="nav-link focus-ring rounded-sm hidden sm:inline" style="padding: 6px 10px;">Sign in</a>
+      <a href="#" class="btn btn-md btn-primary focus-ring">Try demo</a>
+    </div>
+  </div>
+</nav>
+
+<!-- ====================== HERO ====================== -->
+<header class="relative overflow-hidden" style="border-bottom: 1px solid var(--border);">
+  <div class="hero-bg"></div>
+  <div class="hero-grid"></div>
+
+  <div class="mx-auto max-w-[1240px] px-6 sm:px-8 pt-16 pb-24 sm:pt-24 sm:pb-32 relative" style="z-index: 1;">
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+
+      <!-- LEFT -->
+      <div class="lg:col-span-7 max-w-2xl">
+        <div class="inline-flex items-center gap-2 hairline rounded-full px-2.5 py-1" style="background: var(--surface);">
+          <span class="live-dot"></span>
+          <span class="caption mono" style="color: var(--text);">Built for the SOEN BEng program · Concordia</span>
+        </div>
+
+        <h1 class="h-hero mt-6">
+          Plan your <span style="color: var(--accent-hover);" class="dark:[color:var(--accent)]">software engineering</span> degree the smart way.
+        </h1>
+
+        <p class="lead mt-6" style="color: var(--text-muted); max-width: 620px;">
+          Drag courses across terms. See prereq violations and burnout risk before you commit. Ask Compass for advice — with sources. Built by SE students, for SE students.
+        </p>
+
+        <div class="mt-8 flex flex-wrap items-center gap-3">
+          <a href="#" class="btn btn-lg btn-accent focus-ring">Try the demo →</a>
+          <a href="#" class="btn btn-lg btn-secondary focus-ring">
+            <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true">
+              <path d="M15.5 8.18c0-.62-.05-1.07-.16-1.53H8v2.78h4.31c-.09.72-.55 1.82-1.59 2.55l-.01.1 2.31 1.79.16.01c1.47-1.36 2.32-3.37 2.32-5.7z" fill="#4285F4"/>
+              <path d="M8 16c2.1 0 3.86-.69 5.15-1.88l-2.46-1.91c-.66.46-1.54.78-2.69.78a4.67 4.67 0 0 1-4.41-3.21l-.1.01-2.39 1.85-.03.09C2.32 14.18 4.95 16 8 16z" fill="#34A853"/>
+              <path d="M3.59 9.78A4.65 4.65 0 0 1 3.33 8c0-.62.11-1.22.25-1.78l-.01-.12L1.16 4.22l-.08.04A8.01 8.01 0 0 0 0 8c0 1.29.31 2.51.85 3.59l2.74-2.13z" fill="#FBBC05"/>
+              <path d="M8 3.06c1.61 0 2.7.7 3.32 1.28l2.42-2.36C12.33.71 10.32 0 8 0 4.95 0 2.32 1.82.85 4.41l2.73 2.13A4.69 4.69 0 0 1 8 3.06z" fill="#EA4335"/>
+            </svg>
+            Sign in with Google
+          </a>
+        </div>
+        <p class="caption mt-4">No account required for the demo. Free for students, always.</p>
+
+        <!-- mini logo strip -->
+        <div class="mt-12 flex items-center gap-6 flex-wrap" style="color: var(--text-subtle);">
+          <span class="caption mono">Mapped programs</span>
+          <span class="caption mono tnum">SOEN BEng</span>
+          <span class="caption mono tnum">COMP MEng (soon)</span>
+          <span class="caption mono tnum">ENGR Foundation</span>
+        </div>
+      </div>
+
+      <!-- RIGHT — Live planner mockup -->
+      <div class="lg:col-span-5 hero-mockup relative">
+        <div class="rounded-xl hairline relative" style="background: var(--surface-2); padding: 20px;">
+          <!-- mockup chrome -->
+          <div class="flex items-center justify-between mb-4">
+            <div class="flex items-center gap-2">
+              <span class="badge" style="background: var(--surface); border:1px solid var(--border); color: var(--text-muted);">Term Planner</span>
+              <span class="caption mono">Year 3 of 4</span>
+            </div>
+            <span class="caption mono tnum">87 / 120 cr</span>
+          </div>
+
+          <!-- term column -->
+          <div class="term-mini" style="width: 100%;">
+            <div class="term-head">
+              <div class="term-head-row">
+                <div class="term-name">Fall 2026</div>
+                <span class="wl wl-heavy">
+                  <span class="wl-label">Heavy</span>
+                  <span class="wl-meter"><span class="wl-bar on"></span><span class="wl-bar on"></span><span class="wl-bar on"></span><span class="wl-bar"></span></span>
+                </span>
+              </div>
+              <div class="term-meta tnum"><span class="mono">14 cr</span> · 4 courses</div>
+            </div>
+
+            <div class="cc cc-enrolled"><div class="cc-bar"></div><div class="cc-body">
+              <div class="flex items-start justify-between gap-2">
+                <div><div class="cc-code">COMP 352</div><div class="cc-title">Data Structures &amp; Algorithms</div></div>
+                <span class="badge" style="background:var(--accent-soft); color:var(--accent-hover);"><span class="badge-dot" style="background:var(--accent);"></span>Enrolled</span>
+              </div>
+              <div class="cc-meta tnum"><span class="mono">3.5 cr</span> · Prof. Bhatt</div>
+            </div></div>
+
+            <div class="cc cc-enrolled"><div class="cc-bar"></div><div class="cc-body">
+              <div class="flex items-start justify-between gap-2">
+                <div><div class="cc-code">COMP 335</div><div class="cc-title">Theoretical Computer Science</div></div>
+                <span class="badge" style="background:var(--accent-soft); color:var(--accent-hover);"><span class="badge-dot" style="background:var(--accent);"></span>Enrolled</span>
+              </div>
+              <div class="cc-meta tnum"><span class="mono">3.5 cr</span> · Prof. Du</div>
+            </div></div>
+
+            <div class="cc cc-warn" style="border-color: color-mix(in oklch, var(--warning) 35%, var(--border));"><div class="cc-bar"></div><div class="cc-body">
+              <div class="flex items-start justify-between gap-2">
+                <div><div class="cc-code">SOEN 341</div><div class="cc-title">Software Process</div></div>
+                <span class="badge" style="background:var(--warning-soft); color:var(--warning);"><span class="badge-dot" style="background:var(--warning);"></span>Prereq</span>
+              </div>
+              <div class="cc-meta tnum"><span class="mono">3.5 cr</span></div>
+            </div></div>
+
+            <div class="cc cc-planned"><div class="cc-bar"></div><div class="cc-body">
+              <div class="flex items-start justify-between gap-2">
+                <div><div class="cc-code">ENGR 391</div><div class="cc-title">Numerical Methods</div></div>
+                <span class="badge" style="background:var(--surface-2); color:var(--text-muted);"><span class="badge-dot" style="background:var(--text-muted);"></span>Planned</span>
+              </div>
+              <div class="cc-meta tnum"><span class="mono">3.5 cr</span></div>
+            </div></div>
+          </div>
+
+          <!-- Floating insight -->
+          <div class="insight" style="top: -18px; right: -36px; transform: rotate(2deg);">
+            <div class="insight-head">
+              <span class="insight-dot">C</span>
+              <span style="color: var(--accent-hover);" class="dark:[color:var(--accent)]">Compass insight</span>
+            </div>
+            <div class="insight-body">
+              <code class="inline">SOEN 341</code> needs <code class="inline">ENGR 201</code> first. Take it in <strong>Summer 2026</strong>?
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- ====================== STATS ====================== -->
+<section style="border-bottom: 1px solid var(--border);">
+  <div class="mx-auto max-w-[1240px] px-6 sm:px-8 py-10">
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-x-8 gap-y-6">
+      <div>
+        <div class="mono tnum" style="font-size: 30px; font-weight: 600; letter-spacing: -0.02em;">120</div>
+        <div class="caption mt-1">credits in the SOEN BEng — mapped</div>
+      </div>
+      <div>
+        <div class="mono tnum" style="font-size: 30px; font-weight: 600; letter-spacing: -0.02em;">80<span style="color: var(--text-subtle);">+</span></div>
+        <div class="caption mt-1">courses with full prereq graph</div>
+      </div>
+      <div>
+        <div class="mono tnum" style="font-size: 30px; font-weight: 600; letter-spacing: -0.02em;">14</div>
+        <div class="caption mt-1">terms · Fall / Winter / Summer planning</div>
+      </div>
+      <div>
+        <div class="mono tnum" style="font-size: 30px; font-weight: 600; letter-spacing: -0.02em;">5</div>
+        <div class="caption mt-1">credit categories tracked separately</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ====================== FEATURES ====================== -->
+<section id="features" class="border-b" style="border-color: var(--border);">
+  <div class="mx-auto max-w-[1240px] px-6 sm:px-8 py-20 sm:py-28">
+    <div class="max-w-2xl">
+      <div class="eyebrow">Features</div>
+      <h2 class="h2 mt-3">Everything the registrar's site doesn't tell you.</h2>
+      <p class="lead mt-4" style="color: var(--text-muted);">
+        Six tools, one workspace. Compass replaces a tab full of PDFs, a spreadsheet of guesses, and three texts to your advisor.
+      </p>
+    </div>
+
+    <div class="mt-12 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+      <!-- 1 Term Planner -->
+      <div class="feat">
+        <span class="feat-mark accent">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="2.5" y="3" width="11" height="10" rx="1.5" stroke="currentColor" stroke-width="1.4"/><path d="M2.5 6.5h11" stroke="currentColor" stroke-width="1.4"/><path d="M5.5 9.5h5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+        </span>
+        <div class="h4 mt-5">Term Planner</div>
+        <p class="body mt-2" style="color: var(--text-muted);">
+          Drag courses across Fall, Winter, and Summer. Prereqs validated in real time. Drop is rejected if the move breaks your degree.
+        </p>
+      </div>
+      <!-- 2 Prereq Map -->
+      <div class="feat">
+        <span class="feat-mark">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="4" cy="4" r="2" stroke="currentColor" stroke-width="1.4"/><circle cx="12" cy="4" r="2" stroke="currentColor" stroke-width="1.4"/><circle cx="8" cy="12" r="2" stroke="currentColor" stroke-width="1.4"/><path d="M5.5 5.5L7 10.5M10.5 5.5L9 10.5" stroke="currentColor" stroke-width="1.4"/></svg>
+        </span>
+        <div class="h4 mt-5">Prereq Map</div>
+        <p class="body mt-2" style="color: var(--text-muted);">
+          The whole SOEN program as an interactive graph. Click a course to see what it unlocks and what it requires — three clicks deep.
+        </p>
+      </div>
+      <!-- 3 Workload Predictor -->
+      <div class="feat">
+        <span class="feat-mark">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M2 13h12M3.5 10v3M6.5 7v6M9.5 4v9M12.5 8v5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+        </span>
+        <div class="h4 mt-5">Workload Predictor</div>
+        <p class="body mt-2" style="color: var(--text-muted);">
+          Each term is scored Light → Burnout based on credits, assignment load, and historical course difficulty. Plan a term you can survive.
+        </p>
+      </div>
+      <!-- 4 Ask Compass -->
+      <div class="feat">
+        <span class="feat-mark accent">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 13V6.5L8 3l5 3.5V13H3z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/><circle cx="8" cy="9" r="1.5" stroke="currentColor" stroke-width="1.4"/></svg>
+        </span>
+        <div class="h4 mt-5">Ask Compass</div>
+        <p class="body mt-2" style="color: var(--text-muted);">
+          Chat with an AI advisor trained on the Concordia calendar, your transcript, and your plan. Every answer cites its sources.
+        </p>
+      </div>
+      <!-- 5 Requirements Checklist -->
+      <div class="feat">
+        <span class="feat-mark">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="2.5" y="2.5" width="11" height="11" rx="1.5" stroke="currentColor" stroke-width="1.4"/><path d="M5 8l2 2 4-4.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </span>
+        <div class="h4 mt-5">Requirements Tracker</div>
+        <p class="body mt-2" style="color: var(--text-muted);">
+          120 credits, five categories, one progress bar. See what's missing at a glance — and what one extra elective could unlock.
+        </p>
+      </div>
+      <!-- 6 Public Profile -->
+      <div class="feat">
+        <span class="feat-mark">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="6" r="2.5" stroke="currentColor" stroke-width="1.4"/><path d="M3 13.5a5 5 0 0 1 10 0" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+        </span>
+        <div class="h4 mt-5">Public Profile</div>
+        <p class="body mt-2" style="color: var(--text-muted);">
+          Share your plan at <code class="inline">compass.dev/u/your-name</code>. Recruiter-friendly snapshot of where you are in the program.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ====================== HOW IT WORKS ====================== -->
+<section id="how" class="border-b" style="border-color: var(--border);">
+  <div class="mx-auto max-w-[1240px] px-6 sm:px-8 py-20 sm:py-28">
+    <div class="max-w-2xl">
+      <div class="eyebrow">How it works</div>
+      <h2 class="h2 mt-3">From transcript to plan in three steps.</h2>
+      <p class="lead mt-4" style="color: var(--text-muted);">
+        No transcript upload required for the demo — start clicking courses and the plan builds itself.
+      </p>
+    </div>
+
+    <div class="mt-12 grid grid-cols-1 md:grid-cols-3 gap-10">
+      <!-- Step 1 -->
+      <div>
+        <div class="flex items-center gap-3">
+          <span class="step-num">01</span>
+          <div class="h4">Import what you've done</div>
+        </div>
+        <p class="body mt-3" style="color: var(--text-muted);">
+          Drop a transcript PDF, or check off courses you've completed. Compass parses grades, credits, and term — every value editable.
+        </p>
+        <div class="mt-5 surface rounded-lg p-3.5">
+          <div class="caption mono mb-2">Recognized</div>
+          <div class="flex flex-wrap gap-1.5">
+            <span class="badge" style="background:var(--surface-2); color:var(--text);"><span class="badge-dot" style="background:var(--success);"></span><span class="mono tnum">COMP 248</span> A−</span>
+            <span class="badge" style="background:var(--surface-2); color:var(--text);"><span class="badge-dot" style="background:var(--success);"></span><span class="mono tnum">MATH 204</span> B+</span>
+            <span class="badge" style="background:var(--surface-2); color:var(--text);"><span class="badge-dot" style="background:var(--success);"></span><span class="mono tnum">ENCS 282</span> A</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 2 -->
+      <div>
+        <div class="flex items-center gap-3">
+          <span class="step-num">02</span>
+          <div class="h4">Plan future terms</div>
+        </div>
+        <p class="body mt-3" style="color: var(--text-muted);">
+          Drag courses into Fall, Winter, or Summer slots. Prereq violations, term offering conflicts, and workload risk surface as you move.
+        </p>
+        <div class="mt-5 surface rounded-lg p-3.5">
+          <div class="cc cc-warn" style="border-color: color-mix(in oklch, var(--warning) 35%, var(--border));">
+            <div class="cc-bar"></div>
+            <div class="cc-body">
+              <div class="flex items-start justify-between gap-2">
+                <div><div class="cc-code">SOEN 341</div><div class="cc-title">Software Process</div></div>
+                <span class="badge" style="background:var(--warning-soft); color:var(--warning);"><span class="badge-dot" style="background:var(--warning);"></span>Conflict</span>
+              </div>
+              <div class="cc-meta">Move blocked · missing <code class="inline">ENGR 201</code></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 3 -->
+      <div>
+        <div class="flex items-center gap-3">
+          <span class="step-num">03</span>
+          <div class="h4">Decide with Compass</div>
+        </div>
+        <p class="body mt-3" style="color: var(--text-muted);">
+          Ask anything: "What's the lightest fourth-year?" "Can I graduate a term early?" Answers cite the calendar and your own plan.
+        </p>
+        <div class="mt-5 surface rounded-lg p-3.5">
+          <div class="flex items-center gap-2">
+            <span class="insight-dot">C</span>
+            <span class="caption mono" style="color: var(--accent-hover);">Compass · 2 sources</span>
+          </div>
+          <p class="body-sm mt-2" style="color: var(--text);">
+            You can graduate Winter 2028 if you take <code class="inline">COMP 354</code> next summer.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ====================== CTA STRIP ====================== -->
+<section>
+  <div class="mx-auto max-w-[1240px] px-6 sm:px-8 py-20">
+    <div class="cta-card p-10 sm:p-14 text-center">
+      <div class="eyebrow">Ready when you are</div>
+      <h2 class="h2 mt-4 max-w-2xl mx-auto">Try the planner with sample data — no sign-up needed.</h2>
+      <p class="lead mt-4 max-w-xl mx-auto" style="color: var(--text-muted);">
+        Loads in under a second. Bring your own transcript when you're ready, or start from a blank slate.
+      </p>
+      <div class="mt-7 flex flex-wrap items-center justify-center gap-3">
+        <a href="#" class="btn btn-lg btn-accent focus-ring">Try the demo →</a>
+        <a href="#" class="btn btn-lg btn-secondary focus-ring">
+          <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true">
+            <path d="M15.5 8.18c0-.62-.05-1.07-.16-1.53H8v2.78h4.31c-.09.72-.55 1.82-1.59 2.55l-.01.1 2.31 1.79.16.01c1.47-1.36 2.32-3.37 2.32-5.7z" fill="#4285F4"/>
+            <path d="M8 16c2.1 0 3.86-.69 5.15-1.88l-2.46-1.91c-.66.46-1.54.78-2.69.78a4.67 4.67 0 0 1-4.41-3.21l-.1.01-2.39 1.85-.03.09C2.32 14.18 4.95 16 8 16z" fill="#34A853"/>
+            <path d="M3.59 9.78A4.65 4.65 0 0 1 3.33 8c0-.62.11-1.22.25-1.78l-.01-.12L1.16 4.22l-.08.04A8.01 8.01 0 0 0 0 8c0 1.29.31 2.51.85 3.59l2.74-2.13z" fill="#FBBC05"/>
+            <path d="M8 3.06c1.61 0 2.7.7 3.32 1.28l2.42-2.36C12.33.71 10.32 0 8 0 4.95 0 2.32 1.82.85 4.41l2.73 2.13A4.69 4.69 0 0 1 8 3.06z" fill="#EA4335"/>
+          </svg>
+          Sign in with Google
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ====================== FOOTER ====================== -->
+<footer style="border-top: 1px solid var(--border);">
+  <div class="mx-auto max-w-[1240px] px-6 sm:px-8 py-12">
+    <div class="grid grid-cols-2 md:grid-cols-5 gap-8">
+      <div class="col-span-2">
+        <div class="flex items-center gap-2.5">
+          <svg width="22" height="22" viewBox="0 0 96 96" aria-hidden="true" style="flex-shrink:0;"><circle cx="48" cy="48" r="44" fill="var(--primary)"/><g transform="translate(48 48) rotate(35)"><path d="M 0 -28 L 7 0 L 0 28 L -7 0 Z" fill="var(--primary-fg)"/><path d="M 0 -28 L 7 0 L -7 0 Z" fill="var(--accent)"/><circle r="3.2" fill="var(--primary-fg)"/></g></svg>
+          <span class="font-semibold" style="font-size:14px;">Compass</span>
+        </div>
+        <p class="body-sm mt-3" style="color: var(--text-muted); max-width: 320px;">
+          Open-source degree planning for Concordia Software Engineering. Built by students, not by a vendor.
+        </p>
+      </div>
+      <div>
+        <div class="eyebrow">Product</div>
+        <ul class="mt-3 space-y-1.5 body-sm">
+          <li><a href="#" class="nav-link focus-ring rounded-sm">Features</a></li>
+          <li><a href="#" class="nav-link focus-ring rounded-sm">How it works</a></li>
+          <li><a href="#" class="nav-link focus-ring rounded-sm">Try demo</a></li>
+          <li><a href="#" class="nav-link focus-ring rounded-sm">Changelog</a></li>
+        </ul>
+      </div>
+      <div>
+        <div class="eyebrow">Resources</div>
+        <ul class="mt-3 space-y-1.5 body-sm">
+          <li><a href="#" class="nav-link focus-ring rounded-sm">GitHub</a></li>
+          <li><a href="#" class="nav-link focus-ring rounded-sm">Docs</a></li>
+          <li><a href="#" class="nav-link focus-ring rounded-sm">Roadmap</a></li>
+          <li><a href="#" class="nav-link focus-ring rounded-sm">Status</a></li>
+        </ul>
+      </div>
+      <div>
+        <div class="eyebrow">Legal</div>
+        <ul class="mt-3 space-y-1.5 body-sm">
+          <li><a href="#" class="nav-link focus-ring rounded-sm">Privacy</a></li>
+          <li><a href="#" class="nav-link focus-ring rounded-sm">Terms</a></li>
+          <li><a href="#" class="nav-link focus-ring rounded-sm">Contact</a></li>
+        </ul>
+      </div>
+    </div>
+
+    <hr class="hr my-8" />
+
+    <div class="flex flex-wrap items-center justify-between gap-4">
+      <p class="caption">
+        Not affiliated with Concordia University. Course data sourced from public calendar.
+      </p>
+      <p class="caption mono tnum">© 2026 SOEN Compass · v0.4.1</p>
+    </div>
+  </div>
+</footer>
+
+<script>
+  const root = document.body;
+  const lightBtn = document.getElementById('modeLight');
+  const darkBtn  = document.getElementById('modeDark');
+  function setMode(mode){
+    root.classList.toggle('dark', mode === 'dark');
+    lightBtn.setAttribute('aria-pressed', mode === 'light');
+    darkBtn .setAttribute('aria-pressed', mode === 'dark');
+  }
+  lightBtn.addEventListener('click', () => setMode('light'));
+  darkBtn .addEventListener('click', () => setMode('dark'));
+</script>
+
+</body>
+</html>

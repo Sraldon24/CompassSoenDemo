@@ -1,0 +1,355 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8" /><meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>SOEN Compass — Design System Index</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" /><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@400;500;600&family=Geist:wght@400;500;600&display=swap" rel="stylesheet" />
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+  :root { --font-sans:"Geist",ui-sans-serif,system-ui,sans-serif; --font-mono:"Geist Mono",ui-monospace,Menlo,monospace; --r-sm:6px; --r-md:8px; --r-lg:12px; --r-xl:16px; --r-full:9999px;
+    --shadow-sm:0 1px 2px rgba(0,0,0,.06),0 1px 1px rgba(0,0,0,.04); --shadow-md:0 4px 12px rgba(0,0,0,.06),0 2px 4px rgba(0,0,0,.04); }
+  .theme-graphite { --bg:oklch(0.990 0.002 240); --surface:oklch(0.980 0.002 240); --surface-2:oklch(0.965 0.003 240); --border:oklch(0.910 0.004 240); --border-strong:oklch(0.840 0.005 240);
+    --text:oklch(0.180 0.005 240); --text-muted:oklch(0.500 0.005 240); --text-subtle:oklch(0.630 0.005 240);
+    --primary:oklch(0.220 0.010 240); --primary-fg:oklch(0.985 0.002 240);
+    --accent:oklch(0.580 0.150 155); --accent-hover:oklch(0.510 0.160 155); --accent-soft:oklch(0.957 0.035 155); }
+  .theme-graphite.dark { --bg:oklch(0.150 0.004 240); --surface:oklch(0.190 0.005 240); --surface-2:oklch(0.225 0.005 240); --border:oklch(0.280 0.006 240); --border-strong:oklch(0.360 0.007 240);
+    --text:oklch(0.975 0.003 240); --text-muted:oklch(0.700 0.005 240); --text-subtle:oklch(0.570 0.005 240);
+    --primary:oklch(0.975 0.003 240); --primary-fg:oklch(0.150 0.004 240);
+    --accent:oklch(0.725 0.150 155); --accent-hover:oklch(0.780 0.145 155); --accent-soft:oklch(0.278 0.060 155); }
+
+  html,body{font-family:var(--font-sans);-webkit-font-smoothing:antialiased}
+  body{background:var(--bg);color:var(--text);min-height:100vh}
+  .mono{font-family:var(--font-mono);font-feature-settings:"ss01","cv01"} .tnum{font-variant-numeric:tabular-nums slashed-zero}
+  .eyebrow{font-family:var(--font-mono);font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--text-subtle)}
+  .h1{font-size:44px;line-height:1.05;letter-spacing:-.035em;font-weight:600}
+  .h2{font-size:22px;line-height:1.15;letter-spacing:-.02em;font-weight:600}
+  .h3{font-size:16px;line-height:1.3;letter-spacing:-.01em;font-weight:600}
+  .body{font-size:15px;line-height:1.55} .body-sm{font-size:13.5px;line-height:1.5}
+  .caption{font-size:12px;line-height:1.4;color:var(--text-muted)}
+  .pill{display:inline-flex;padding:3px;border-radius:var(--r-full);background:var(--surface-2);border:1px solid var(--border)}
+  .pill button{padding:4px 12px;font-size:12px;font-weight:500;border-radius:var(--r-full);color:var(--text-muted)}
+  .pill button[aria-pressed="true"]{background:var(--surface);color:var(--text)}
+
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--r-lg); overflow: hidden; transition: border-color 150ms ease, transform 150ms ease; display: block; }
+  .card:hover { border-color: var(--border-strong); transform: translateY(-2px); }
+  .card-thumb {
+    height: 156px;
+    border-bottom: 1px solid var(--border);
+    background:
+      radial-gradient(ellipse 300px 160px at 50% 0%, color-mix(in oklch, var(--accent) 10%, transparent), transparent 60%),
+      radial-gradient(var(--border) 1px, transparent 1px) 0 0 / 16px 16px,
+      var(--surface-2);
+    position: relative;
+    overflow: hidden;
+  }
+  .card-body { padding: 16px 18px; }
+  .card-num { font-family: var(--font-mono); font-size: 10.5px; letter-spacing: 0.1em; color: var(--text-subtle); text-transform: uppercase; }
+  .card-title { font-size: 15px; font-weight: 600; letter-spacing: -0.01em; margin-top: 4px; }
+  .card-sub { font-size: 12.5px; color: var(--text-muted); margin-top: 6px; line-height: 1.45; }
+  .card-foot { display: flex; align-items: center; justify-content: space-between; padding: 10px 18px; border-top: 1px solid var(--border); }
+  .badge-pill { font-family: var(--font-mono); font-size: 10px; padding: 2px 7px; border-radius: var(--r-sm); background: var(--accent-soft); color: var(--accent-hover); font-feature-settings: "ss01","cv01"; }
+  .dark .badge-pill { color: var(--accent); }
+  .arrow { color: var(--text-subtle); }
+
+  /* SVG thumbnail "icons" representing each phase */
+  .thumb-overlay { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; }
+</style>
+</head>
+<body class="theme-graphite">
+
+<header class="border-b" style="border-color: var(--border);">
+  <div class="mx-auto max-w-[1280px] px-8 py-14 flex items-start justify-between gap-10 flex-wrap">
+    <div class="max-w-2xl">
+      <div class="flex items-center gap-3">
+        <svg width="42" height="42" viewBox="0 0 96 96"><circle cx="48" cy="48" r="44" fill="var(--primary)"/><g transform="translate(48 48) rotate(35)"><path d="M 0 -28 L 7 0 L 0 28 L -7 0 Z" fill="var(--primary-fg)"/><path d="M 0 -28 L 7 0 L -7 0 Z" fill="var(--accent)"/><circle r="3.2" fill="var(--primary-fg)"/></g></svg>
+        <div class="eyebrow">SOEN Compass · Design System</div>
+      </div>
+      <h1 class="h1 mt-5">12 phases. One system.</h1>
+      <p class="body mt-4" style="color: var(--text-muted);">
+        End-to-end design for a Next.js 15 degree planner. Graphite + Emerald, Geist Sans/Mono, OKLCH, light/dark first-class. Every screen below is built on the same locked tokens — drop them into Tailwind v4's <code style="font-family: var(--font-mono); font-size: 0.92em; background: var(--accent-soft); color: var(--accent-hover); padding: 1px 5px; border-radius: 6px;">@theme</code> and start shipping.
+      </p>
+      <div class="flex flex-wrap items-center gap-2 mt-6">
+        <a href="brand/lockup.svg" class="badge-pill" style="padding: 4px 10px;">brand/lockup.svg</a>
+        <a href="brand/favicon.svg" class="badge-pill" style="padding: 4px 10px;">brand/favicon.svg</a>
+        <a href="HANDOFF.md" class="badge-pill" style="padding: 4px 10px; background: var(--surface-2); color: var(--text);">HANDOFF.md</a>
+      </div>
+    </div>
+    <div class="pill">
+      <button id="modeLight" aria-pressed="true">Light</button>
+      <button id="modeDark"  aria-pressed="false">Dark</button>
+    </div>
+  </div>
+</header>
+
+<main class="mx-auto max-w-[1280px] px-8 py-12 space-y-12">
+
+  <!-- FOUNDATIONS -->
+  <section>
+    <div class="eyebrow mb-5">Foundations</div>
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+
+      <a href="Phase 1 - Color Palettes.html" class="card">
+        <div class="card-thumb"><div class="thumb-overlay">
+          <div style="display:flex;gap:8px;">
+            <div style="width:42px;height:42px;border-radius:10px;background:var(--primary);"></div>
+            <div style="width:42px;height:42px;border-radius:10px;background:var(--accent);"></div>
+            <div style="width:42px;height:42px;border-radius:10px;background:var(--surface);border:1px solid var(--border);"></div>
+          </div>
+        </div></div>
+        <div class="card-body">
+          <div class="card-num">01 · Foundations</div>
+          <div class="card-title">Color palettes</div>
+          <div class="card-sub">Five rounds of exploration. Locked: Graphite + Emerald, OKLCH.</div>
+        </div>
+        <div class="card-foot"><span class="badge-pill">locked</span><span class="arrow">→</span></div>
+      </a>
+
+      <a href="Phase 2 - Typography and Spacing.html" class="card">
+        <div class="card-thumb"><div class="thumb-overlay">
+          <div style="font-family:var(--font-sans);font-weight:600;letter-spacing:-0.04em;line-height:1;text-align:center;">
+            <div style="font-size:40px;color:var(--text);">Aa</div>
+            <div style="font-family:var(--font-mono);font-size:11px;color:var(--text-subtle);letter-spacing:0.1em;margin-top:6px;">GEIST · 12→36</div>
+          </div>
+        </div></div>
+        <div class="card-body">
+          <div class="card-num">02 · Foundations</div>
+          <div class="card-title">Typography &amp; spacing</div>
+          <div class="card-sub">Type scale, 3 weights, tracking, line-height, tabular numerics. 4 px spacing base.</div>
+        </div>
+        <div class="card-foot"><span class="badge-pill">locked</span><span class="arrow">→</span></div>
+      </a>
+
+      <a href="Phase 9 - Logo.html" class="card">
+        <div class="card-thumb"><div class="thumb-overlay">
+          <svg width="72" height="72" viewBox="0 0 96 96"><circle cx="48" cy="48" r="44" fill="var(--primary)"/><g transform="translate(48 48) rotate(35)"><path d="M 0 -28 L 7 0 L 0 28 L -7 0 Z" fill="var(--primary-fg)"/><path d="M 0 -28 L 7 0 L -7 0 Z" fill="var(--accent)"/><circle r="3.2" fill="var(--primary-fg)"/></g></svg>
+        </div></div>
+        <div class="card-body">
+          <div class="card-num">09 · Foundations</div>
+          <div class="card-title">Logo — Needle C</div>
+          <div class="card-sub">6 directions explored. Locked: Needle C. SVG exports in <code class="mono caption">brand/</code>.</div>
+        </div>
+        <div class="card-foot"><span class="badge-pill">locked</span><span class="arrow">→</span></div>
+      </a>
+    </div>
+  </section>
+
+  <!-- COMPONENTS -->
+  <section>
+    <div class="eyebrow mb-5">Components</div>
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+      <a href="Phase 3 - Components Catalog.html" class="card">
+        <div class="card-thumb"><div class="thumb-overlay">
+          <div style="display:flex;flex-direction:column;gap:6px;width:60%;">
+            <div style="background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:8px 10px;display:flex;align-items:center;justify-content:space-between;">
+              <span style="font-family:var(--font-mono);font-size:10px;color:var(--text-subtle);">COMP 352</span>
+              <span style="font-family:var(--font-mono);font-size:9px;background:var(--accent-soft);color:var(--accent-hover);padding:1px 5px;border-radius:4px;">Enrolled</span>
+            </div>
+            <div style="background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:8px 10px;">
+              <span style="font-family:var(--font-mono);font-size:10px;color:var(--text-subtle);">SOEN 341</span>
+            </div>
+          </div>
+        </div></div>
+        <div class="card-body">
+          <div class="card-num">03 · Components</div>
+          <div class="card-title">Components catalog</div>
+          <div class="card-sub">CourseCard · TermColumn · CreditProgress · StatusBadge · AI message · Skeleton · Toast · Sidebar nav.</div>
+        </div>
+        <div class="card-foot"><span class="badge-pill">10 components</span><span class="arrow">→</span></div>
+      </a>
+    </div>
+  </section>
+
+  <!-- PAGES -->
+  <section>
+    <div class="eyebrow mb-5">Pages</div>
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+
+      <a href="Phase 4 - Landing Page.html" class="card">
+        <div class="card-thumb"><div class="thumb-overlay">
+          <div style="display:flex;flex-direction:column;align-items:center;gap:8px;">
+            <div style="font-family:var(--font-sans);font-weight:600;letter-spacing:-0.03em;font-size:18px;line-height:1;text-align:center;">Plan your<br><span style="color:var(--accent-hover);" class="dark:[color:var(--accent)]">degree</span></div>
+            <div style="display:flex;gap:4px;"><div style="width:50px;height:22px;background:var(--accent);border-radius:4px;"></div><div style="width:60px;height:22px;background:var(--surface);border:1px solid var(--border);border-radius:4px;"></div></div>
+          </div>
+        </div></div>
+        <div class="card-body">
+          <div class="card-num">04 · Pages</div>
+          <div class="card-title">Landing</div>
+          <div class="card-sub">Hero with live planner mockup, 6 feature cards, 3-step how-it-works.</div>
+        </div>
+        <div class="card-foot"><span class="badge-pill">public</span><span class="arrow">→</span></div>
+      </a>
+
+      <a href="Phase 5 - Dashboard.html" class="card">
+        <div class="card-thumb"><div class="thumb-overlay">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;width:70%;">
+            <div style="background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:6px;height:36px;"><div style="font-family:var(--font-mono);font-size:9px;color:var(--text-subtle);">PROGRESS</div><div style="font-family:var(--font-mono);font-size:14px;font-weight:600;">87/120</div></div>
+            <div style="background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:6px;height:36px;"><div style="font-family:var(--font-mono);font-size:9px;color:var(--text-subtle);">GPA</div><div style="font-family:var(--font-mono);font-size:14px;font-weight:600;">3.78</div></div>
+            <div style="background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:6px;height:36px;"><div style="font-family:var(--font-mono);font-size:9px;color:var(--text-subtle);">DAYS LEFT</div><div style="font-family:var(--font-mono);font-size:14px;font-weight:600;color:var(--warning);">12</div></div>
+            <div style="background:var(--accent-soft);border:1px solid color-mix(in oklch,var(--accent) 25%, var(--border));border-radius:6px;padding:6px;height:36px;"><div style="font-family:var(--font-mono);font-size:9px;color:var(--accent-hover);" class="dark:[color:var(--accent)]">INSIGHT</div></div>
+          </div>
+        </div></div>
+        <div class="card-body">
+          <div class="card-num">05 · Pages</div>
+          <div class="card-title">Dashboard</div>
+          <div class="card-sub">Welcome header · 5-stat grid · AI insight · deadlines · action items · recommended courses.</div>
+        </div>
+        <div class="card-foot"><span class="badge-pill">authed</span><span class="arrow">→</span></div>
+      </a>
+
+      <a href="Phase 6 - Term Planner.html" class="card">
+        <div class="card-thumb"><div class="thumb-overlay">
+          <div style="display:flex;gap:6px;">
+            <div style="width:60px;display:flex;flex-direction:column;gap:4px;"><div style="background:var(--surface);border:1px solid var(--border);border-radius:5px;height:18px;"></div><div style="background:var(--surface);border:1px solid var(--border);border-radius:5px;height:24px;"></div><div style="background:var(--surface);border:1px solid var(--border);border-radius:5px;height:24px;"></div></div>
+            <div style="width:60px;display:flex;flex-direction:column;gap:4px;"><div style="background:var(--accent-soft);border:1px solid var(--accent);border-radius:5px;height:18px;"></div><div style="background:var(--surface);border:1px solid var(--border);border-radius:5px;height:24px;"></div><div style="background:var(--surface);border:1px solid color-mix(in oklch,var(--warning) 40%,var(--border));border-radius:5px;height:24px;"></div></div>
+            <div style="width:60px;display:flex;flex-direction:column;gap:4px;"><div style="background:var(--surface);border:1px solid var(--border);border-radius:5px;height:18px;"></div><div style="background:var(--surface);border:1px solid var(--border);border-radius:5px;height:24px;"></div></div>
+          </div>
+        </div></div>
+        <div class="card-body">
+          <div class="card-num">06 · Pages</div>
+          <div class="card-title">Term Planner</div>
+          <div class="card-sub">Horizontal year-grouped board · drag/drop · workload + prereq + conflict states.</div>
+        </div>
+        <div class="card-foot"><span class="badge-pill">core feature</span><span class="arrow">→</span></div>
+      </a>
+
+      <a href="Phase 7 - Ask Compass.html" class="card">
+        <div class="card-thumb"><div class="thumb-overlay">
+          <div style="width:70%;display:flex;flex-direction:column;gap:6px;">
+            <div style="background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:8px;font-size:10px;color:var(--text-muted);">Can I take SOEN 341 without ENGR 201?</div>
+            <div style="display:flex;align-items:flex-start;gap:6px;"><div style="width:14px;height:14px;border-radius:9999px;background:var(--accent);flex-shrink:0;margin-top:2px;"></div><div style="font-size:10px;color:var(--text);">Technically no — but you can apply for an override...</div></div>
+          </div>
+        </div></div>
+        <div class="card-body">
+          <div class="card-num">07 · Pages</div>
+          <div class="card-title">Ask Compass · chat</div>
+          <div class="card-sub">Prose messages · inline citations · streaming · composer w/ rate limit &amp; tools.</div>
+        </div>
+        <div class="card-foot"><span class="badge-pill">AI</span><span class="arrow">→</span></div>
+      </a>
+
+      <a href="Phase 8 - Prereq Map.html" class="card">
+        <div class="card-thumb"><div class="thumb-overlay">
+          <svg width="180" height="100" viewBox="0 0 180 100">
+            <line x1="30" y1="50" x2="80" y2="30" stroke="var(--border-strong)" stroke-width="1.4"/>
+            <line x1="30" y1="50" x2="80" y2="70" stroke="var(--border-strong)" stroke-width="1.4"/>
+            <line x1="80" y1="30" x2="140" y2="50" stroke="var(--accent)" stroke-width="2" stroke-dasharray="3 3"/>
+            <line x1="80" y1="70" x2="140" y2="50" stroke="var(--border-strong)" stroke-width="1.4"/>
+            <circle cx="30" cy="50" r="10" fill="var(--surface)" stroke="var(--text-subtle)" stroke-width="1.4"/>
+            <circle cx="80" cy="30" r="10" fill="var(--surface)" stroke="var(--text-subtle)" stroke-width="1.4"/>
+            <circle cx="80" cy="70" r="10" fill="var(--surface)" stroke="var(--text-subtle)" stroke-width="1.4"/>
+            <circle cx="140" cy="50" r="12" fill="var(--accent-soft)" stroke="var(--accent)" stroke-width="2"/>
+          </svg>
+        </div></div>
+        <div class="card-body">
+          <div class="card-num">08 · Pages</div>
+          <div class="card-title">Prereq Map</div>
+          <div class="card-sub">Year-lane graph · selected/done/warn nodes · highlighted path · mini-map + inspector panel.</div>
+        </div>
+        <div class="card-foot"><span class="badge-pill">D3</span><span class="arrow">→</span></div>
+      </a>
+
+      <a href="Phase 10 - Secondary Screens.html" class="card">
+        <div class="card-thumb"><div class="thumb-overlay">
+          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px;width:75%;">
+            <div style="background:var(--surface);border:1px solid var(--border);border-radius:5px;height:34px;"></div>
+            <div style="background:var(--surface);border:1px solid var(--border);border-radius:5px;height:34px;"></div>
+            <div style="background:var(--surface);border:1px solid var(--border);border-radius:5px;height:34px;"></div>
+            <div style="background:var(--surface);border:1px solid var(--border);border-radius:5px;height:34px;"></div>
+            <div style="background:var(--accent-soft);border:1px solid var(--accent);border-radius:5px;height:34px;"></div>
+          </div>
+        </div></div>
+        <div class="card-body">
+          <div class="card-num">10 · Pages</div>
+          <div class="card-title">Secondary screens</div>
+          <div class="card-sub">Onboarding wizard · ⌘K palette · Requirements · Public profile · Settings.</div>
+        </div>
+        <div class="card-foot"><span class="badge-pill">5 screens</span><span class="arrow">→</span></div>
+      </a>
+
+      <a href="Phase 11 - Deadlines and Email Templates.html" class="card">
+        <div class="card-thumb"><div class="thumb-overlay">
+          <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:3px;width:70%;">
+            <div style="height:14px;background:var(--surface);border:1px solid var(--border);border-radius:2px;"></div>
+            <div style="height:14px;background:var(--surface);border:1px solid var(--border);border-radius:2px;"></div>
+            <div style="height:14px;background:var(--surface);border:1px solid var(--border);border-radius:2px;"></div>
+            <div style="height:14px;background:var(--surface);border:1px solid var(--border);border-radius:2px;"></div>
+            <div style="height:14px;background:var(--surface);border:1px solid var(--border);border-radius:2px;"></div>
+            <div style="height:14px;background:var(--surface);border:1px solid var(--border);border-radius:2px;border-left:2px solid var(--warning);"></div>
+            <div style="height:14px;background:var(--surface);border:1px solid var(--border);border-radius:2px;"></div>
+            <div style="height:14px;background:var(--surface);border:1px solid var(--border);border-radius:2px;"></div>
+            <div style="height:14px;background:var(--accent);border-radius:2px;"></div>
+            <div style="height:14px;background:var(--surface);border:1px solid var(--border);border-radius:2px;"></div>
+            <div style="height:14px;background:var(--surface);border:1px solid var(--border);border-radius:2px;border-left:2px solid var(--danger);"></div>
+            <div style="height:14px;background:var(--surface);border:1px solid var(--border);border-radius:2px;"></div>
+            <div style="height:14px;background:var(--surface);border:1px solid var(--border);border-radius:2px;"></div>
+            <div style="height:14px;background:var(--surface);border:1px solid var(--border);border-radius:2px;"></div>
+          </div>
+        </div></div>
+        <div class="card-body">
+          <div class="card-num">11 · Pages</div>
+          <div class="card-title">Deadlines &amp; templates</div>
+          <div class="card-sub">Month calendar + upcoming list · email template library with variables.</div>
+        </div>
+        <div class="card-foot"><span class="badge-pill">utility</span><span class="arrow">→</span></div>
+      </a>
+
+      <a href="Phase 12 - Auth and Error States.html" class="card">
+        <div class="card-thumb"><div class="thumb-overlay">
+          <div style="font-family:var(--font-mono);font-size:38px;font-weight:600;letter-spacing:-0.05em;line-height:1;color:var(--text);">4<span style="color:var(--accent);">0</span>4</div>
+        </div></div>
+        <div class="card-body">
+          <div class="card-num">12 · Pages</div>
+          <div class="card-title">Auth &amp; error states</div>
+          <div class="card-sub">Sign-in · magic link · 404 · 500 · transcript-failed · loading skeleton · locked account.</div>
+        </div>
+        <div class="card-foot"><span class="badge-pill">edge cases</span><span class="arrow">→</span></div>
+      </a>
+
+    </div>
+  </section>
+
+  <!-- HANDOFF -->
+  <section class="surface" style="border-radius: var(--r-xl); padding: 32px;">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
+      <div>
+        <div class="eyebrow">Handoff</div>
+        <h2 class="h2 mt-2">Ready to ship</h2>
+        <p class="body mt-3" style="color: var(--text-muted);">
+          Tokens are CSS variables that drop straight into Tailwind v4's <code style="font-family: var(--font-mono); font-size: 0.92em; background: var(--accent-soft); color: var(--accent-hover); padding: 1px 5px; border-radius: 6px;">@theme</code> block. SVGs in <code style="font-family: var(--font-mono); font-size: 0.92em; background: var(--surface-2); color: var(--text); padding: 1px 5px; border-radius: 6px; border: 1px solid var(--border);">brand/</code> use <code style="font-family: var(--font-mono); font-size: 0.92em; background: var(--surface-2); color: var(--text); padding: 1px 5px; border-radius: 6px; border: 1px solid var(--border);">currentColor</code> where it matters. Component class names match shadcn/ui conventions where applicable.
+        </p>
+        <div class="flex flex-wrap gap-2 mt-5">
+          <a href="HANDOFF.md" class="badge-pill" style="padding: 5px 12px; font-size: 12px;">HANDOFF.md →</a>
+          <a href="brand/lockup.svg" class="badge-pill" style="padding: 5px 12px; font-size: 12px; background: var(--surface-2); color: var(--text); border: 1px solid var(--border);">SVG exports</a>
+        </div>
+      </div>
+      <div class="mono caption" style="background: var(--surface-2); border: 1px solid var(--border); border-radius: var(--r-md); padding: 16px; font-size: 11.5px; line-height: 1.6; overflow-x: auto;">
+<pre style="margin:0;color:var(--text);">/* app/globals.css */
+@import "tailwindcss";
+
+@theme {
+  --color-bg: oklch(0.990 0.002 240);
+  --color-surface: oklch(0.980 0.002 240);
+  --color-text: oklch(0.180 0.005 240);
+  --color-primary: oklch(0.220 0.010 240);
+  --color-accent: oklch(0.580 0.150 155);
+  --color-accent-soft: oklch(0.957 0.035 155);
+  --font-sans: "Geist", ui-sans-serif, sans-serif;
+  --font-mono: "Geist Mono", ui-monospace, monospace;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+}</pre>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="mx-auto max-w-[1280px] px-8 pb-16 pt-2 caption mono flex items-center justify-between">
+  <span>SOEN Compass · v1.0 design system</span>
+  <span>Graphite + Emerald · 12 phases · ready for build</span>
+</footer>
+
+<script>
+  document.getElementById('modeLight').addEventListener('click', () => { document.body.classList.remove('dark'); document.getElementById('modeLight').setAttribute('aria-pressed','true'); document.getElementById('modeDark').setAttribute('aria-pressed','false'); });
+  document.getElementById('modeDark').addEventListener('click',  () => { document.body.classList.add('dark');    document.getElementById('modeLight').setAttribute('aria-pressed','false'); document.getElementById('modeDark').setAttribute('aria-pressed','true'); });
+</script>
+</body></html>

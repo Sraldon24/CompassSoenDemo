@@ -1,0 +1,952 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>SOEN Compass — Secondary Screens</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@400;500;600&family=Geist:wght@400;500;600&display=swap" rel="stylesheet" />
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+  :root {
+    --font-sans: "Geist", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    --font-mono: "Geist Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+    --r-sm:6px; --r-md:8px; --r-lg:12px; --r-xl:16px; --r-full:9999px;
+    --shadow-sm: 0 1px 2px rgba(0,0,0,.06), 0 1px 1px rgba(0,0,0,.04);
+    --shadow-md: 0 4px 12px rgba(0,0,0,.06), 0 2px 4px rgba(0,0,0,.04);
+    --shadow-lg: 0 18px 40px rgba(0,0,0,.10), 0 4px 12px rgba(0,0,0,.06);
+    --h-sm:28px; --h-md:36px;
+  }
+  .theme-graphite {
+    --bg: oklch(0.990 0.002 240); --surface: oklch(0.980 0.002 240); --surface-2: oklch(0.965 0.003 240);
+    --border: oklch(0.910 0.004 240); --border-strong: oklch(0.840 0.005 240);
+    --text: oklch(0.180 0.005 240); --text-muted: oklch(0.500 0.005 240); --text-subtle: oklch(0.630 0.005 240);
+    --primary: oklch(0.220 0.010 240); --primary-hover: oklch(0.150 0.010 240); --primary-fg: oklch(0.985 0.002 240);
+    --accent: oklch(0.580 0.150 155); --accent-hover: oklch(0.510 0.160 155); --accent-soft: oklch(0.957 0.035 155);
+    --success: oklch(0.595 0.130 158); --success-soft: oklch(0.955 0.025 158);
+    --warning: oklch(0.720 0.140 75); --warning-soft: oklch(0.965 0.030 80);
+    --danger: oklch(0.580 0.195 25); --danger-soft: oklch(0.960 0.025 25);
+  }
+  .theme-graphite.dark {
+    --bg: oklch(0.150 0.004 240); --surface: oklch(0.190 0.005 240); --surface-2: oklch(0.225 0.005 240);
+    --border: oklch(0.280 0.006 240); --border-strong: oklch(0.360 0.007 240);
+    --text: oklch(0.975 0.003 240); --text-muted: oklch(0.700 0.005 240); --text-subtle: oklch(0.570 0.005 240);
+    --primary: oklch(0.975 0.003 240); --primary-hover: oklch(0.900 0.004 240); --primary-fg: oklch(0.150 0.004 240);
+    --accent: oklch(0.725 0.150 155); --accent-hover: oklch(0.780 0.145 155); --accent-soft: oklch(0.278 0.060 155);
+    --success: oklch(0.720 0.135 158); --success-soft: oklch(0.265 0.050 158);
+    --warning: oklch(0.800 0.135 75); --warning-soft: oklch(0.290 0.055 80);
+    --danger: oklch(0.700 0.175 25); --danger-soft: oklch(0.290 0.070 25);
+  }
+
+  html, body { font-family: var(--font-sans); -webkit-font-smoothing: antialiased; }
+  body { background: var(--bg); color: var(--text); min-height: 100vh; }
+  .mono { font-family: var(--font-mono); font-feature-settings: "ss01","cv01"; }
+  .tnum { font-variant-numeric: tabular-nums slashed-zero; }
+  .eyebrow { font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--text-subtle); }
+  .h1 { font-size: 30px; line-height: 1.1; letter-spacing: -0.03em; font-weight: 600; }
+  .h2 { font-size: 22px; line-height: 1.15; letter-spacing: -0.02em; font-weight: 600; }
+  .h3 { font-size: 16px; line-height: 1.25; letter-spacing: -0.01em; font-weight: 600; }
+  .h4 { font-size: 14px; line-height: 1.3; font-weight: 600; }
+  .body { font-size: 14px; line-height: 1.5; }
+  .body-sm { font-size: 13px; line-height: 1.45; }
+  .caption { font-size: 12px; line-height: 1.4; color: var(--text-muted); }
+
+  .surface  { background: var(--surface); border: 1px solid var(--border); }
+  .surface-2{ background: var(--surface-2); border: 1px solid var(--border); }
+  .hairline { border: 1px solid var(--border); }
+  .focus-ring:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: inherit; }
+
+  .btn { display:inline-flex; align-items:center; justify-content:center; gap:6px; font-weight: 500; white-space:nowrap; transition: background 120ms ease, border-color 120ms ease, color 120ms ease; user-select:none; cursor: pointer; }
+  .btn-sm { height: var(--h-sm); padding: 0 12px; font-size: 12px; border-radius: var(--r-sm); }
+  .btn-md { height: var(--h-md); padding: 0 16px; font-size: 13px; border-radius: var(--r-md); }
+  .btn-primary { background: var(--primary); color: var(--primary-fg); }
+  .btn-primary:hover { background: var(--primary-hover); }
+  .btn-secondary { background: var(--surface); color: var(--text); border: 1px solid var(--border); }
+  .btn-secondary:hover { border-color: var(--border-strong); background: var(--surface-2); }
+  .btn-ghost { background: transparent; color: var(--text-muted); }
+  .btn-ghost:hover { color: var(--text); background: var(--surface-2); }
+  .btn-accent { background: var(--accent); color: var(--primary-fg); }
+  .dark .btn-accent { color: oklch(0.150 0.004 240); }
+
+  .badge { display:inline-flex; align-items:center; gap:6px; height:22px; padding: 0 8px; font-size: 11px; font-weight: 500; border-radius: var(--r-full); white-space:nowrap; }
+  .badge-dot { width: 6px; height: 6px; border-radius: var(--r-full); }
+
+  .pill { display:inline-flex; padding:3px; border-radius: var(--r-full); background: var(--surface-2); border: 1px solid var(--border); }
+  .pill button { padding: 4px 12px; font-size: 12px; font-weight: 500; border-radius: var(--r-full); color: var(--text-muted); }
+  .pill button[aria-pressed="true"] { background: var(--surface); color: var(--text); }
+
+  code.inline { font-family: var(--font-mono); font-size: 0.9em; padding: 1px 5px; border-radius: var(--r-sm); background: var(--accent-soft); color: var(--accent-hover); font-feature-settings: "ss01","cv01"; }
+  .dark code.inline { color: var(--accent); }
+
+  /* shared mark */
+  .needle { flex-shrink:0; }
+
+  /* section frame */
+  .frame {
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: var(--r-xl);
+    overflow: hidden;
+  }
+  .frame-bar {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 10px 16px;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    font-family: var(--font-mono); font-size: 11px; color: var(--text-subtle);
+    letter-spacing: 0.06em;
+  }
+  .frame-bar .dots { display: inline-flex; gap: 6px; }
+  .frame-bar .dot { width: 9px; height: 9px; border-radius: var(--r-full); background: var(--border-strong); }
+  .frame-body { padding: 24px; }
+  .frame-body.flush { padding: 0; }
+
+  /* ============ Onboarding ============ */
+  .wiz {
+    display: grid; grid-template-columns: 280px 1fr; min-height: 580px;
+    background: var(--surface);
+  }
+  .wiz-rail { padding: 28px 24px; border-right: 1px solid var(--border); background: var(--surface-2); }
+  .wiz-rail-brand { display: flex; align-items: center; gap: 10px; }
+  .wiz-rail-brand-name { font-size: 15px; font-weight: 600; letter-spacing: -0.01em; }
+  .wiz-steps { margin-top: 36px; display: flex; flex-direction: column; gap: 6px; }
+  .wiz-step { display: flex; align-items: flex-start; gap: 12px; padding: 8px 10px; border-radius: var(--r-md); }
+  .wiz-step.is-current { background: var(--surface); border: 1px solid var(--border); box-shadow: var(--shadow-sm); }
+  .wiz-step-num {
+    width: 22px; height: 22px; border-radius: var(--r-full);
+    display: inline-flex; align-items: center; justify-content: center;
+    font-family: var(--font-mono); font-size: 11px; font-weight: 600;
+    background: var(--surface); color: var(--text-subtle); border: 1px solid var(--border);
+    flex-shrink: 0;
+  }
+  .wiz-step.is-done .wiz-step-num { background: var(--accent); color: var(--primary-fg); border-color: var(--accent); }
+  .dark .wiz-step.is-done .wiz-step-num { color: oklch(0.150 0.004 240); }
+  .wiz-step.is-current .wiz-step-num { background: var(--text); color: var(--primary-fg); border-color: var(--text); }
+  .wiz-step-name { font-size: 13px; font-weight: 500; color: var(--text-muted); line-height: 1.3; padding-top: 3px; }
+  .wiz-step.is-current .wiz-step-name { color: var(--text); }
+  .wiz-step-sub { font-size: 11px; color: var(--text-subtle); margin-top: 2px; line-height: 1.4; }
+  .wiz-rail-foot { margin-top: 36px; font-size: 11px; color: var(--text-subtle); }
+
+  .wiz-pane { display: flex; flex-direction: column; min-height: 580px; }
+  .wiz-content { padding: 56px 64px 32px 64px; flex: 1; }
+  .wiz-eyebrow { font-family: var(--font-mono); font-size: 10.5px; letter-spacing: 0.16em; color: var(--text-subtle); text-transform: uppercase; }
+  .wiz-h { font-size: 28px; line-height: 1.12; letter-spacing: -0.03em; font-weight: 600; margin-top: 8px; }
+  .wiz-sub { font-size: 15px; color: var(--text-muted); margin-top: 10px; max-width: 540px; line-height: 1.55; }
+
+  .wiz-actions { padding: 20px 64px; border-top: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; background: var(--surface); }
+
+  /* fancy upload area */
+  .drop {
+    margin-top: 28px;
+    border: 1.5px dashed var(--border-strong);
+    background: var(--surface-2);
+    border-radius: var(--r-lg);
+    padding: 32px 24px;
+    display: flex; align-items: center; gap: 18px;
+    transition: border-color 120ms ease, background 120ms ease;
+  }
+  .drop.active { border-color: var(--accent); background: var(--accent-soft); }
+  .drop-icon { width: 44px; height: 44px; border-radius: var(--r-md); background: var(--surface); border: 1px solid var(--border); display: inline-flex; align-items: center; justify-content: center; color: var(--text-muted); flex-shrink: 0; }
+  .drop-or { font-size: 11px; color: var(--text-subtle); margin-left: 4px; margin-right: 4px; }
+
+  .input { background: var(--surface); border: 1px solid var(--border); color: var(--text); border-radius: var(--r-md); height: var(--h-md); padding: 0 14px; font-size: 14px; transition: border-color 120ms ease, box-shadow 120ms ease; }
+  .input::placeholder { color: var(--text-subtle); }
+  .input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px color-mix(in oklch, var(--accent) 18%, transparent); }
+
+  /* term-load selector — radio-card */
+  .opt-card {
+    display: flex; flex-direction: column;
+    padding: 16px;
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--r-lg);
+    cursor: pointer;
+    transition: border-color 120ms ease, background 120ms ease;
+  }
+  .opt-card:hover { border-color: var(--border-strong); }
+  .opt-card.selected { border-color: var(--accent); background: var(--accent-soft); }
+  .opt-card .opt-title { font-size: 14px; font-weight: 600; }
+  .opt-card .opt-sub { font-size: 12px; color: var(--text-muted); margin-top: 4px; line-height: 1.4; }
+  .opt-card.selected .opt-sub { color: var(--text); }
+
+  /* checkmark chip for goals */
+  .goal {
+    display: flex; align-items: center; gap: 10px;
+    padding: 10px 14px;
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--r-md);
+    cursor: pointer;
+    transition: border-color 120ms ease, background 120ms ease;
+  }
+  .goal:hover { border-color: var(--border-strong); }
+  .goal.checked { border-color: var(--accent); background: var(--accent-soft); }
+  .goal-check {
+    width: 16px; height: 16px; border-radius: 4px;
+    background: var(--surface); border: 1px solid var(--border-strong);
+    display: inline-flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .goal.checked .goal-check { background: var(--accent); border-color: var(--accent); }
+  .goal-check svg { opacity: 0; }
+  .goal.checked .goal-check svg { opacity: 1; }
+  .goal-text { font-size: 13px; font-weight: 500; }
+
+  /* ============ Command Palette ============ */
+  .palette-stage {
+    height: 540px;
+    background:
+      radial-gradient(ellipse 600px 300px at 50% 20%, color-mix(in oklch, var(--accent) 6%, transparent), transparent 60%),
+      radial-gradient(var(--border) 1px, transparent 1px) 0 0 / 20px 20px,
+      var(--surface-2);
+    display: flex; align-items: flex-start; justify-content: center;
+    padding-top: 80px;
+    position: relative;
+  }
+  .palette {
+    width: 580px; max-width: 92%;
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--r-xl);
+    box-shadow: var(--shadow-lg);
+    overflow: hidden;
+  }
+  .palette-input-row {
+    display: flex; align-items: center; gap: 12px;
+    padding: 14px 18px; border-bottom: 1px solid var(--border);
+  }
+  .palette-input { flex: 1; background: transparent; border: 0; outline: 0; font-size: 16px; color: var(--text); padding: 0; }
+  .palette-input::placeholder { color: var(--text-subtle); }
+  .palette-cursor { display: inline-block; width: 2px; height: 18px; background: var(--accent); vertical-align: -3px; animation: blink 1s ease-in-out infinite; }
+  @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+  .palette-kbd { font-family: var(--font-mono); font-size: 10px; padding: 2px 6px; border-radius: var(--r-sm); background: var(--surface-2); border: 1px solid var(--border); color: var(--text-muted); font-feature-settings: "ss01","cv01"; }
+  .palette-group { padding: 6px; }
+  .palette-section { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.1em; color: var(--text-subtle); text-transform: uppercase; padding: 8px 12px 4px 12px; }
+  .palette-item { display: flex; align-items: center; gap: 12px; padding: 9px 12px; border-radius: var(--r-md); cursor: pointer; }
+  .palette-item:hover, .palette-item.active { background: var(--accent-soft); }
+  .palette-item .pi-icon { width: 18px; height: 18px; display: inline-flex; align-items: center; justify-content: center; color: var(--text-muted); flex-shrink: 0; }
+  .palette-item.active .pi-icon { color: var(--accent-hover); }
+  .dark .palette-item.active .pi-icon { color: var(--accent); }
+  .palette-item .pi-label { font-size: 13.5px; color: var(--text); font-weight: 500; }
+  .palette-item .pi-desc { font-size: 12px; color: var(--text-subtle); margin-left: 6px; }
+  .palette-item .pi-tag { margin-left: auto; }
+  .palette-foot { display: flex; align-items: center; justify-content: space-between; padding: 9px 14px; border-top: 1px solid var(--border); background: var(--surface-2); font-size: 11px; color: var(--text-muted); }
+  .pf-cluster { display: inline-flex; align-items: center; gap: 14px; }
+  .pf-key { display: inline-flex; align-items: center; gap: 4px; }
+  .pi-course { font-family: var(--font-mono); font-size: 11px; padding: 1px 5px; border-radius: var(--r-sm); background: var(--accent-soft); color: var(--accent-hover); font-feature-settings: "ss01","cv01"; }
+  .dark .pi-course { color: var(--accent); }
+
+  /* ============ Requirements Checklist ============ */
+  .req-cat {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--r-lg); overflow: hidden;
+  }
+  .req-cat-head { display: flex; align-items: center; justify-content: space-between; padding: 14px 18px; border-bottom: 1px solid var(--border); }
+  .req-cat-l { display: flex; align-items: center; gap: 12px; }
+  .req-cat-h { font-size: 14px; font-weight: 600; letter-spacing: -0.005em; }
+  .req-cat-sub { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+  .req-cat-prog { width: 120px; height: 6px; background: var(--surface-2); border-radius: var(--r-full); overflow: hidden; }
+  .req-cat-prog-fill { height: 100%; background: var(--accent); }
+  .req-cat-pct { font-family: var(--font-mono); font-size: 12px; color: var(--text); font-variant-numeric: tabular-nums; font-weight: 600; }
+  .req-list { padding: 6px 8px 10px 8px; }
+  .req-row2 { display: flex; align-items: center; gap: 12px; padding: 10px 10px; border-radius: var(--r-md); }
+  .req-row2 + .req-row2 { border-top: 1px solid var(--border); }
+  .req-status-icon {
+    width: 18px; height: 18px; border-radius: var(--r-full);
+    display: inline-flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .req-status-icon.done { background: var(--accent); color: var(--primary-fg); }
+  .dark .req-status-icon.done { color: oklch(0.150 0.004 240); }
+  .req-status-icon.enrolled { background: var(--accent-soft); color: var(--accent-hover); border: 1px solid color-mix(in oklch, var(--accent) 40%, var(--border)); }
+  .dark .req-status-icon.enrolled { color: var(--accent); }
+  .req-status-icon.planned { background: var(--surface-2); color: var(--text-muted); border: 1px solid var(--border-strong); }
+  .req-status-icon.missing { background: var(--surface-2); color: var(--text-subtle); border: 1px dashed var(--border-strong); }
+  .req-code2 { font-family: var(--font-mono); font-size: 12px; font-weight: 600; min-width: 76px; font-variant-numeric: tabular-nums slashed-zero; }
+  .req-name2 { font-size: 13px; color: var(--text); flex: 1; min-width: 0; }
+  .req-cr { font-family: var(--font-mono); font-size: 11px; color: var(--text-subtle); font-variant-numeric: tabular-nums slashed-zero; min-width: 50px; text-align: right; }
+  .req-status-pill { min-width: 84px; text-align: right; }
+
+  /* ============ Public Profile ============ */
+  .profile-hero {
+    position: relative;
+    border-radius: var(--r-xl);
+    overflow: hidden;
+    background:
+      radial-gradient(ellipse 600px 240px at 20% 0%, color-mix(in oklch, var(--accent) 16%, transparent), transparent 60%),
+      var(--surface);
+    border: 1px solid var(--border);
+  }
+  .pp-cover { height: 120px; background:
+      radial-gradient(ellipse 400px 200px at 70% 50%, color-mix(in oklch, var(--accent) 22%, transparent), transparent 60%),
+      linear-gradient(135deg, color-mix(in oklch, var(--primary) 90%, var(--accent)), var(--primary));
+  }
+  .pp-body { padding: 0 28px 24px 28px; }
+  .pp-avatar {
+    width: 72px; height: 72px; border-radius: var(--r-full);
+    background: var(--surface-2);
+    border: 4px solid var(--surface);
+    display: inline-flex; align-items: center; justify-content: center;
+    font-family: var(--font-mono); font-size: 24px; font-weight: 600; color: var(--text);
+    margin-top: -36px;
+    box-shadow: var(--shadow-md);
+  }
+  .pp-name { font-size: 22px; font-weight: 600; letter-spacing: -0.02em; margin-top: 12px; }
+  .pp-handle { font-family: var(--font-mono); font-size: 12px; color: var(--text-subtle); margin-top: 2px; }
+  .pp-row { display: flex; align-items: center; gap: 14px; margin-top: 14px; flex-wrap: wrap; }
+  .pp-meta-item { display: inline-flex; align-items: center; gap: 6px; font-size: 12.5px; color: var(--text-muted); }
+  .pp-stat {
+    padding: 14px 16px;
+    background: var(--surface-2); border: 1px solid var(--border);
+    border-radius: var(--r-lg);
+  }
+  .pp-stat-label { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-subtle); }
+  .pp-stat-value { font-family: var(--font-mono); font-size: 22px; font-weight: 600; letter-spacing: -0.015em; margin-top: 6px; font-variant-numeric: tabular-nums slashed-zero; }
+  .pp-stat-sub { font-size: 11.5px; color: var(--text-muted); margin-top: 2px; }
+
+  .pp-term {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--r-lg); padding: 16px 18px;
+  }
+  .pp-term-h { display: flex; align-items: center; justify-content: space-between; }
+  .pp-term-name { font-size: 13px; font-weight: 600; letter-spacing: -0.005em; }
+  .pp-term-list { margin-top: 12px; display: flex; flex-direction: column; gap: 6px; }
+  .pp-course { display: flex; align-items: center; gap: 10px; }
+  .pp-course-code { font-family: var(--font-mono); font-size: 12px; color: var(--text); font-variant-numeric: tabular-nums slashed-zero; min-width: 70px; }
+  .pp-course-name { font-size: 13px; color: var(--text-muted); flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+  /* ============ Settings ============ */
+  .set-grid { display: grid; grid-template-columns: 220px 1fr; gap: 24px; }
+  .set-nav { display: flex; flex-direction: column; gap: 2px; }
+  .set-nav-item { padding: 8px 12px; border-radius: var(--r-md); font-size: 13px; font-weight: 500; color: var(--text-muted); cursor: pointer; }
+  .set-nav-item:hover { background: var(--surface-2); color: var(--text); }
+  .set-nav-item.active { background: var(--accent-soft); color: var(--accent-hover); }
+  .dark .set-nav-item.active { color: var(--accent); }
+  .set-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--r-lg); padding: 20px; }
+  .set-row { display: flex; align-items: flex-start; justify-content: space-between; gap: 18px; padding: 16px 0; border-bottom: 1px solid var(--border); }
+  .set-row:first-child { padding-top: 0; }
+  .set-row:last-child { padding-bottom: 0; border-bottom: 0; }
+  .set-row-l { flex: 1; min-width: 0; }
+  .set-row-name { font-size: 13.5px; font-weight: 500; }
+  .set-row-sub { font-size: 12px; color: var(--text-muted); margin-top: 3px; line-height: 1.5; max-width: 480px; }
+
+  /* toggle */
+  .switch { position: relative; width: 36px; height: 20px; background: var(--surface-2); border: 1px solid var(--border-strong); border-radius: var(--r-full); cursor: pointer; transition: background 120ms ease, border-color 120ms ease; flex-shrink: 0; }
+  .switch::after { content: ""; position: absolute; top: 1px; left: 1px; width: 16px; height: 16px; border-radius: var(--r-full); background: var(--surface); border: 1px solid var(--border); transition: transform 160ms cubic-bezier(.4,.2,.2,1); }
+  .switch.on { background: var(--accent); border-color: var(--accent); }
+  .switch.on::after { transform: translateX(16px); border-color: transparent; }
+
+  /* section nav for the index */
+  .index-nav { display: flex; gap: 6px; flex-wrap: wrap; }
+  .index-link { padding: 6px 12px; font-size: 12px; font-weight: 500; color: var(--text-muted); border: 1px solid var(--border); border-radius: var(--r-full); cursor: pointer; transition: border-color 120ms ease, color 120ms ease; }
+  .index-link:hover { border-color: var(--border-strong); color: var(--text); }
+  .index-link.active { background: var(--accent-soft); color: var(--accent-hover); border-color: color-mix(in oklch, var(--accent) 25%, var(--border)); }
+  .dark .index-link.active { color: var(--accent); }
+</style>
+</head>
+<body class="theme-graphite">
+
+<header class="border-b" style="border-color: var(--border);">
+  <div class="mx-auto max-w-[1280px] px-8 py-9 flex items-start justify-between gap-10 flex-wrap">
+    <div class="max-w-2xl">
+      <div class="eyebrow">SOEN Compass · Secondary screens</div>
+      <h1 class="h1 mt-3">Phase 10 — Onboarding · Palette · Requirements · Profile · Settings</h1>
+      <p class="body mt-3" style="color: var(--text-muted);">
+        Five secondary screens, all built on the locked Graphite + Emerald system. Designed to read top-to-bottom — each section is framed like a window so you can scan them as a deck.
+      </p>
+      <div class="index-nav mt-5">
+        <a class="index-link active" href="#onboarding">Onboarding wizard</a>
+        <a class="index-link" href="#palette">Command palette ⌘K</a>
+        <a class="index-link" href="#requirements">Requirements checklist</a>
+        <a class="index-link" href="#profile">Public profile</a>
+        <a class="index-link" href="#settings">Settings</a>
+      </div>
+    </div>
+    <div class="pill">
+      <button id="modeLight" aria-pressed="true"  class="focus-ring">Light</button>
+      <button id="modeDark"  aria-pressed="false" class="focus-ring">Dark</button>
+    </div>
+  </div>
+</header>
+
+<main class="mx-auto max-w-[1280px] px-8 py-10 space-y-14">
+
+  <!-- ============================================================ ONBOARDING WIZARD -->
+  <section id="onboarding">
+    <div class="flex items-end justify-between mb-4 flex-wrap gap-3">
+      <div>
+        <div class="eyebrow">01</div>
+        <h2 class="h2 mt-2">Onboarding wizard — 5 steps</h2>
+        <p class="body mt-2" style="color: var(--text-muted); max-width: 640px;">
+          The first 90 seconds. Imports a transcript, picks a track, sets workload preference, picks goals, confirms. Skippable at every step.
+        </p>
+      </div>
+    </div>
+
+    <div class="frame">
+      <div class="frame-bar">
+        <div class="dots"><span class="dot"></span><span class="dot"></span><span class="dot"></span></div>
+        <span>compass.dev/welcome</span>
+        <span></span>
+      </div>
+      <div class="frame-body flush">
+        <div class="wiz">
+          <!-- RAIL -->
+          <aside class="wiz-rail">
+            <div class="wiz-rail-brand">
+              <svg width="28" height="28" viewBox="0 0 96 96" class="needle"><circle cx="48" cy="48" r="44" fill="var(--primary)"/><g transform="translate(48 48) rotate(35)"><path d="M 0 -28 L 7 0 L 0 28 L -7 0 Z" fill="var(--primary-fg)"/><path d="M 0 -28 L 7 0 L -7 0 Z" fill="var(--accent)"/><circle r="3.2" fill="var(--primary-fg)"/></g></svg>
+              <div>
+                <div class="wiz-rail-brand-name">Compass</div>
+                <div class="caption mono">Get set up</div>
+              </div>
+            </div>
+
+            <div class="wiz-steps">
+              <div class="wiz-step is-done">
+                <span class="wiz-step-num"><svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 5l2 2 4-5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+                <div><div class="wiz-step-name">Welcome</div><div class="wiz-step-sub">Hello there.</div></div>
+              </div>
+              <div class="wiz-step is-done">
+                <span class="wiz-step-num"><svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 5l2 2 4-5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+                <div><div class="wiz-step-name">Import transcript</div><div class="wiz-step-sub">12 courses parsed.</div></div>
+              </div>
+              <div class="wiz-step is-current">
+                <span class="wiz-step-num">3</span>
+                <div><div class="wiz-step-name">Workload preference</div><div class="wiz-step-sub">How heavy do you like terms?</div></div>
+              </div>
+              <div class="wiz-step">
+                <span class="wiz-step-num">4</span>
+                <div><div class="wiz-step-name">Goals</div><div class="wiz-step-sub">What matters to you?</div></div>
+              </div>
+              <div class="wiz-step">
+                <span class="wiz-step-num">5</span>
+                <div><div class="wiz-step-name">Review &amp; launch</div><div class="wiz-step-sub">Confirm and enter Compass.</div></div>
+              </div>
+            </div>
+
+            <div class="wiz-rail-foot">Takes about 90 seconds. Skip anything — you can edit later.</div>
+          </aside>
+
+          <!-- PANE -->
+          <div class="wiz-pane">
+            <div class="wiz-content">
+              <div class="wiz-eyebrow">Step 3 of 5 · Workload</div>
+              <h3 class="wiz-h">How much do you want to take on per term?</h3>
+              <p class="wiz-sub">We'll use this as a guardrail when planning future terms — Compass warns you when a term goes past your comfort zone. Pick the closest. You can change this anytime.</p>
+
+              <div class="grid grid-cols-1 md:grid-cols-3 gap-3 mt-7" style="max-width: 720px;">
+                <div class="opt-card">
+                  <div class="flex items-center justify-between">
+                    <span class="opt-title">Light</span>
+                    <span class="badge" style="background: var(--success-soft); color: var(--success);"><span class="badge-dot" style="background: var(--success);"></span>10–11 cr</span>
+                  </div>
+                  <p class="opt-sub">Three courses a term. Room for co-op, work, or a heavier extracurricular load.</p>
+                </div>
+                <div class="opt-card selected">
+                  <div class="flex items-center justify-between">
+                    <span class="opt-title">Medium</span>
+                    <span class="badge" style="background: var(--surface); color: var(--text); border: 1px solid var(--border);"><span class="badge-dot" style="background: var(--text-muted);"></span>13–14 cr</span>
+                  </div>
+                  <p class="opt-sub">Four courses, on-pace for 4-year graduation. The default for most SE students.</p>
+                </div>
+                <div class="opt-card">
+                  <div class="flex items-center justify-between">
+                    <span class="opt-title">Heavy</span>
+                    <span class="badge" style="background: var(--warning-soft); color: var(--warning);"><span class="badge-dot" style="background: var(--warning);"></span>15+ cr</span>
+                  </div>
+                  <p class="opt-sub">Five courses. Faster path, less margin. We'll surface workload warnings often.</p>
+                </div>
+              </div>
+
+              <div class="mt-7 flex items-center gap-2 text-sm" style="color: var(--text-muted); font-size: 13px;">
+                <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="5.5" stroke="currentColor" stroke-width="1.3"/><path d="M7 4.5v3M7 9.5v.4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+                <span>You picked <strong style="color: var(--text);">Medium</strong> because your past terms averaged 13.7 cr.</span>
+              </div>
+            </div>
+
+            <div class="wiz-actions">
+              <button class="btn btn-md btn-ghost focus-ring">Skip</button>
+              <div class="flex items-center gap-2">
+                <button class="btn btn-md btn-secondary focus-ring">← Back</button>
+                <button class="btn btn-md btn-primary focus-ring">Continue →</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- STEP 2 mini-preview: transcript import -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+      <div class="frame">
+        <div class="frame-bar"><div class="dots"><span class="dot"></span><span class="dot"></span><span class="dot"></span></div><span>Step 2 · Import transcript</span><span></span></div>
+        <div class="frame-body" style="background: var(--surface);">
+          <div class="caption mono mb-2">Drag a PDF, or pick from list</div>
+          <div class="drop active">
+            <span class="drop-icon"><svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M10 3v9M5.5 8.5L10 4l4.5 4.5M3 16h14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+            <div>
+              <div class="body-sm" style="font-weight: 500;">transcript-W26.pdf · <span class="mono tnum">142 KB</span></div>
+              <p class="caption mt-1">Parsed 12 courses · ENGR 213 was unrecognized — flag for review</p>
+            </div>
+            <span class="badge ml-auto" style="background: var(--accent-soft); color: var(--accent-hover);"><span class="badge-dot" style="background: var(--accent);"></span>Ready</span>
+          </div>
+          <div class="mt-3 flex items-center gap-2">
+            <span class="caption mono">or</span>
+            <button class="btn btn-sm btn-secondary focus-ring">Add courses manually</button>
+            <button class="btn btn-sm btn-ghost focus-ring">Start blank</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- STEP 4 mini-preview: goals -->
+      <div class="frame">
+        <div class="frame-bar"><div class="dots"><span class="dot"></span><span class="dot"></span><span class="dot"></span></div><span>Step 4 · Goals</span><span></span></div>
+        <div class="frame-body" style="background: var(--surface);">
+          <div class="caption mb-3">Pick anything that applies — informs what Compass recommends.</div>
+          <div class="grid grid-cols-1 gap-2">
+            <div class="goal checked"><span class="goal-check"><svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 5l2 2 4-5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="goal-text">Graduate by Winter 2028</span></div>
+            <div class="goal checked"><span class="goal-check"><svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 5l2 2 4-5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="goal-text">Lean into backend / systems electives</span></div>
+            <div class="goal"><span class="goal-check"><svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 5l2 2 4-5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="goal-text">Maintain 3.5+ GPA for honours</span></div>
+            <div class="goal"><span class="goal-check"><svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 5l2 2 4-5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="goal-text">Do a co-op term</span></div>
+            <div class="goal"><span class="goal-check"><svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 5l2 2 4-5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="goal-text">Take a light summer term</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================ COMMAND PALETTE -->
+  <section id="palette">
+    <div class="flex items-end justify-between mb-4 flex-wrap gap-3">
+      <div>
+        <div class="eyebrow">02</div>
+        <h2 class="h2 mt-2">Command palette · ⌘K</h2>
+        <p class="body mt-2" style="color: var(--text-muted); max-width: 640px;">
+          Universal launcher. Course codes, pages, actions, recent chats — all keyboard-navigable. Type query, ↑↓ to pick, ↵ to go, ⌘↵ for an alt action.
+        </p>
+      </div>
+    </div>
+
+    <div class="frame">
+      <div class="frame-bar"><div class="dots"><span class="dot"></span><span class="dot"></span><span class="dot"></span></div><span>compass.dev/dashboard</span><span class="palette-kbd">⌘K</span></div>
+      <div class="palette-stage">
+        <div class="palette">
+          <div class="palette-input-row">
+            <svg width="18" height="18" viewBox="0 0 18 18" fill="none" style="color: var(--text-subtle);"><circle cx="8" cy="8" r="5.5" stroke="currentColor" stroke-width="1.4"/><path d="M12 12L16 16" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+            <input class="palette-input" placeholder="Search courses, pages, actions…" value="comp 352" />
+            <span class="palette-cursor" aria-hidden="true"></span>
+            <span class="palette-kbd">esc</span>
+          </div>
+
+          <div class="palette-group">
+            <div class="palette-section">Courses · 3 matches</div>
+            <div class="palette-item active">
+              <span class="pi-icon"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="2" y="2" width="10" height="10" rx="2" stroke="currentColor" stroke-width="1.3"/><path d="M5 7h4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg></span>
+              <span class="pi-course">COMP 352</span>
+              <span class="pi-label">Data Structures &amp; Algorithms</span>
+              <span class="pi-desc">enrolled · Fall 2026</span>
+              <span class="pi-tag"><span class="badge" style="background:var(--accent-soft); color:var(--accent-hover);"><span class="badge-dot" style="background:var(--accent);"></span>open</span></span>
+            </div>
+            <div class="palette-item">
+              <span class="pi-icon"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="2" y="2" width="10" height="10" rx="2" stroke="currentColor" stroke-width="1.3"/></svg></span>
+              <span class="pi-course">COMP 354</span>
+              <span class="pi-label">Software Engineering</span>
+              <span class="pi-desc">planned · Winter 2027</span>
+            </div>
+            <div class="palette-item">
+              <span class="pi-icon"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="2" y="2" width="10" height="10" rx="2" stroke="currentColor" stroke-width="1.3"/></svg></span>
+              <span class="pi-course">COMP 335</span>
+              <span class="pi-label">Theoretical Computer Science</span>
+              <span class="pi-desc">enrolled · Fall 2026</span>
+            </div>
+          </div>
+
+          <div class="palette-group">
+            <div class="palette-section">Actions</div>
+            <div class="palette-item">
+              <span class="pi-icon"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M7 2v10M2 7h10" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg></span>
+              <span class="pi-label">Add COMP 352 to a term…</span>
+              <span class="palette-kbd pi-tag">⌘↵</span>
+            </div>
+            <div class="palette-item">
+              <span class="pi-icon"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="5" stroke="currentColor" stroke-width="1.4"/><path d="M7 4.5v3M7 9.5v.4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg></span>
+              <span class="pi-label">Ask Compass about COMP 352</span>
+            </div>
+          </div>
+
+          <div class="palette-group">
+            <div class="palette-section">Recent</div>
+            <div class="palette-item">
+              <span class="pi-icon"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="5.5" stroke="currentColor" stroke-width="1.3"/><path d="M7 4v3l2 2" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg></span>
+              <span class="pi-label">Can I take SOEN 341 without ENGR 201?</span>
+              <span class="pi-desc">2 min ago</span>
+            </div>
+          </div>
+
+          <div class="palette-foot">
+            <div class="pf-cluster">
+              <span class="pf-key"><span class="palette-kbd">↑</span><span class="palette-kbd">↓</span> Navigate</span>
+              <span class="pf-key"><span class="palette-kbd">↵</span> Open</span>
+              <span class="pf-key"><span class="palette-kbd">⌘↵</span> Add to plan</span>
+            </div>
+            <span class="caption mono">14 results · 12 ms</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================ REQUIREMENTS CHECKLIST -->
+  <section id="requirements">
+    <div class="flex items-end justify-between mb-4 flex-wrap gap-3">
+      <div>
+        <div class="eyebrow">03</div>
+        <h2 class="h2 mt-2">Requirements checklist</h2>
+        <p class="body mt-2" style="color: var(--text-muted); max-width: 640px;">
+          120 credits across 5 categories. Each row shows status (done/enrolled/planned/missing) — categories collapse to give you the headline number first.
+        </p>
+      </div>
+      <div class="flex items-center gap-2">
+        <div class="pill">
+          <button aria-pressed="true">All</button>
+          <button>Missing only</button>
+        </div>
+        <button class="btn btn-sm btn-secondary focus-ring">Export PDF</button>
+      </div>
+    </div>
+
+    <div class="frame">
+      <div class="frame-bar"><div class="dots"><span class="dot"></span><span class="dot"></span><span class="dot"></span></div><span>compass.dev/requirements</span><span></span></div>
+      <div class="frame-body" style="background: var(--surface);">
+
+        <!-- Big progress header -->
+        <div class="flex items-baseline justify-between flex-wrap gap-3 mb-1">
+          <div>
+            <div class="eyebrow">SOEN BEng · 120 credit program</div>
+            <div class="tnum mono" style="font-size: 36px; font-weight: 600; letter-spacing: -0.02em; margin-top: 6px;">87 <span style="color: var(--text-subtle); font-weight: 500;">/ 120 cr</span></div>
+          </div>
+          <div class="flex items-center gap-3">
+            <span class="badge" style="background: var(--success-soft); color: var(--success);"><span class="badge-dot" style="background: var(--success);"></span>72.5% complete</span>
+            <span class="badge" style="background: var(--surface-2); color: var(--text-muted);"><span class="badge-dot" style="background: var(--text-muted);"></span>33 cr remaining</span>
+          </div>
+        </div>
+        <!-- segmented bar -->
+        <div style="height: 10px; background: var(--surface-2); border-radius: var(--r-full); overflow: hidden; display: flex; margin-top: 14px;">
+          <div style="width: 30%; background: var(--accent);" title="Core complete"></div>
+          <div style="width: 8%; background: color-mix(in oklch, var(--accent) 50%, transparent); border-left: 1px solid var(--surface-2);"></div>
+          <div style="width: 12%; background: var(--accent); border-left: 1px solid var(--surface-2);"></div>
+          <div style="width: 14%; background: var(--accent); border-left: 1px solid var(--surface-2);"></div>
+          <div style="width: 8.5%; background: var(--accent); border-left: 1px solid var(--surface-2);"></div>
+        </div>
+
+        <div class="grid grid-cols-1 gap-4 mt-6">
+
+          <!-- CATEGORY 1: Core -->
+          <div class="req-cat">
+            <div class="req-cat-head">
+              <div class="req-cat-l">
+                <div>
+                  <div class="req-cat-h">SOEN Core</div>
+                  <div class="req-cat-sub">Required software engineering courses · 45 credits</div>
+                </div>
+              </div>
+              <div class="flex items-center gap-3">
+                <div class="req-cat-prog"><div class="req-cat-prog-fill" style="width: 80%;"></div></div>
+                <span class="req-cat-pct tnum">36 / 45</span>
+              </div>
+            </div>
+            <div class="req-list">
+              <div class="req-row2"><span class="req-status-icon done"><svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 5l2 2 4-5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="req-code2">COMP 248</span><span class="req-name2">Object-Oriented Programming I</span><span class="req-cr">3.5</span><span class="req-status-pill"><span class="badge" style="background:var(--success-soft); color:var(--success);">A−</span></span></div>
+              <div class="req-row2"><span class="req-status-icon done"><svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 5l2 2 4-5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="req-code2">COMP 249</span><span class="req-name2">Object-Oriented Programming II</span><span class="req-cr">3.5</span><span class="req-status-pill"><span class="badge" style="background:var(--success-soft); color:var(--success);">A</span></span></div>
+              <div class="req-row2"><span class="req-status-icon enrolled">●</span><span class="req-code2">COMP 352</span><span class="req-name2">Data Structures &amp; Algorithms</span><span class="req-cr">3.5</span><span class="req-status-pill"><span class="badge" style="background:var(--accent-soft); color:var(--accent-hover);"><span class="badge-dot" style="background:var(--accent);"></span>Fall 26</span></span></div>
+              <div class="req-row2"><span class="req-status-icon planned">○</span><span class="req-code2">SOEN 341</span><span class="req-name2">Software Process</span><span class="req-cr">3.5</span><span class="req-status-pill"><span class="badge" style="background:var(--warning-soft); color:var(--warning);"><span class="badge-dot" style="background:var(--warning);"></span>Prereq</span></span></div>
+              <div class="req-row2"><span class="req-status-icon planned">○</span><span class="req-code2">SOEN 387</span><span class="req-name2">Web-Based Enterprise Application Design</span><span class="req-cr">3.5</span><span class="req-status-pill"><span class="badge" style="background:var(--surface-2); color:var(--text-muted);">Winter 27</span></span></div>
+              <div class="req-row2"><span class="req-status-icon planned">○</span><span class="req-code2">SOEN 390</span><span class="req-name2">Team Design Project</span><span class="req-cr">3.5</span><span class="req-status-pill"><span class="badge" style="background:var(--surface-2); color:var(--text-muted);">Fall 27</span></span></div>
+              <div class="req-row2"><span class="req-status-icon missing">?</span><span class="req-code2">SOEN 490</span><span class="req-name2">Capstone</span><span class="req-cr">6.0</span><span class="req-status-pill"><span class="badge" style="background:var(--surface-2); color:var(--text-subtle);">Not planned</span></span></div>
+            </div>
+          </div>
+
+          <!-- CATEGORY 2: Math (compact) -->
+          <div class="req-cat">
+            <div class="req-cat-head">
+              <div class="req-cat-l">
+                <div>
+                  <div class="req-cat-h">Mathematics &amp; Statistics</div>
+                  <div class="req-cat-sub">14 credits · all done</div>
+                </div>
+              </div>
+              <div class="flex items-center gap-3">
+                <div class="req-cat-prog"><div class="req-cat-prog-fill" style="width: 100%;"></div></div>
+                <span class="req-cat-pct tnum">14 / 14</span>
+              </div>
+            </div>
+            <div class="req-list">
+              <div class="req-row2"><span class="req-status-icon done"><svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 5l2 2 4-5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="req-code2">MATH 204</span><span class="req-name2">Vectors &amp; Matrices</span><span class="req-cr">3.0</span><span class="req-status-pill"><span class="badge" style="background:var(--success-soft); color:var(--success);">B+</span></span></div>
+              <div class="req-row2"><span class="req-status-icon done"><svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 5l2 2 4-5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="req-code2">MATH 205</span><span class="req-name2">Differential &amp; Integral Calculus II</span><span class="req-cr">3.0</span><span class="req-status-pill"><span class="badge" style="background:var(--success-soft); color:var(--success);">B</span></span></div>
+              <div class="req-row2"><span class="req-status-icon done"><svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 5l2 2 4-5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="req-code2">STAT 249</span><span class="req-name2">Probability</span><span class="req-cr">3.5</span><span class="req-status-pill"><span class="badge" style="background:var(--success-soft); color:var(--success);">A−</span></span></div>
+            </div>
+          </div>
+
+          <!-- Capstone — alone, partially missing -->
+          <div class="req-cat">
+            <div class="req-cat-head">
+              <div class="req-cat-l">
+                <div>
+                  <div class="req-cat-h">Capstone &amp; Engineering Practice</div>
+                  <div class="req-cat-sub">8 credits · nothing planned yet</div>
+                </div>
+              </div>
+              <div class="flex items-center gap-3">
+                <div class="req-cat-prog"><div class="req-cat-prog-fill" style="width: 0%;"></div></div>
+                <span class="req-cat-pct tnum" style="color: var(--text-subtle);">0 / 8</span>
+              </div>
+            </div>
+            <div class="req-list">
+              <div class="req-row2"><span class="req-status-icon missing">?</span><span class="req-code2">SOEN 490</span><span class="req-name2">Capstone Software Engineering Design Project</span><span class="req-cr">6.0</span><span class="req-status-pill"><span class="badge" style="background:var(--surface-2); color:var(--text-subtle);">Not planned</span></span></div>
+              <div class="req-row2"><span class="req-status-icon missing">?</span><span class="req-code2">ENGR 290</span><span class="req-name2">Engineering Design Practice</span><span class="req-cr">2.0</span><span class="req-status-pill"><span class="badge" style="background:var(--surface-2); color:var(--text-subtle);">Not planned</span></span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================ PUBLIC PROFILE -->
+  <section id="profile">
+    <div class="flex items-end justify-between mb-4 flex-wrap gap-3">
+      <div>
+        <div class="eyebrow">04</div>
+        <h2 class="h2 mt-2">Public profile · /u/amir-ghadimi</h2>
+        <p class="body mt-2" style="color: var(--text-muted); max-width: 640px;">
+          Shareable snapshot of degree progress — for recruiters, advisors, or just family. Sensitive details (grades, GPA) hidden by default.
+        </p>
+      </div>
+    </div>
+
+    <div class="frame">
+      <div class="frame-bar"><div class="dots"><span class="dot"></span><span class="dot"></span><span class="dot"></span></div><span>compass.dev/u/amir-ghadimi</span><span><span class="palette-kbd">public</span></span></div>
+      <div class="frame-body" style="background: var(--surface);">
+
+        <div class="profile-hero">
+          <div class="pp-cover"></div>
+          <div class="pp-body">
+            <div class="flex items-end gap-5 flex-wrap">
+              <span class="pp-avatar">AG</span>
+              <div style="flex: 1;">
+                <div class="pp-name">Amir Ghadimi</div>
+                <div class="pp-handle">@amir-ghadimi · compass.dev/u/amir-ghadimi</div>
+                <div class="pp-row">
+                  <span class="pp-meta-item"><svg width="13" height="13" viewBox="0 0 13 13" fill="none"><circle cx="6.5" cy="6.5" r="5" stroke="currentColor" stroke-width="1.3"/><path d="M6.5 2v9M2 6.5h9" stroke="currentColor" stroke-width="1.3"/></svg>Concordia · SOEN BEng</span>
+                  <span class="pp-meta-item"><svg width="13" height="13" viewBox="0 0 13 13" fill="none"><circle cx="6.5" cy="6.5" r="5" stroke="currentColor" stroke-width="1.3"/></svg>Year 3 · expected Winter 2028</span>
+                  <span class="pp-meta-item"><svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M2 6.5L5 9.5L11 3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>Open to internships</span>
+                </div>
+              </div>
+              <div class="flex items-center gap-2">
+                <button class="btn btn-sm btn-secondary focus-ring">Share</button>
+                <button class="btn btn-sm btn-primary focus-ring">Contact</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Stats -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mt-5">
+          <div class="pp-stat"><div class="pp-stat-label">Progress</div><div class="pp-stat-value">87<span style="color: var(--text-subtle); font-weight: 500; font-size: 16px;"> / 120</span></div><div class="pp-stat-sub">72.5% complete</div></div>
+          <div class="pp-stat"><div class="pp-stat-label">On track</div><div class="pp-stat-value" style="color: var(--accent-hover);"><span class="dark:[color:var(--accent)]">Winter '28</span></div><div class="pp-stat-sub" style="color: var(--success);">1 term ahead</div></div>
+          <div class="pp-stat"><div class="pp-stat-label">Completed terms</div><div class="pp-stat-value">5</div><div class="pp-stat-sub">28 courses passed</div></div>
+          <div class="pp-stat"><div class="pp-stat-label">Focus</div><div class="pp-stat-value" style="font-size: 16px; padding-top: 6px;">Backend &amp; Systems</div><div class="pp-stat-sub">Self-declared track</div></div>
+        </div>
+
+        <!-- Plan summary -->
+        <div class="mt-7">
+          <div class="eyebrow mb-3">Plan summary</div>
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+            <div class="pp-term">
+              <div class="pp-term-h"><span class="pp-term-name">Fall 2026 · enrolled</span><span class="badge" style="background:var(--accent-soft); color:var(--accent-hover);"><span class="badge-dot" style="background:var(--accent);"></span>Now</span></div>
+              <div class="pp-term-list">
+                <div class="pp-course"><span class="pp-course-code">COMP 352</span><span class="pp-course-name">Data Structures &amp; Algorithms</span></div>
+                <div class="pp-course"><span class="pp-course-code">COMP 335</span><span class="pp-course-name">Theoretical Computer Science</span></div>
+                <div class="pp-course"><span class="pp-course-code">SOEN 341</span><span class="pp-course-name">Software Process</span></div>
+                <div class="pp-course"><span class="pp-course-code">ENGR 391</span><span class="pp-course-name">Numerical Methods</span></div>
+              </div>
+            </div>
+            <div class="pp-term">
+              <div class="pp-term-h"><span class="pp-term-name">Winter 2027 · planned</span></div>
+              <div class="pp-term-list">
+                <div class="pp-course"><span class="pp-course-code">SOEN 387</span><span class="pp-course-name">Web Enterprise Apps</span></div>
+                <div class="pp-course"><span class="pp-course-code">COMP 354</span><span class="pp-course-name">Software Engineering</span></div>
+              </div>
+            </div>
+            <div class="pp-term">
+              <div class="pp-term-h"><span class="pp-term-name">Year 4 · draft</span></div>
+              <div class="pp-term-list">
+                <div class="pp-course"><span class="pp-course-code">SOEN 490</span><span class="pp-course-name">Capstone Design Project</span></div>
+                <div class="pp-course"><span class="pp-course-code">SOEN 363</span><span class="pp-course-name">Data Systems for SE</span></div>
+                <div class="pp-course"><span class="pp-course-code">SOEN 487</span><span class="pp-course-name">Web Services &amp; Applications</span></div>
+                <div class="pp-course"><span class="pp-course-code">…</span><span class="pp-course-name">+ 4 more</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="caption mt-6">Grades and GPA are hidden by default · <a href="#" style="color: var(--accent-hover); font-weight: 500;" class="dark:[color:var(--accent)]">privacy settings</a></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================ SETTINGS -->
+  <section id="settings">
+    <div class="flex items-end justify-between mb-4 flex-wrap gap-3">
+      <div>
+        <div class="eyebrow">05</div>
+        <h2 class="h2 mt-2">Settings</h2>
+        <p class="body mt-2" style="color: var(--text-muted); max-width: 640px;">
+          Sectioned left-nav. Each row uses one clear control — switch, dropdown, or button. No accordions, no nested tabs.
+        </p>
+      </div>
+    </div>
+
+    <div class="frame">
+      <div class="frame-bar"><div class="dots"><span class="dot"></span><span class="dot"></span><span class="dot"></span></div><span>compass.dev/settings/account</span><span></span></div>
+      <div class="frame-body" style="background: var(--surface);">
+        <div class="set-grid">
+          <nav class="set-nav">
+            <div class="set-nav-item">Profile</div>
+            <div class="set-nav-item active">Account</div>
+            <div class="set-nav-item">Privacy</div>
+            <div class="set-nav-item">Notifications</div>
+            <div class="set-nav-item">Import &amp; Export</div>
+            <div class="set-nav-item">Appearance</div>
+            <div class="set-nav-item">Keyboard</div>
+            <div class="set-nav-item" style="color: var(--danger);">Delete account</div>
+          </nav>
+
+          <div class="space-y-5">
+            <!-- Identity -->
+            <div class="set-card">
+              <div class="eyebrow mb-3">Identity</div>
+              <div class="set-row">
+                <div class="set-row-l">
+                  <div class="set-row-name">Email</div>
+                  <div class="set-row-sub mono tnum">amir.ghadimi@mail.concordia.ca</div>
+                </div>
+                <button class="btn btn-sm btn-secondary focus-ring">Change</button>
+              </div>
+              <div class="set-row">
+                <div class="set-row-l">
+                  <div class="set-row-name">Concordia student ID</div>
+                  <div class="set-row-sub mono tnum">40213847 · verified</div>
+                </div>
+                <span class="badge" style="background: var(--success-soft); color: var(--success);"><span class="badge-dot" style="background: var(--success);"></span>Verified</span>
+              </div>
+              <div class="set-row">
+                <div class="set-row-l">
+                  <div class="set-row-name">Program</div>
+                  <div class="set-row-sub">Software Engineering BEng · 2024–2028 calendar year</div>
+                </div>
+                <button class="btn btn-sm btn-ghost focus-ring">Change track</button>
+              </div>
+            </div>
+
+            <!-- Sessions -->
+            <div class="set-card">
+              <div class="eyebrow mb-3">Active sessions</div>
+              <div class="set-row">
+                <div class="set-row-l">
+                  <div class="set-row-name">MacBook Pro · Montreal <span class="caption mono">· this device</span></div>
+                  <div class="set-row-sub">Last active just now · Safari 17</div>
+                </div>
+                <button class="btn btn-sm btn-ghost focus-ring" disabled style="opacity: 0.5; cursor: not-allowed;">Current</button>
+              </div>
+              <div class="set-row">
+                <div class="set-row-l">
+                  <div class="set-row-name">iPhone 15 · Montreal</div>
+                  <div class="set-row-sub">Last active 4 hours ago</div>
+                </div>
+                <button class="btn btn-sm btn-secondary focus-ring">Sign out</button>
+              </div>
+            </div>
+
+            <!-- Preferences (a sampler from other sections) -->
+            <div class="set-card">
+              <div class="eyebrow mb-3">Preferences</div>
+              <div class="set-row">
+                <div class="set-row-l">
+                  <div class="set-row-name">Compass insights</div>
+                  <div class="set-row-sub">Show AI tips on the planner and dashboard.</div>
+                </div>
+                <span class="switch on focus-ring" tabindex="0"></span>
+              </div>
+              <div class="set-row">
+                <div class="set-row-l">
+                  <div class="set-row-name">Public profile</div>
+                  <div class="set-row-sub">Anyone with the link can see your plan summary. Grades stay hidden.</div>
+                </div>
+                <span class="switch on focus-ring" tabindex="0"></span>
+              </div>
+              <div class="set-row">
+                <div class="set-row-l">
+                  <div class="set-row-name">Email digests</div>
+                  <div class="set-row-sub">Weekly summary of deadlines, conflicts, and AI suggestions.</div>
+                </div>
+                <span class="switch focus-ring" tabindex="0"></span>
+              </div>
+              <div class="set-row">
+                <div class="set-row-l">
+                  <div class="set-row-name">Default term load</div>
+                  <div class="set-row-sub">Used as the workload guardrail.</div>
+                </div>
+                <select class="input focus-ring" style="height: 32px; padding: 0 32px 0 12px;">
+                  <option>Light · 10–11 cr</option>
+                  <option selected>Medium · 13–14 cr</option>
+                  <option>Heavy · 15+ cr</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Danger zone -->
+            <div class="set-card" style="border-color: color-mix(in oklch, var(--danger) 25%, var(--border));">
+              <div class="eyebrow mb-3" style="color: var(--danger);">Danger zone</div>
+              <div class="set-row">
+                <div class="set-row-l">
+                  <div class="set-row-name">Reset plan</div>
+                  <div class="set-row-sub">Clears all future-term courses. Past terms (with grades) stay intact.</div>
+                </div>
+                <button class="btn btn-sm btn-secondary focus-ring" style="color: var(--danger); border-color: color-mix(in oklch, var(--danger) 30%, var(--border));">Reset plan</button>
+              </div>
+              <div class="set-row">
+                <div class="set-row-l">
+                  <div class="set-row-name">Delete account</div>
+                  <div class="set-row-sub">Permanent. We'll email a copy of your plan first.</div>
+                </div>
+                <button class="btn btn-sm focus-ring" style="background: var(--danger); color: var(--primary-fg); height: 28px; padding: 0 12px; font-size: 12px; border-radius: var(--r-sm);">Delete</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="mx-auto max-w-[1280px] px-8 pb-16 pt-2 caption mono flex items-center justify-between">
+  <span>SOEN Compass · Phase 10 of 10</span>
+  <span>complete · all screens designed</span>
+</footer>
+
+<script>
+  const root = document.body;
+  document.getElementById('modeLight').addEventListener('click', () => { root.classList.remove('dark'); document.getElementById('modeLight').setAttribute('aria-pressed','true'); document.getElementById('modeDark').setAttribute('aria-pressed','false'); });
+  document.getElementById('modeDark').addEventListener('click',  () => { root.classList.add('dark');    document.getElementById('modeLight').setAttribute('aria-pressed','false'); document.getElementById('modeDark').setAttribute('aria-pressed','true'); });
+
+  // Smooth-scroll for index links + active state
+  const links = document.querySelectorAll('.index-link');
+  links.forEach(link => link.addEventListener('click', (e) => {
+    e.preventDefault();
+    document.querySelector(link.getAttribute('href'))?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    links.forEach(l => l.classList.remove('active'));
+    link.classList.add('active');
+  }));
+</script>
+
+</body>
+</html>

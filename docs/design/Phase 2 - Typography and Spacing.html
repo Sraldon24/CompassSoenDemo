@@ -1,0 +1,851 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>SOEN Compass — Phase 2: Typography &amp; Spacing</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@400;500;600&family=Geist:wght@400;500;600&display=swap" rel="stylesheet" />
+<script src="https://cdn.tailwindcss.com?plugins=forms"></script>
+<style>
+  /* =========================================================================
+     SOEN COMPASS · LOCKED TOKENS · Graphite + Emerald
+     ========================================================================= */
+  :root {
+    /* font */
+    --font-sans: "Geist", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    --font-mono: "Geist Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+
+    /* type scale */
+    --fs-12: 12px;
+    --fs-14: 14px;
+    --fs-16: 16px;
+    --fs-18: 18px;
+    --fs-20: 20px;
+    --fs-24: 24px;
+    --fs-30: 30px;
+    --fs-36: 36px;
+
+    /* line-height */
+    --lh-heading: 1.1;
+    --lh-heading-lg: 1.15;
+    --lh-snug: 1.3;
+    --lh-body: 1.5;
+
+    /* tracking */
+    --tr-display: -0.03em;
+    --tr-h2: -0.025em;
+    --tr-h3: -0.02em;
+    --tr-h4: -0.01em;
+    --tr-body: 0;
+    --tr-eyebrow: 0.16em;
+
+    /* weights */
+    --w-regular: 400;
+    --w-medium: 500;
+    --w-semibold: 600;
+
+    /* spacing (4 px base) */
+    --s-0: 0;
+    --s-1: 4px;
+    --s-2: 8px;
+    --s-3: 12px;
+    --s-4: 16px;
+    --s-5: 20px;
+    --s-6: 24px;
+    --s-8: 32px;
+    --s-10: 40px;
+    --s-12: 48px;
+    --s-16: 64px;
+    --s-20: 80px;
+    --s-24: 96px;
+
+    /* radius */
+    --r-sm: 6px;
+    --r-md: 8px;
+    --r-lg: 12px;
+    --r-xl: 16px;
+    --r-full: 9999px;
+
+    /* elevation (subtle, elevated surfaces only) */
+    --shadow-sm: 0 1px 2px rgba(0,0,0,0.06), 0 1px 1px rgba(0,0,0,0.04);
+    --shadow-md: 0 4px 12px rgba(0,0,0,0.06), 0 2px 4px rgba(0,0,0,0.04);
+    --shadow-lg: 0 12px 32px rgba(0,0,0,0.08), 0 4px 8px rgba(0,0,0,0.05);
+
+    /* sizes */
+    --h-sm: 28px;
+    --h-md: 36px;
+    --h-lg: 40px;
+  }
+
+  /* Graphite + Emerald — light (default) */
+  .theme-graphite {
+    --bg:           oklch(0.990 0.002 240);
+    --surface:      oklch(0.980 0.002 240);
+    --surface-2:    oklch(0.965 0.003 240);
+    --border:       oklch(0.910 0.004 240);
+    --border-strong:oklch(0.840 0.005 240);
+    --text:         oklch(0.180 0.005 240);
+    --text-muted:   oklch(0.500 0.005 240);
+    --text-subtle:  oklch(0.630 0.005 240);
+    --primary:      oklch(0.220 0.010 240);
+    --primary-hover:oklch(0.150 0.010 240);
+    --primary-fg:   oklch(0.985 0.002 240);
+    --accent:       oklch(0.580 0.150 155);
+    --accent-hover: oklch(0.510 0.160 155);
+    --accent-soft:  oklch(0.957 0.035 155);
+    --success:      oklch(0.595 0.130 158);
+    --success-soft: oklch(0.955 0.025 158);
+    --warning:      oklch(0.720 0.140 75);
+    --warning-soft: oklch(0.965 0.030 80);
+    --danger:       oklch(0.580 0.195 25);
+    --danger-soft:  oklch(0.960 0.025 25);
+  }
+  .theme-graphite.dark {
+    --bg:           oklch(0.150 0.004 240);
+    --surface:      oklch(0.190 0.005 240);
+    --surface-2:    oklch(0.225 0.005 240);
+    --border:       oklch(0.280 0.006 240);
+    --border-strong:oklch(0.360 0.007 240);
+    --text:         oklch(0.975 0.003 240);
+    --text-muted:   oklch(0.700 0.005 240);
+    --text-subtle:  oklch(0.570 0.005 240);
+    --primary:      oklch(0.975 0.003 240);
+    --primary-hover:oklch(0.900 0.004 240);
+    --primary-fg:   oklch(0.150 0.004 240);
+    --accent:       oklch(0.725 0.150 155);
+    --accent-hover: oklch(0.780 0.145 155);
+    --accent-soft:  oklch(0.278 0.060 155);
+    --success:      oklch(0.720 0.135 158);
+    --success-soft: oklch(0.265 0.050 158);
+    --warning:      oklch(0.800 0.135 75);
+    --warning-soft: oklch(0.290 0.055 80);
+    --danger:       oklch(0.700 0.175 25);
+    --danger-soft:  oklch(0.290 0.070 25);
+  }
+
+  html, body { font-family: var(--font-sans); -webkit-font-smoothing: antialiased; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+  }
+
+  .mono     { font-family: var(--font-mono); font-feature-settings: "ss01", "cv01"; }
+  .tnum     { font-variant-numeric: tabular-nums slashed-zero; }
+  .eyebrow  { font-family: var(--font-mono); font-size: 11px; letter-spacing: var(--tr-eyebrow); text-transform: uppercase; color: var(--text-subtle); }
+
+  /* heading classes */
+  .h1 { font-size: var(--fs-36); line-height: var(--lh-heading); letter-spacing: var(--tr-display); font-weight: var(--w-semibold); }
+  .h2 { font-size: var(--fs-30); line-height: var(--lh-heading); letter-spacing: var(--tr-display); font-weight: var(--w-semibold); }
+  .h3 { font-size: var(--fs-24); line-height: var(--lh-heading-lg); letter-spacing: var(--tr-h3); font-weight: var(--w-semibold); }
+  .h4 { font-size: var(--fs-20); line-height: var(--lh-snug); letter-spacing: var(--tr-h4); font-weight: var(--w-semibold); }
+  .body-lg { font-size: var(--fs-18); line-height: var(--lh-body); letter-spacing: var(--tr-body); }
+  .body    { font-size: var(--fs-16); line-height: var(--lh-body); letter-spacing: var(--tr-body); }
+  .body-sm { font-size: var(--fs-14); line-height: 1.45; letter-spacing: 0.005em; }
+  .caption { font-size: var(--fs-12); line-height: 1.4; letter-spacing: 0.01em; color: var(--text-muted); }
+
+  /* surface helpers */
+  .surface { background: var(--surface); border: 1px solid var(--border); }
+  .surface-2 { background: var(--surface-2); border: 1px solid var(--border); }
+
+  /* focus ring — emerald, 2px + 2px offset */
+  :where(button, input, select, textarea, [tabindex], a) :focus,
+  :where(button, input, select, textarea, [tabindex], a):focus { outline: none; }
+  .focus-ring:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+    border-radius: inherit;
+  }
+
+  /* buttons */
+  .btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; font-weight: var(--w-medium); white-space: nowrap; user-select: none; transition: background 120ms ease, border-color 120ms ease, color 120ms ease, box-shadow 120ms ease; }
+  .btn-sm { height: var(--h-sm); padding: 0 var(--s-3); font-size: 12px; border-radius: var(--r-sm); }
+  .btn-md { height: var(--h-md); padding: 0 var(--s-4); font-size: 13px; border-radius: var(--r-md); }
+  .btn-lg { height: var(--h-lg); padding: 0 var(--s-5); font-size: 14px; border-radius: var(--r-md); }
+  .btn-primary   { background: var(--primary); color: var(--primary-fg); }
+  .btn-primary:hover { background: var(--primary-hover); }
+  .btn-secondary { background: var(--surface); color: var(--text); border: 1px solid var(--border); }
+  .btn-secondary:hover { border-color: var(--border-strong); background: var(--surface-2); }
+  .btn-ghost     { background: transparent; color: var(--text-muted); }
+  .btn-ghost:hover { color: var(--text); background: var(--surface-2); }
+  .btn-accent    { background: var(--accent); color: var(--primary-fg); }
+  .btn-accent:hover { background: var(--accent-hover); }
+  .btn-danger    { background: var(--danger); color: var(--primary-fg); }
+
+  /* inputs */
+  .input { background: var(--surface); border: 1px solid var(--border); color: var(--text); border-radius: var(--r-md); transition: border-color 120ms ease, box-shadow 120ms ease; }
+  .input::placeholder { color: var(--text-subtle); }
+  .input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px color-mix(in oklch, var(--accent) 18%, transparent); outline: none; }
+  .input-sm { height: var(--h-sm); padding: 0 var(--s-3); font-size: 13px; }
+  .input-md { height: var(--h-md); padding: 0 var(--s-4); font-size: 14px; }
+  .input-lg { height: var(--h-lg); padding: 0 var(--s-4); font-size: 14px; }
+
+  /* badges */
+  .badge { display: inline-flex; align-items: center; gap: 6px; height: 22px; padding: 0 8px; font-size: 11px; font-weight: var(--w-medium); border-radius: var(--r-full); white-space: nowrap; }
+  .badge-dot { width: 6px; height: 6px; border-radius: var(--r-full); }
+
+  /* inline code */
+  code.inline {
+    font-family: var(--font-mono);
+    font-size: 0.9em;
+    padding: 1px 5px;
+    border-radius: var(--r-sm);
+    background: var(--accent-soft);
+    color: var(--accent-hover);
+    font-feature-settings: "ss01", "cv01";
+  }
+  .dark code.inline { color: var(--accent); }
+
+  /* swatch border */
+  .hairline { border: 1px solid var(--border); }
+
+  /* checkbox / radio — custom appearance */
+  .check, .radio {
+    appearance: none; -webkit-appearance: none;
+    width: 16px; height: 16px;
+    background: var(--surface);
+    border: 1px solid var(--border-strong);
+    transition: background 120ms ease, border-color 120ms ease, box-shadow 120ms ease;
+    cursor: pointer;
+    display: inline-grid; place-content: center;
+    flex-shrink: 0;
+  }
+  .check { border-radius: 4px; }
+  .radio { border-radius: var(--r-full); }
+  .check:checked, .radio:checked { background: var(--accent); border-color: var(--accent); }
+  .check:checked::after {
+    content: "";
+    width: 10px; height: 10px;
+    background: var(--primary-fg);
+    -webkit-mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 10' fill='none'><path d='M2 5l2 2 4-5' stroke='black' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/></svg>") center / contain no-repeat;
+            mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 10' fill='none'><path d='M2 5l2 2 4-5' stroke='black' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/></svg>") center / contain no-repeat;
+  }
+  .dark .check:checked::after { background: oklch(0.150 0.004 240); }
+  .radio:checked::after { content: ""; width: 6px; height: 6px; border-radius: var(--r-full); background: var(--primary-fg); }
+  .dark .radio:checked::after { background: oklch(0.150 0.004 240); }
+  .check:focus-visible, .radio:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .field-row { display: inline-flex; align-items: center; gap: 8px; cursor: pointer; }
+  .field-row .body-sm { user-select: none; }
+
+  /* "blueprint" backing for samples */
+  .demo {
+    background:
+      linear-gradient(var(--border) 1px, transparent 1px) 0 0 / 24px 24px,
+      linear-gradient(90deg, var(--border) 1px, transparent 1px) 0 0 / 24px 24px,
+      var(--surface);
+    background-blend-mode: normal;
+    opacity: 1;
+  }
+  .demo-plain { background: var(--surface); }
+
+  /* tokens grid divider line */
+  .row + .row { border-top: 1px solid var(--border); }
+
+  /* scrollable theme toggle pill */
+  .pill { display: inline-flex; padding: 3px; border-radius: var(--r-full); background: var(--surface-2); border: 1px solid var(--border); }
+  .pill button { padding: 4px 12px; font-size: 12px; font-weight: var(--w-medium); border-radius: var(--r-full); color: var(--text-muted); }
+  .pill button[aria-pressed="true"] { background: var(--surface); color: var(--text); box-shadow: var(--shadow-sm); }
+</style>
+</head>
+<body class="theme-graphite">
+
+<!-- =================================================================== -->
+<!--  HEADER                                                               -->
+<!-- =================================================================== -->
+<header class="border-b" style="border-color:var(--border);">
+  <div class="mx-auto max-w-[1320px] px-8 py-10">
+    <div class="flex items-start justify-between gap-10 flex-wrap">
+      <div class="max-w-2xl">
+        <div class="eyebrow">SOEN Compass · Design System</div>
+        <h1 class="h1 mt-3">Phase 2 — Typography &amp; spacing</h1>
+        <p class="body mt-4" style="color:var(--text-muted);">
+          Locked Graphite + Emerald tokens, the full 12 → 36 type scale, weight rules, line-height pairing, numerics, the 4 px spacing scale, radius / shadow scales, and sized buttons / inputs / cards. Everything here gets imported into Phase 3 components — no revisits.
+        </p>
+      </div>
+
+      <div class="flex flex-col items-end gap-3">
+        <div class="pill" role="tablist">
+          <button id="modeLight" aria-pressed="true" class="focus-ring">Light</button>
+          <button id="modeDark"  aria-pressed="false" class="focus-ring">Dark</button>
+        </div>
+        <div class="caption mono">Graphite + Emerald · locked</div>
+      </div>
+    </div>
+
+    <!-- token meta strip -->
+    <div class="mt-10 grid grid-cols-2 md:grid-cols-4 gap-6 pt-6 border-t" style="border-color:var(--border);">
+      <div>
+        <div class="eyebrow">Sans</div>
+        <div class="body-sm mt-1.5" style="color:var(--text);">Geist · 400 / 500 / 600</div>
+      </div>
+      <div>
+        <div class="eyebrow">Mono</div>
+        <div class="body-sm mt-1.5" style="color:var(--text);">Geist Mono · slashed zero + tnum</div>
+      </div>
+      <div>
+        <div class="eyebrow">Spacing base</div>
+        <div class="body-sm mt-1.5" style="color:var(--text);">4 px (s-1 … s-24)</div>
+      </div>
+      <div>
+        <div class="eyebrow">Density</div>
+        <div class="body-sm mt-1.5" style="color:var(--text);">Balanced</div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<main class="mx-auto max-w-[1320px] px-8 py-12 space-y-20">
+
+  <!-- =================================================================== -->
+  <!--  1. TYPE SCALE                                                        -->
+  <!-- =================================================================== -->
+  <section>
+    <div class="flex items-end justify-between gap-6 mb-8">
+      <div>
+        <div class="eyebrow">01</div>
+        <h2 class="h2 mt-1">Type scale</h2>
+        <p class="body mt-3 max-w-xl" style="color:var(--text-muted);">
+          Eight steps from 12 to 36. Each row shows the actual rendered size with the token, line-height, tracking, and a usage note so we don't second-guess what "h2" means later.
+        </p>
+      </div>
+      <div class="mono caption hidden md:block">font-family · Geist</div>
+    </div>
+
+    <div class="rounded-xl hairline surface overflow-hidden">
+      <!-- 36 -->
+      <div class="row grid grid-cols-12 gap-6 px-6 py-6 items-baseline">
+        <div class="col-span-7 h1">The smart way to plan your degree</div>
+        <div class="col-span-2 mono caption tnum">36 / 1.1 / -0.03</div>
+        <div class="col-span-3 caption">h1 · hero, landing display</div>
+      </div>
+      <!-- 30 -->
+      <div class="row grid grid-cols-12 gap-6 px-6 py-6 items-baseline">
+        <div class="col-span-7 h2">Plan your software engineering degree</div>
+        <div class="col-span-2 mono caption tnum">30 / 1.1 / -0.03</div>
+        <div class="col-span-3 caption">h2 · page titles</div>
+      </div>
+      <!-- 24 -->
+      <div class="row grid grid-cols-12 gap-6 px-6 py-6 items-baseline">
+        <div class="col-span-7 h3">Recommended for your Fall 2026 term</div>
+        <div class="col-span-2 mono caption tnum">24 / 1.15 / -0.02</div>
+        <div class="col-span-3 caption">h3 · section heads</div>
+      </div>
+      <!-- 20 -->
+      <div class="row grid grid-cols-12 gap-6 px-6 py-6 items-baseline">
+        <div class="col-span-7 h4">Data Structures &amp; Algorithms</div>
+        <div class="col-span-2 mono caption tnum">20 / 1.3 / -0.01</div>
+        <div class="col-span-3 caption">h4 · card titles, dialogs</div>
+      </div>
+      <!-- 18 -->
+      <div class="row grid grid-cols-12 gap-6 px-6 py-6 items-baseline">
+        <div class="col-span-7 body-lg">A composable course planner with prereq awareness.</div>
+        <div class="col-span-2 mono caption tnum">18 / 1.5 / 0</div>
+        <div class="col-span-3 caption">body-lg · lead paragraphs</div>
+      </div>
+      <!-- 16 -->
+      <div class="row grid grid-cols-12 gap-6 px-6 py-6 items-baseline">
+        <div class="col-span-7 body" style="color:var(--text);">SOEN Compass walks you term-by-term through the SE program, surfacing prereq gaps and workload risk before you commit.</div>
+        <div class="col-span-2 mono caption tnum">16 / 1.5 / 0</div>
+        <div class="col-span-3 caption">body · default copy</div>
+      </div>
+      <!-- 14 -->
+      <div class="row grid grid-cols-12 gap-6 px-6 py-6 items-baseline">
+        <div class="col-span-7 body-sm" style="color:var(--text);">Used inside cards, list items, tables. The workhorse UI size.</div>
+        <div class="col-span-2 mono caption tnum">14 / 1.45 / 0.005</div>
+        <div class="col-span-3 caption">body-sm · UI default</div>
+      </div>
+      <!-- 12 -->
+      <div class="row grid grid-cols-12 gap-6 px-6 py-6 items-baseline">
+        <div class="col-span-7 caption" style="color:var(--text);">For metadata, captions, footnotes — never as body copy.</div>
+        <div class="col-span-2 mono caption tnum">12 / 1.4 / 0.01</div>
+        <div class="col-span-3 caption">caption · metadata, eyebrows</div>
+      </div>
+    </div>
+
+    <!-- weight axes -->
+    <div class="mt-10 grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div class="rounded-lg surface p-5">
+        <div class="eyebrow">Regular · 400</div>
+        <div class="mt-2 h4" style="font-weight:400;">Software engineering</div>
+        <p class="body-sm mt-2" style="color:var(--text-muted);">Default body weight. All running copy.</p>
+      </div>
+      <div class="rounded-lg surface p-5">
+        <div class="eyebrow">Medium · 500</div>
+        <div class="mt-2 h4" style="font-weight:500;">Software engineering</div>
+        <p class="body-sm mt-2" style="color:var(--text-muted);">UI controls — button labels, tabs, links, table headers.</p>
+      </div>
+      <div class="rounded-lg surface p-5">
+        <div class="eyebrow">Semibold · 600</div>
+        <div class="mt-2 h4" style="font-weight:600;">Software engineering</div>
+        <p class="body-sm mt-2" style="color:var(--text-muted);">All headings. The only weight that "anchors" hierarchy.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- =================================================================== -->
+  <!--  2. NUMERICS & CODE                                                   -->
+  <!-- =================================================================== -->
+  <section>
+    <div class="flex items-end justify-between gap-6 mb-8">
+      <div>
+        <div class="eyebrow">02</div>
+        <h2 class="h2 mt-1">Numerics &amp; course codes</h2>
+        <p class="body mt-3 max-w-xl" style="color:var(--text-muted);">
+          Course codes are Geist Mono with slashed zero — they need to align in columns and never be confused with each other. Stat numbers use tabular figures so they don't shimmy when they change.
+        </p>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <!-- Course codes -->
+      <div class="rounded-xl surface p-6">
+        <div class="eyebrow">Course code · mono + slashed zero</div>
+        <div class="mt-4 grid grid-cols-3 gap-x-6 gap-y-2">
+          <div class="mono body" style="font-size:16px;">COMP 352</div>
+          <div class="mono body" style="font-size:16px;">SOEN 341</div>
+          <div class="mono body" style="font-size:16px;">ENGR 201</div>
+          <div class="mono body" style="font-size:16px;">COMP 308</div>
+          <div class="mono body" style="font-size:16px;">SOEN 287</div>
+          <div class="mono body" style="font-size:16px;">MATH 204</div>
+          <div class="mono body" style="font-size:16px;">ELEC 275</div>
+          <div class="mono body" style="font-size:16px;">PHYS 205</div>
+          <div class="mono body" style="font-size:16px;">ENCS 282</div>
+        </div>
+        <p class="caption mt-4">Try writing <code class="inline">COMP 0xx</code> — zeros are slashed. Aligns at 4-character widths.</p>
+      </div>
+
+      <!-- Tabular figures -->
+      <div class="rounded-xl surface p-6">
+        <div class="eyebrow">Tabular figures · on data only</div>
+        <div class="mt-4 grid grid-cols-2 gap-4">
+          <div>
+            <div class="caption">Tabular</div>
+            <div class="tnum mt-1" style="font-size:24px;font-weight:500;">87 / 120 cr</div>
+            <div class="tnum mt-1" style="font-size:24px;font-weight:500;">11 / 120 cr</div>
+            <div class="tnum mt-1" style="font-size:24px;font-weight:500;">3.78 GPA</div>
+          </div>
+          <div>
+            <div class="caption">Proportional</div>
+            <div class="mt-1" style="font-size:24px;font-weight:500;">87 / 120 cr</div>
+            <div class="mt-1" style="font-size:24px;font-weight:500;">11 / 120 cr</div>
+            <div class="mt-1" style="font-size:24px;font-weight:500;">3.78 GPA</div>
+          </div>
+        </div>
+        <p class="caption mt-5">Tabular = digits stay in their lanes when the value changes. Use on credit progress, GPA, calendar, counters. Body copy stays proportional.</p>
+      </div>
+
+      <!-- Inline code in prose -->
+      <div class="rounded-xl surface p-6 md:col-span-2">
+        <div class="eyebrow">Inline code in prose</div>
+        <p class="body mt-3" style="color:var(--text);">
+          You can take <code class="inline">COMP 352</code> after <code class="inline">COMP 248</code> and <code class="inline">COMP 249</code>. Note: <code class="inline">SOEN 341</code> has a soft prereq of <code class="inline">ENGR 201</code> — Compass will warn if you try to register without it.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- =================================================================== -->
+  <!--  3. SPACING                                                            -->
+  <!-- =================================================================== -->
+  <section>
+    <div class="flex items-end justify-between gap-6 mb-8">
+      <div>
+        <div class="eyebrow">03</div>
+        <h2 class="h2 mt-1">Spacing scale</h2>
+        <p class="body mt-3 max-w-xl" style="color:var(--text-muted);">
+          4 px base. Tokens you'll reach for most: s-2, s-3, s-4, s-6. Reserve s-12 and up for page-level rhythm.
+        </p>
+      </div>
+    </div>
+
+    <div class="rounded-xl surface overflow-hidden">
+      <table class="w-full" style="border-collapse: collapse;">
+        <thead>
+          <tr class="text-left" style="border-bottom: 1px solid var(--border);">
+            <th class="px-6 py-3 caption" style="width:120px;">Token</th>
+            <th class="px-6 py-3 caption" style="width:120px;">Value</th>
+            <th class="px-6 py-3 caption">Visualization</th>
+            <th class="px-6 py-3 caption" style="width:280px;">Typical use</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td class="px-6 py-2.5 mono body-sm">s-1</td><td class="px-6 py-2.5 mono caption tnum">4 px</td><td class="px-6 py-2.5"><div style="height:6px;width:4px;background:var(--accent);"></div></td><td class="px-6 py-2.5 caption">Icon-to-label gap, tight stack</td></tr>
+          <tr><td class="px-6 py-2.5 mono body-sm">s-2</td><td class="px-6 py-2.5 mono caption tnum">8 px</td><td class="px-6 py-2.5"><div style="height:6px;width:8px;background:var(--accent);"></div></td><td class="px-6 py-2.5 caption">Item gap, badge padding-x</td></tr>
+          <tr><td class="px-6 py-2.5 mono body-sm">s-3</td><td class="px-6 py-2.5 mono caption tnum">12 px</td><td class="px-6 py-2.5"><div style="height:6px;width:12px;background:var(--accent);"></div></td><td class="px-6 py-2.5 caption">Form control inner padding</td></tr>
+          <tr><td class="px-6 py-2.5 mono body-sm">s-4</td><td class="px-6 py-2.5 mono caption tnum">16 px</td><td class="px-6 py-2.5"><div style="height:6px;width:16px;background:var(--accent);"></div></td><td class="px-6 py-2.5 caption">Card padding sm, button gap</td></tr>
+          <tr><td class="px-6 py-2.5 mono body-sm">s-5</td><td class="px-6 py-2.5 mono caption tnum">20 px</td><td class="px-6 py-2.5"><div style="height:6px;width:20px;background:var(--accent);"></div></td><td class="px-6 py-2.5 caption">Card padding md</td></tr>
+          <tr><td class="px-6 py-2.5 mono body-sm">s-6</td><td class="px-6 py-2.5 mono caption tnum">24 px</td><td class="px-6 py-2.5"><div style="height:6px;width:24px;background:var(--accent);"></div></td><td class="px-6 py-2.5 caption">Card padding lg, grid gap</td></tr>
+          <tr><td class="px-6 py-2.5 mono body-sm">s-8</td><td class="px-6 py-2.5 mono caption tnum">32 px</td><td class="px-6 py-2.5"><div style="height:6px;width:32px;background:var(--accent);"></div></td><td class="px-6 py-2.5 caption">Section inner padding</td></tr>
+          <tr><td class="px-6 py-2.5 mono body-sm">s-10</td><td class="px-6 py-2.5 mono caption tnum">40 px</td><td class="px-6 py-2.5"><div style="height:6px;width:40px;background:var(--accent);"></div></td><td class="px-6 py-2.5 caption">Card-stack gap</td></tr>
+          <tr><td class="px-6 py-2.5 mono body-sm">s-12</td><td class="px-6 py-2.5 mono caption tnum">48 px</td><td class="px-6 py-2.5"><div style="height:6px;width:48px;background:var(--accent);"></div></td><td class="px-6 py-2.5 caption">Section gap</td></tr>
+          <tr><td class="px-6 py-2.5 mono body-sm">s-16</td><td class="px-6 py-2.5 mono caption tnum">64 px</td><td class="px-6 py-2.5"><div style="height:6px;width:64px;background:var(--accent);"></div></td><td class="px-6 py-2.5 caption">Large section gap</td></tr>
+          <tr><td class="px-6 py-2.5 mono body-sm">s-20</td><td class="px-6 py-2.5 mono caption tnum">80 px</td><td class="px-6 py-2.5"><div style="height:6px;width:80px;background:var(--accent);"></div></td><td class="px-6 py-2.5 caption">Hero block top/bottom</td></tr>
+          <tr><td class="px-6 py-2.5 mono body-sm">s-24</td><td class="px-6 py-2.5 mono caption tnum">96 px</td><td class="px-6 py-2.5"><div style="height:6px;width:96px;background:var(--accent);"></div></td><td class="px-6 py-2.5 caption">Page-section breathing</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- =================================================================== -->
+  <!--  4. RADIUS, ELEVATION                                                  -->
+  <!-- =================================================================== -->
+  <section>
+    <div class="flex items-end justify-between gap-6 mb-8">
+      <div>
+        <div class="eyebrow">04</div>
+        <h2 class="h2 mt-1">Radius &amp; elevation</h2>
+        <p class="body mt-3 max-w-xl" style="color:var(--text-muted);">
+          Mid-curve radii — soft enough to feel modern, sharp enough to feel technical. Shadows only on truly elevated surfaces; everything else uses hairline borders.
+        </p>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <!-- Radius -->
+      <div class="rounded-xl surface p-6">
+        <div class="eyebrow">Radius</div>
+        <div class="mt-5 grid grid-cols-5 gap-4">
+          <div class="text-center">
+            <div class="mx-auto hairline surface-2" style="width:56px;height:56px;border-radius:6px;"></div>
+            <div class="caption mt-2 mono">sm · 6</div>
+            <div class="caption">badges, code</div>
+          </div>
+          <div class="text-center">
+            <div class="mx-auto hairline surface-2" style="width:56px;height:56px;border-radius:8px;"></div>
+            <div class="caption mt-2 mono">md · 8</div>
+            <div class="caption">buttons, inputs</div>
+          </div>
+          <div class="text-center">
+            <div class="mx-auto hairline surface-2" style="width:56px;height:56px;border-radius:12px;"></div>
+            <div class="caption mt-2 mono">lg · 12</div>
+            <div class="caption">cards</div>
+          </div>
+          <div class="text-center">
+            <div class="mx-auto hairline surface-2" style="width:56px;height:56px;border-radius:16px;"></div>
+            <div class="caption mt-2 mono">xl · 16</div>
+            <div class="caption">panels, modals</div>
+          </div>
+          <div class="text-center">
+            <div class="mx-auto hairline surface-2" style="width:56px;height:56px;border-radius:9999px;"></div>
+            <div class="caption mt-2 mono">full</div>
+            <div class="caption">pills, avatars</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Elevation -->
+      <div class="rounded-xl surface p-6">
+        <div class="eyebrow">Elevation · subtle, elevated only</div>
+        <div class="mt-5 grid grid-cols-3 gap-4">
+          <div class="text-center">
+            <div class="mx-auto surface" style="width:120px;height:80px;border-radius:8px;"></div>
+            <div class="caption mt-3 mono">none</div>
+            <div class="caption">cards, surfaces — borders do the work</div>
+          </div>
+          <div class="text-center">
+            <div class="mx-auto" style="width:120px;height:80px;border-radius:8px;background:var(--surface);box-shadow:var(--shadow-sm);"></div>
+            <div class="caption mt-3 mono">sm</div>
+            <div class="caption">dropdowns, popovers</div>
+          </div>
+          <div class="text-center">
+            <div class="mx-auto" style="width:120px;height:80px;border-radius:12px;background:var(--surface);box-shadow:var(--shadow-md);"></div>
+            <div class="caption mt-3 mono">md</div>
+            <div class="caption">modals, command palette</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- =================================================================== -->
+  <!--  5. BUTTONS                                                            -->
+  <!-- =================================================================== -->
+  <section>
+    <div class="flex items-end justify-between gap-6 mb-8">
+      <div>
+        <div class="eyebrow">05</div>
+        <h2 class="h2 mt-1">Buttons</h2>
+        <p class="body mt-3 max-w-xl" style="color:var(--text-muted);">
+          Three sizes × four variants. Primary is graphite ink (the workhorse). Accent emerald is reserved for the single most-important call to action on a screen.
+        </p>
+      </div>
+    </div>
+
+    <div class="rounded-xl surface overflow-hidden">
+      <!-- header row -->
+      <div class="grid grid-cols-12 gap-6 px-6 py-3 caption" style="border-bottom: 1px solid var(--border);">
+        <div class="col-span-2">Size</div>
+        <div class="col-span-2">Primary</div>
+        <div class="col-span-2">Accent</div>
+        <div class="col-span-2">Secondary</div>
+        <div class="col-span-2">Ghost</div>
+        <div class="col-span-2">Danger</div>
+      </div>
+      <!-- lg row -->
+      <div class="grid grid-cols-12 gap-6 px-6 py-5 items-center row">
+        <div class="col-span-2"><div class="mono body-sm">lg · 40</div><div class="caption">14 / 500</div></div>
+        <div class="col-span-2"><button class="btn btn-lg btn-primary focus-ring">Add to plan</button></div>
+        <div class="col-span-2"><button class="btn btn-lg btn-accent focus-ring">Try demo</button></div>
+        <div class="col-span-2"><button class="btn btn-lg btn-secondary focus-ring">Details</button></div>
+        <div class="col-span-2"><button class="btn btn-lg btn-ghost focus-ring">Skip</button></div>
+        <div class="col-span-2"><button class="btn btn-lg btn-danger focus-ring">Remove</button></div>
+      </div>
+      <!-- md row -->
+      <div class="grid grid-cols-12 gap-6 px-6 py-5 items-center row">
+        <div class="col-span-2"><div class="mono body-sm">md · 36</div><div class="caption">13 / 500</div></div>
+        <div class="col-span-2"><button class="btn btn-md btn-primary focus-ring">Add to plan</button></div>
+        <div class="col-span-2"><button class="btn btn-md btn-accent focus-ring">Try demo</button></div>
+        <div class="col-span-2"><button class="btn btn-md btn-secondary focus-ring">Details</button></div>
+        <div class="col-span-2"><button class="btn btn-md btn-ghost focus-ring">Skip</button></div>
+        <div class="col-span-2"><button class="btn btn-md btn-danger focus-ring">Remove</button></div>
+      </div>
+      <!-- sm row -->
+      <div class="grid grid-cols-12 gap-6 px-6 py-5 items-center row">
+        <div class="col-span-2"><div class="mono body-sm">sm · 28</div><div class="caption">12 / 500</div></div>
+        <div class="col-span-2"><button class="btn btn-sm btn-primary focus-ring">Add</button></div>
+        <div class="col-span-2"><button class="btn btn-sm btn-accent focus-ring">Try</button></div>
+        <div class="col-span-2"><button class="btn btn-sm btn-secondary focus-ring">Details</button></div>
+        <div class="col-span-2"><button class="btn btn-sm btn-ghost focus-ring">Skip</button></div>
+        <div class="col-span-2"><button class="btn btn-sm btn-danger focus-ring">Remove</button></div>
+      </div>
+    </div>
+
+    <p class="caption mt-3">Tab through the row above to see the emerald focus ring.</p>
+  </section>
+
+  <!-- =================================================================== -->
+  <!--  6. INPUTS                                                             -->
+  <!-- =================================================================== -->
+  <section>
+    <div class="flex items-end justify-between gap-6 mb-8">
+      <div>
+        <div class="eyebrow">06</div>
+        <h2 class="h2 mt-1">Inputs</h2>
+        <p class="body mt-3 max-w-xl" style="color:var(--text-muted);">
+          Three sizes matching button heights. Border on rest, emerald border + soft halo on focus, never a fill change.
+        </p>
+      </div>
+    </div>
+
+    <div class="rounded-xl surface p-6 grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div>
+        <label class="caption block mb-1.5">Search lg</label>
+        <input class="input input-lg w-full" placeholder="Search courses, e.g. COMP 352" />
+      </div>
+      <div>
+        <label class="caption block mb-1.5">Email md (default)</label>
+        <input class="input input-md w-full" placeholder="amir.ghadimi@mail.concordia.ca" />
+      </div>
+      <div>
+        <label class="caption block mb-1.5">Code sm</label>
+        <input class="input input-sm w-full mono" placeholder="COMP 352" />
+      </div>
+
+      <div>
+        <label class="caption block mb-1.5">Disabled</label>
+        <input class="input input-md w-full" placeholder="Locked field" disabled style="opacity:0.5; cursor:not-allowed;" />
+      </div>
+      <div>
+        <label class="caption block mb-1.5">Error</label>
+        <input class="input input-md w-full" value="bad@email" style="border-color: var(--danger);" />
+        <div class="caption mt-1.5" style="color: var(--danger);">Not a valid email address.</div>
+      </div>
+      <div>
+        <label class="caption block mb-1.5">With prefix</label>
+        <div class="input input-md w-full flex items-center" style="padding-left:0; padding-right:0;">
+          <span class="mono caption px-3" style="color:var(--text-subtle); border-right: 1px solid var(--border);">@</span>
+          <input class="w-full bg-transparent outline-none body-sm pl-3 pr-3" placeholder="username" />
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- =================================================================== -->
+  <!--  7. CARDS / SURFACES                                                   -->
+  <!-- =================================================================== -->
+  <section>
+    <div class="flex items-end justify-between gap-6 mb-8">
+      <div>
+        <div class="eyebrow">07</div>
+        <h2 class="h2 mt-1">Card padding</h2>
+        <p class="body mt-3 max-w-xl" style="color:var(--text-muted);">
+          Three padding sizes for cards. The same content rendered at each density — pick by information weight, not personal preference.
+        </p>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <!-- sm -->
+      <div class="rounded-xl surface" style="padding: var(--s-4);">
+        <div class="flex items-center justify-between">
+          <div class="mono caption tnum">COMP 352</div>
+          <span class="badge" style="background:var(--accent-soft); color:var(--accent-hover);"><span class="badge-dot" style="background:var(--accent);"></span>Enrolled</span>
+        </div>
+        <div class="h4 mt-1" style="font-size: 16px;">Data Structures &amp; Algorithms</div>
+        <div class="caption mt-1 mono tnum">3.5 cr · Fall 2026</div>
+        <div class="caption mt-4 mono">padding · s-4 / 16</div>
+      </div>
+      <!-- md -->
+      <div class="rounded-xl surface" style="padding: var(--s-5);">
+        <div class="flex items-center justify-between">
+          <div class="mono caption tnum">COMP 352</div>
+          <span class="badge" style="background:var(--accent-soft); color:var(--accent-hover);"><span class="badge-dot" style="background:var(--accent);"></span>Enrolled</span>
+        </div>
+        <div class="h4 mt-1.5" style="font-size: 18px;">Data Structures &amp; Algorithms</div>
+        <div class="caption mt-1.5 mono tnum">3.5 cr · Fall 2026 · Prof. Bhatt</div>
+        <div class="caption mt-5 mono">padding · s-5 / 20 (default)</div>
+      </div>
+      <!-- lg -->
+      <div class="rounded-xl surface" style="padding: var(--s-6);">
+        <div class="flex items-center justify-between">
+          <div class="mono caption tnum">COMP 352</div>
+          <span class="badge" style="background:var(--accent-soft); color:var(--accent-hover);"><span class="badge-dot" style="background:var(--accent);"></span>Enrolled</span>
+        </div>
+        <div class="h4 mt-2" style="font-size: 20px;">Data Structures &amp; Algorithms</div>
+        <div class="caption mt-2 mono tnum">3.5 cr · Fall 2026 · Prof. Bhatt · Tue/Thu 14:45</div>
+        <div class="caption mt-6 mono">padding · s-6 / 24</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- =================================================================== -->
+  <!--  8. FOCUS / INTERACTION                                                -->
+  <!-- =================================================================== -->
+  <section>
+    <div class="flex items-end justify-between gap-6 mb-8">
+      <div>
+        <div class="eyebrow">08</div>
+        <h2 class="h2 mt-1">Focus ring &amp; states</h2>
+        <p class="body mt-3 max-w-xl" style="color:var(--text-muted);">
+          2 px emerald outline, 2 px offset. Visible on keyboard nav, invisible on mouse click. Tab through the buttons below to test.
+        </p>
+      </div>
+    </div>
+
+    <div class="rounded-xl surface p-6">
+      <div class="flex flex-wrap gap-3">
+        <button class="btn btn-md btn-primary focus-ring">Primary</button>
+        <button class="btn btn-md btn-secondary focus-ring">Secondary</button>
+        <a href="#" class="btn btn-md btn-ghost focus-ring">Link-style</a>
+        <input class="input input-md focus-ring" placeholder="Try tabbing into this" style="width: 240px;" />
+        <label class="field-row">
+          <input type="checkbox" class="check" checked />
+          <span class="body-sm">Checkbox</span>
+        </label>
+        <label class="field-row">
+          <input type="radio" name="demo-radio" class="radio" checked />
+          <span class="body-sm">Radio</span>
+        </label>
+      </div>
+    </div>
+  </section>
+
+  <!-- =================================================================== -->
+  <!--  9. TOKEN REFERENCE                                                    -->
+  <!-- =================================================================== -->
+  <section>
+    <div class="flex items-end justify-between gap-6 mb-8">
+      <div>
+        <div class="eyebrow">09</div>
+        <h2 class="h2 mt-1">Locked tokens</h2>
+        <p class="body mt-3 max-w-xl" style="color:var(--text-muted);">
+          Full CSS variable reference. Copy this block straight into Tailwind v4's <code class="inline">@theme</code>.
+        </p>
+      </div>
+    </div>
+
+    <div class="rounded-xl surface p-6 grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-2">
+      <div class="mono body-sm tnum">
+        <div style="color:var(--text-subtle);" class="caption mb-2">— Color (light)</div>
+        <div>--bg <span style="color:var(--text-muted);">oklch(0.990 0.002 240)</span></div>
+        <div>--surface <span style="color:var(--text-muted);">oklch(0.980 0.002 240)</span></div>
+        <div>--border <span style="color:var(--text-muted);">oklch(0.910 0.004 240)</span></div>
+        <div>--text <span style="color:var(--text-muted);">oklch(0.180 0.005 240)</span></div>
+        <div>--primary <span style="color:var(--text-muted);">oklch(0.220 0.010 240)</span></div>
+        <div>--accent <span style="color:var(--text-muted);">oklch(0.580 0.150 155)</span></div>
+        <div>--accent-soft <span style="color:var(--text-muted);">oklch(0.957 0.035 155)</span></div>
+        <div>--success <span style="color:var(--text-muted);">oklch(0.595 0.130 158)</span></div>
+        <div>--warning <span style="color:var(--text-muted);">oklch(0.720 0.140 75)</span></div>
+        <div>--danger <span style="color:var(--text-muted);">oklch(0.580 0.195 25)</span></div>
+
+        <div style="color:var(--text-subtle);" class="caption mt-5 mb-2">— Color (dark)</div>
+        <div>--bg <span style="color:var(--text-muted);">oklch(0.150 0.004 240)</span></div>
+        <div>--surface <span style="color:var(--text-muted);">oklch(0.190 0.005 240)</span></div>
+        <div>--accent <span style="color:var(--text-muted);">oklch(0.725 0.150 155)</span></div>
+      </div>
+
+      <div class="mono body-sm tnum">
+        <div style="color:var(--text-subtle);" class="caption mb-2">— Type</div>
+        <div>--fs-12 → --fs-36 <span style="color:var(--text-muted);">12 / 14 / 16 / 18 / 20 / 24 / 30 / 36</span></div>
+        <div>--lh-heading <span style="color:var(--text-muted);">1.1</span></div>
+        <div>--lh-body <span style="color:var(--text-muted);">1.5</span></div>
+        <div>--tr-display <span style="color:var(--text-muted);">-0.03em</span></div>
+        <div>--w-regular / medium / semibold <span style="color:var(--text-muted);">400 / 500 / 600</span></div>
+
+        <div style="color:var(--text-subtle);" class="caption mt-5 mb-2">— Spacing (4 px base)</div>
+        <div>--s-1 → --s-24 <span style="color:var(--text-muted);">4 / 8 / 12 / 16 / 20 / 24 / 32 / 40 / 48 / 64 / 80 / 96</span></div>
+
+        <div style="color:var(--text-subtle);" class="caption mt-5 mb-2">— Radius</div>
+        <div>--r-sm / md / lg / xl / full <span style="color:var(--text-muted);">6 / 8 / 12 / 16 / 9999</span></div>
+
+        <div style="color:var(--text-subtle);" class="caption mt-5 mb-2">— Sizes</div>
+        <div>--h-sm / md / lg <span style="color:var(--text-muted);">28 / 36 / 40</span></div>
+
+        <div style="color:var(--text-subtle);" class="caption mt-5 mb-2">— Shadow</div>
+        <div>--shadow-sm <span style="color:var(--text-muted);">0 1px 2px / 0 1px 1px</span></div>
+        <div>--shadow-md <span style="color:var(--text-muted);">0 4px 12px / 0 2px 4px</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- =================================================================== -->
+  <!--  Next                                                                  -->
+  <!-- =================================================================== -->
+  <section class="rounded-xl surface p-8">
+    <div class="flex items-start justify-between gap-8 flex-wrap">
+      <div class="max-w-xl">
+        <div class="eyebrow">Next</div>
+        <h3 class="h3 mt-1">Approve → Phase 3: core components catalog</h3>
+        <p class="body mt-3" style="color:var(--text-muted);">
+          Phase 3 will build the reusable components from your brief: CourseCard (3 variants), TermColumn, CreditProgressBar, StatusBadge, AI message bubble, empty state, loading skeleton, toast, sidebar nav item — all wired to these locked tokens.
+        </p>
+        <p class="caption mt-3">
+          Want to tweak anything here before we lock? (e.g. <code class="inline">"buttons feel slightly tall"</code>, <code class="inline">"too much tracking on h1"</code>, <code class="inline">"add an xl button size"</code>)
+        </p>
+      </div>
+      <div class="mono caption tnum space-y-1.5" style="min-width:200px;">
+        <div>☐ &nbsp;Type scale</div>
+        <div>☐ &nbsp;Weights</div>
+        <div>☐ &nbsp;Numerics</div>
+        <div>☐ &nbsp;Spacing</div>
+        <div>☐ &nbsp;Radius / Elevation</div>
+        <div>☐ &nbsp;Buttons / Inputs / Cards</div>
+        <div>☐ &nbsp;Focus ring</div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="mx-auto max-w-[1320px] px-8 pb-16 pt-2 mono caption flex items-center justify-between">
+  <span>SOEN Compass · Phase 2 of 7</span>
+  <span>next → Phase 3: Components</span>
+</footer>
+
+<script>
+  // Light/Dark toggle
+  const root = document.body;
+  const lightBtn = document.getElementById('modeLight');
+  const darkBtn  = document.getElementById('modeDark');
+  function setMode(mode){
+    root.classList.toggle('dark', mode === 'dark');
+    lightBtn.setAttribute('aria-pressed', mode === 'light');
+    darkBtn .setAttribute('aria-pressed', mode === 'dark');
+  }
+  lightBtn.addEventListener('click', () => setMode('light'));
+  darkBtn .addEventListener('click', () => setMode('dark'));
+</script>
+
+</body>
+</html>

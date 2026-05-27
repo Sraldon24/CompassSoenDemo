@@ -1,0 +1,440 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8" /><meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>SOEN Compass — Deadlines &amp; Email Templates</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" /><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@400;500;600&family=Geist:wght@400;500;600&display=swap" rel="stylesheet" />
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+  :root { --font-sans:"Geist",ui-sans-serif,system-ui,sans-serif; --font-mono:"Geist Mono",ui-monospace,Menlo,monospace; --r-sm:6px; --r-md:8px; --r-lg:12px; --r-xl:16px; --r-full:9999px;
+    --shadow-sm:0 1px 2px rgba(0,0,0,.06),0 1px 1px rgba(0,0,0,.04); --shadow-md:0 4px 12px rgba(0,0,0,.06),0 2px 4px rgba(0,0,0,.04);
+    --h-sm:28px; --h-md:36px; }
+  .theme-graphite { --bg:oklch(0.990 0.002 240); --surface:oklch(0.980 0.002 240); --surface-2:oklch(0.965 0.003 240); --border:oklch(0.910 0.004 240); --border-strong:oklch(0.840 0.005 240);
+    --text:oklch(0.180 0.005 240); --text-muted:oklch(0.500 0.005 240); --text-subtle:oklch(0.630 0.005 240);
+    --primary:oklch(0.220 0.010 240); --primary-hover:oklch(0.150 0.010 240); --primary-fg:oklch(0.985 0.002 240);
+    --accent:oklch(0.580 0.150 155); --accent-hover:oklch(0.510 0.160 155); --accent-soft:oklch(0.957 0.035 155);
+    --success:oklch(0.595 0.130 158); --success-soft:oklch(0.955 0.025 158);
+    --warning:oklch(0.720 0.140 75); --warning-soft:oklch(0.965 0.030 80);
+    --danger:oklch(0.580 0.195 25); --danger-soft:oklch(0.960 0.025 25); }
+  .theme-graphite.dark { --bg:oklch(0.150 0.004 240); --surface:oklch(0.190 0.005 240); --surface-2:oklch(0.225 0.005 240); --border:oklch(0.280 0.006 240); --border-strong:oklch(0.360 0.007 240);
+    --text:oklch(0.975 0.003 240); --text-muted:oklch(0.700 0.005 240); --text-subtle:oklch(0.570 0.005 240);
+    --primary:oklch(0.975 0.003 240); --primary-hover:oklch(0.900 0.004 240); --primary-fg:oklch(0.150 0.004 240);
+    --accent:oklch(0.725 0.150 155); --accent-hover:oklch(0.780 0.145 155); --accent-soft:oklch(0.278 0.060 155);
+    --success:oklch(0.720 0.135 158); --success-soft:oklch(0.265 0.050 158);
+    --warning:oklch(0.800 0.135 75); --warning-soft:oklch(0.290 0.055 80);
+    --danger:oklch(0.700 0.175 25); --danger-soft:oklch(0.290 0.070 25); }
+
+  html,body{font-family:var(--font-sans);-webkit-font-smoothing:antialiased}
+  body{background:var(--bg);color:var(--text);min-height:100vh}
+  .mono{font-family:var(--font-mono);font-feature-settings:"ss01","cv01"} .tnum{font-variant-numeric:tabular-nums slashed-zero}
+  .eyebrow{font-family:var(--font-mono);font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--text-subtle)}
+  .h1{font-size:30px;line-height:1.1;letter-spacing:-.03em;font-weight:600}
+  .h2{font-size:22px;line-height:1.15;letter-spacing:-.02em;font-weight:600}
+  .h3{font-size:16px;line-height:1.25;letter-spacing:-.01em;font-weight:600}
+  .body{font-size:14px;line-height:1.5} .body-sm{font-size:13px;line-height:1.45}
+  .caption{font-size:12px;line-height:1.4;color:var(--text-muted)}
+  .surface{background:var(--surface);border:1px solid var(--border)}
+  .surface-2{background:var(--surface-2);border:1px solid var(--border)}
+  .focus-ring:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:inherit}
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;font-weight:500;white-space:nowrap;transition:background 120ms,border-color 120ms,color 120ms;cursor:pointer}
+  .btn-sm{height:var(--h-sm);padding:0 12px;font-size:12px;border-radius:var(--r-sm)}
+  .btn-md{height:var(--h-md);padding:0 16px;font-size:13px;border-radius:var(--r-md)}
+  .btn-primary{background:var(--primary);color:var(--primary-fg)} .btn-primary:hover{background:var(--primary-hover)}
+  .btn-secondary{background:var(--surface);color:var(--text);border:1px solid var(--border)} .btn-secondary:hover{border-color:var(--border-strong);background:var(--surface-2)}
+  .btn-ghost{background:transparent;color:var(--text-muted)} .btn-ghost:hover{color:var(--text);background:var(--surface-2)}
+  .btn-accent{background:var(--accent);color:var(--primary-fg)} .dark .btn-accent{color:oklch(0.150 0.004 240)}
+  .badge{display:inline-flex;align-items:center;gap:6px;height:22px;padding:0 8px;font-size:11px;font-weight:500;border-radius:var(--r-full);white-space:nowrap}
+  .badge-dot{width:6px;height:6px;border-radius:var(--r-full)}
+  .pill{display:inline-flex;padding:3px;border-radius:var(--r-full);background:var(--surface-2);border:1px solid var(--border)}
+  .pill button{padding:4px 12px;font-size:12px;font-weight:500;border-radius:var(--r-full);color:var(--text-muted)}
+  .pill button[aria-pressed="true"]{background:var(--surface);color:var(--text)}
+  code.inline{font-family:var(--font-mono);font-size:.9em;padding:1px 5px;border-radius:var(--r-sm);background:var(--accent-soft);color:var(--accent-hover);font-feature-settings:"ss01","cv01"}
+  .dark code.inline{color:var(--accent)}
+
+  /* ============ CALENDAR ============ */
+  .cal {
+    background: var(--surface); border: 1px solid var(--border); border-radius: var(--r-xl); overflow: hidden;
+  }
+  .cal-head { display:flex; align-items:center; justify-content: space-between; padding: 14px 18px; border-bottom: 1px solid var(--border); }
+  .cal-month { font-size: 18px; font-weight: 600; letter-spacing: -0.015em; }
+  .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); }
+  .cal-dow { padding: 10px 12px; font-family: var(--font-mono); font-size: 10.5px; letter-spacing: 0.1em; color: var(--text-subtle); text-transform: uppercase; border-bottom: 1px solid var(--border); }
+  .cal-cell {
+    min-height: 96px;
+    border-right: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    padding: 6px 8px;
+    position: relative;
+    background: var(--surface);
+  }
+  .cal-cell:nth-child(7n) { border-right: 0; }
+  .cal-cell.dim { background: var(--surface-2); }
+  .cal-cell.dim .cal-day { color: var(--text-subtle); }
+  .cal-day { font-family: var(--font-mono); font-size: 11.5px; font-weight: 500; color: var(--text); font-variant-numeric: tabular-nums; }
+  .cal-cell.today .cal-day {
+    display:inline-flex; align-items:center; justify-content:center;
+    width:20px;height:20px;border-radius:50%;
+    background: var(--accent); color: var(--primary-fg); margin: -2px 0 0 -4px;
+  }
+  .dark .cal-cell.today .cal-day { color: oklch(0.150 0.004 240); }
+  .cal-evt { display: block; margin-top: 4px; padding: 2px 6px; font-size: 10.5px; font-weight: 500; border-radius: 3px; line-height: 1.3; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; cursor: pointer; }
+  .cal-evt.reg     { background: var(--accent-soft); color: var(--accent-hover); border-left: 2px solid var(--accent); }
+  .dark .cal-evt.reg { color: var(--accent); }
+  .cal-evt.due     { background: var(--warning-soft); color: var(--warning); border-left: 2px solid var(--warning); }
+  .cal-evt.exam    { background: var(--danger-soft); color: var(--danger); border-left: 2px solid var(--danger); }
+  .cal-evt.advisor { background: var(--surface-2); color: var(--text-muted); border-left: 2px solid var(--border-strong); }
+  .cal-more { display: block; margin-top: 2px; font-family: var(--font-mono); font-size: 9.5px; color: var(--text-subtle); padding: 0 6px; }
+
+  /* upcoming list */
+  .deadline { display:flex; align-items: center; gap: 14px; padding: 14px 16px; border: 1px solid var(--border); background: var(--surface); border-radius: var(--r-lg); }
+  .dl-date { display:flex; flex-direction: column; align-items: center; justify-content: center; width: 50px; padding: 6px 0; border-radius: var(--r-md); background: var(--surface-2); flex-shrink: 0; }
+  .dl-mon { font-family: var(--font-mono); font-size: 9px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-subtle); }
+  .dl-day { font-family: var(--font-mono); font-size: 18px; font-weight: 600; line-height: 1; margin-top: 2px; font-variant-numeric: tabular-nums; }
+  .dl-body { flex: 1; min-width: 0; }
+  .dl-title { font-size: 13.5px; font-weight: 500; }
+  .dl-meta { font-size: 11.5px; color: var(--text-muted); margin-top: 3px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .dl-time { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
+
+  /* ============ TEMPLATES ============ */
+  .tpl-grid { display: grid; grid-template-columns: 280px 1fr; gap: 16px; }
+  .tpl-list { display: flex; flex-direction: column; gap: 4px; }
+  .tpl-item { padding: 10px 12px; border-radius: var(--r-md); border: 1px solid transparent; cursor: pointer; transition: background 120ms, border-color 120ms; }
+  .tpl-item:hover { background: var(--surface-2); }
+  .tpl-item.active { background: var(--accent-soft); border-color: color-mix(in oklch, var(--accent) 25%, var(--border)); }
+  .tpl-title { font-size: 13px; font-weight: 500; line-height: 1.3; }
+  .tpl-item.active .tpl-title { color: var(--accent-hover); }
+  .dark .tpl-item.active .tpl-title { color: var(--accent); }
+  .tpl-sub { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+  .tpl-cat { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.08em; color: var(--text-subtle); text-transform: uppercase; padding: 12px 12px 4px 12px; }
+
+  .tpl-pane { background: var(--surface); border: 1px solid var(--border); border-radius: var(--r-lg); overflow: hidden; }
+  .tpl-pane-head { padding: 14px 18px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+  .tpl-pane-title { font-size: 15px; font-weight: 600; letter-spacing: -0.01em; }
+  .tpl-meta { display: flex; align-items: center; gap: 14px; padding: 12px 18px; background: var(--surface-2); border-bottom: 1px solid var(--border); flex-wrap: wrap; }
+  .tpl-meta-row { display: flex; align-items: center; gap: 8px; }
+  .tpl-meta-key { font-family: var(--font-mono); font-size: 10.5px; letter-spacing: 0.06em; color: var(--text-subtle); text-transform: uppercase; }
+  .tpl-meta-val { font-size: 12.5px; color: var(--text); }
+  .tpl-body { padding: 22px 24px; font-size: 14px; line-height: 1.65; color: var(--text); }
+  .tpl-body p + p { margin-top: 14px; }
+  .var { background: var(--accent-soft); color: var(--accent-hover); padding: 1px 7px; border-radius: var(--r-sm); font-family: var(--font-mono); font-size: 13px; font-weight: 500; cursor: pointer; border: 1px solid color-mix(in oklch, var(--accent) 25%, transparent); }
+  .var:hover { background: color-mix(in oklch, var(--accent) 18%, transparent); }
+  .dark .var { color: var(--accent); }
+  .var-filled { background: var(--surface-2); color: var(--text); border-color: var(--border-strong); }
+  .var-filled:hover { background: var(--surface-2); }
+  .tpl-foot { display: flex; align-items: center; justify-content: space-between; padding: 12px 18px; border-top: 1px solid var(--border); background: var(--surface-2); gap: 10px; flex-wrap: wrap; }
+  .tpl-foot-l { font-size: 11.5px; color: var(--text-muted); display: flex; align-items: center; gap: 8px; }
+
+  /* "copied!" toast inline */
+  .copied { color: var(--success); font-family: var(--font-mono); font-size: 11px; }
+  .copied svg { vertical-align: -2px; }
+</style>
+</head>
+<body class="theme-graphite">
+
+<header class="border-b" style="border-color:var(--border);">
+  <div class="mx-auto max-w-[1280px] px-8 py-9 flex items-start justify-between gap-10 flex-wrap">
+    <div class="max-w-2xl">
+      <div class="eyebrow">SOEN Compass · Phase 11</div>
+      <h1 class="h1 mt-3">Deadlines &amp; Email Templates</h1>
+      <p class="body mt-3" style="color: var(--text-muted);">
+        The two utilities students touch most: a deadline calendar that surfaces what's coming, and a templates library that drafts the awkward emails for them.
+      </p>
+    </div>
+    <div class="pill">
+      <button id="modeLight" aria-pressed="true" class="focus-ring">Light</button>
+      <button id="modeDark"  aria-pressed="false" class="focus-ring">Dark</button>
+    </div>
+  </div>
+</header>
+
+<main class="mx-auto max-w-[1280px] px-8 py-10 space-y-12">
+
+  <!-- ============ DEADLINES ============ -->
+  <section>
+    <div class="flex items-end justify-between mb-4 flex-wrap gap-3">
+      <div>
+        <div class="eyebrow">01</div>
+        <h2 class="h2 mt-2">Deadlines calendar</h2>
+        <p class="body mt-2" style="color: var(--text-muted); max-width: 620px;">
+          Month grid + upcoming list. Four kinds of events: registration windows (emerald), course due dates (warning), exams (danger), advisor meetings (neutral).
+        </p>
+      </div>
+      <div class="flex items-center gap-2">
+        <div class="pill">
+          <button aria-pressed="true">Month</button>
+          <button>Week</button>
+          <button>List</button>
+        </div>
+        <button class="btn btn-sm btn-secondary focus-ring">Export ICS</button>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
+      <!-- Calendar -->
+      <div class="cal lg:col-span-2">
+        <div class="cal-head">
+          <div>
+            <div class="cal-month">June 2026</div>
+            <div class="caption mt-1">4 events · 1 today</div>
+          </div>
+          <div class="flex items-center gap-1.5">
+            <button class="btn btn-sm btn-secondary focus-ring">‹</button>
+            <button class="btn btn-sm btn-secondary focus-ring">Today</button>
+            <button class="btn btn-sm btn-secondary focus-ring">›</button>
+          </div>
+        </div>
+        <div class="cal-grid">
+          <div class="cal-dow">Sun</div><div class="cal-dow">Mon</div><div class="cal-dow">Tue</div>
+          <div class="cal-dow">Wed</div><div class="cal-dow">Thu</div><div class="cal-dow">Fri</div><div class="cal-dow">Sat</div>
+
+          <!-- May tail -->
+          <div class="cal-cell dim"><div class="cal-day">31</div></div>
+          <!-- June -->
+          <div class="cal-cell"><div class="cal-day">1</div></div>
+          <div class="cal-cell"><div class="cal-day">2</div></div>
+          <div class="cal-cell"><div class="cal-day">3</div><span class="cal-evt advisor">Advisor · D. Patel</span></div>
+          <div class="cal-cell"><div class="cal-day">4</div></div>
+          <div class="cal-cell"><div class="cal-day">5</div></div>
+          <div class="cal-cell"><div class="cal-day">6</div></div>
+
+          <div class="cal-cell"><div class="cal-day">7</div></div>
+          <div class="cal-cell"><div class="cal-day">8</div></div>
+          <div class="cal-cell"><div class="cal-day">9</div></div>
+          <div class="cal-cell"><div class="cal-day">10</div></div>
+          <div class="cal-cell"><div class="cal-day">11</div></div>
+          <div class="cal-cell today"><div class="cal-day">12</div><span class="cal-evt reg">Fall reg opens · 09:00</span><span class="cal-evt due">COMP 352 · A2 due</span></div>
+          <div class="cal-cell"><div class="cal-day">13</div></div>
+
+          <div class="cal-cell"><div class="cal-day">14</div></div>
+          <div class="cal-cell"><div class="cal-day">15</div></div>
+          <div class="cal-cell"><div class="cal-day">16</div><span class="cal-evt due">SOEN 287 · Lab 3</span></div>
+          <div class="cal-cell"><div class="cal-day">17</div></div>
+          <div class="cal-cell"><div class="cal-day">18</div><span class="cal-evt exam">COMP 335 · Midterm</span></div>
+          <div class="cal-cell"><div class="cal-day">19</div></div>
+          <div class="cal-cell"><div class="cal-day">20</div></div>
+
+          <div class="cal-cell"><div class="cal-day">21</div></div>
+          <div class="cal-cell"><div class="cal-day">22</div></div>
+          <div class="cal-cell"><div class="cal-day">23</div><span class="cal-evt due">ENGR 391 · Project</span></div>
+          <div class="cal-cell"><div class="cal-day">24</div></div>
+          <div class="cal-cell"><div class="cal-day">25</div></div>
+          <div class="cal-cell"><div class="cal-day">26</div><span class="cal-evt reg">Reg closes · last call</span></div>
+          <div class="cal-cell"><div class="cal-day">27</div></div>
+
+          <div class="cal-cell"><div class="cal-day">28</div></div>
+          <div class="cal-cell"><div class="cal-day">29</div></div>
+          <div class="cal-cell"><div class="cal-day">30</div></div>
+          <!-- July head -->
+          <div class="cal-cell dim"><div class="cal-day">1</div></div>
+          <div class="cal-cell dim"><div class="cal-day">2</div></div>
+          <div class="cal-cell dim"><div class="cal-day">3</div></div>
+          <div class="cal-cell dim"><div class="cal-day">4</div></div>
+        </div>
+
+        <!-- Legend -->
+        <div style="padding: 12px 18px; border-top: 1px solid var(--border); display: flex; gap: 16px; flex-wrap: wrap;">
+          <span class="caption flex items-center gap-1.5"><span style="width:10px;height:3px;background:var(--accent);border-radius:1px;"></span>Registration</span>
+          <span class="caption flex items-center gap-1.5"><span style="width:10px;height:3px;background:var(--warning);border-radius:1px;"></span>Coursework</span>
+          <span class="caption flex items-center gap-1.5"><span style="width:10px;height:3px;background:var(--danger);border-radius:1px;"></span>Exams</span>
+          <span class="caption flex items-center gap-1.5"><span style="width:10px;height:3px;background:var(--border-strong);border-radius:1px;"></span>Advisor / meeting</span>
+        </div>
+      </div>
+
+      <!-- Upcoming list -->
+      <div>
+        <div class="eyebrow mb-3">Upcoming · next 14 days</div>
+        <div class="space-y-3">
+          <div class="deadline" style="border-color: color-mix(in oklch, var(--accent) 30%, var(--border)); background: color-mix(in oklch, var(--accent-soft) 60%, var(--surface));">
+            <div class="dl-date" style="background: var(--accent); color: var(--primary-fg);"><span class="dl-mon" style="color: color-mix(in oklch, var(--primary-fg) 70%, transparent);">JUN</span><span class="dl-day">12</span></div>
+            <div class="dl-body">
+              <div class="dl-title">Fall 2026 registration opens</div>
+              <div class="dl-meta"><span class="dl-time">Today · 09:00</span><span>·</span><span>3 of 4 courses ready</span></div>
+            </div>
+            <button class="btn btn-sm btn-accent focus-ring">Open planner</button>
+          </div>
+
+          <div class="deadline">
+            <div class="dl-date"><span class="dl-mon">JUN</span><span class="dl-day">12</span></div>
+            <div class="dl-body">
+              <div class="dl-title"><code class="inline">COMP 352</code> · Assignment 2</div>
+              <div class="dl-meta"><span class="dl-time">Today · 23:59</span><span>·</span><span>5 hrs left</span><span class="badge" style="background:var(--warning-soft); color:var(--warning);"><span class="badge-dot" style="background:var(--warning);"></span>Due soon</span></div>
+            </div>
+          </div>
+
+          <div class="deadline">
+            <div class="dl-date"><span class="dl-mon">JUN</span><span class="dl-day">16</span></div>
+            <div class="dl-body">
+              <div class="dl-title"><code class="inline">SOEN 287</code> · Lab 3 submission</div>
+              <div class="dl-meta"><span class="dl-time">Tue · 18:00</span><span>·</span><span>in 4 days</span></div>
+            </div>
+          </div>
+
+          <div class="deadline">
+            <div class="dl-date" style="background: var(--danger-soft);"><span class="dl-mon" style="color: var(--danger);">JUN</span><span class="dl-day" style="color: var(--danger);">18</span></div>
+            <div class="dl-body">
+              <div class="dl-title"><code class="inline">COMP 335</code> · Midterm exam</div>
+              <div class="dl-meta"><span class="dl-time">Thu · 14:45 – 17:15</span><span>·</span><span>Room H-435</span></div>
+            </div>
+          </div>
+
+          <div class="deadline">
+            <div class="dl-date"><span class="dl-mon">JUN</span><span class="dl-day">26</span></div>
+            <div class="dl-body">
+              <div class="dl-title">Fall 2026 registration closes</div>
+              <div class="dl-meta"><span class="dl-time">Fri · 23:59</span><span>·</span><span>in 14 days</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ EMAIL TEMPLATES ============ -->
+  <section>
+    <div class="flex items-end justify-between mb-4 flex-wrap gap-3">
+      <div>
+        <div class="eyebrow">02</div>
+        <h2 class="h2 mt-2">Email templates</h2>
+        <p class="body mt-2" style="color: var(--text-muted); max-width: 620px;">
+          Drafts for the awkward emails — prereq overrides, waitlist requests, advisor check-ins, capstone proposals. Variables (emerald chips) get auto-filled from your plan. One click to copy.
+        </p>
+      </div>
+      <button class="btn btn-sm btn-accent focus-ring">+ New template</button>
+    </div>
+
+    <div class="tpl-grid">
+      <!-- LEFT: list -->
+      <aside class="surface rounded-lg" style="padding: 6px;">
+        <div class="tpl-cat">Course access</div>
+        <div class="tpl-item active">
+          <div class="tpl-title">Prereq override request</div>
+          <div class="tpl-sub">To: course instructor · 4 vars</div>
+        </div>
+        <div class="tpl-item">
+          <div class="tpl-title">Waitlist priority request</div>
+          <div class="tpl-sub">To: department · 3 vars</div>
+        </div>
+        <div class="tpl-item">
+          <div class="tpl-title">Schedule conflict — section change</div>
+          <div class="tpl-sub">To: registrar · 5 vars</div>
+        </div>
+
+        <div class="tpl-cat">Advisor</div>
+        <div class="tpl-item">
+          <div class="tpl-title">Quarterly check-in</div>
+          <div class="tpl-sub">To: academic advisor · 2 vars</div>
+        </div>
+        <div class="tpl-item">
+          <div class="tpl-title">Plan change approval</div>
+          <div class="tpl-sub">To: academic advisor · 6 vars</div>
+        </div>
+
+        <div class="tpl-cat">Capstone</div>
+        <div class="tpl-item">
+          <div class="tpl-title">Project topic proposal</div>
+          <div class="tpl-sub">To: capstone coordinator · 4 vars</div>
+        </div>
+        <div class="tpl-item">
+          <div class="tpl-title">Team formation request</div>
+          <div class="tpl-sub">To: capstone coordinator · 3 vars</div>
+        </div>
+
+        <div class="tpl-cat">Other</div>
+        <div class="tpl-item">
+          <div class="tpl-title">Recommendation letter ask</div>
+          <div class="tpl-sub">To: professor · 5 vars</div>
+        </div>
+      </aside>
+
+      <!-- RIGHT: editor -->
+      <div class="tpl-pane">
+        <div class="tpl-pane-head">
+          <div>
+            <div class="tpl-pane-title">Prereq override request</div>
+            <div class="caption mono mt-1">Last edited 3 weeks ago · used 142 times</div>
+          </div>
+          <div class="flex items-center gap-2">
+            <button class="btn btn-sm btn-ghost focus-ring">Edit template</button>
+            <button class="btn btn-sm btn-secondary focus-ring">Preview as email</button>
+          </div>
+        </div>
+
+        <div class="tpl-meta">
+          <div class="tpl-meta-row"><span class="tpl-meta-key">To</span><span class="tpl-meta-val mono">prof.bhatt@concordia.ca</span></div>
+          <div class="tpl-meta-row"><span class="tpl-meta-key">From</span><span class="tpl-meta-val mono">amir.ghadimi@mail.concordia.ca</span></div>
+          <div class="tpl-meta-row"><span class="tpl-meta-key">Subject</span><span class="tpl-meta-val">Permission override request — <span class="var var-filled">SOEN 341</span> · Fall 2026</span></div>
+        </div>
+
+        <div class="tpl-body">
+          <p>Hi <span class="var var-filled">Professor Bhatt</span>,</p>
+
+          <p>I'm a third-year Software Engineering student writing to request a permission override for <span class="var var-filled">SOEN 341 — Software Process</span> in <span class="var var-filled">Fall 2026</span>.</p>
+
+          <p>I'm aware <code class="inline">ENGR 201</code> is a hard prerequisite. I'm planning to take it concurrently in <span class="var">Summer 2026</span> before Fall begins. I've completed the related programming prereqs:</p>
+
+          <p style="margin-left: 18px; color: var(--text-muted);">
+            • <code class="inline">COMP 248</code> — A−<br />
+            • <code class="inline">COMP 249</code> — A<br />
+            • <code class="inline">COMP 232</code> — A−
+          </p>
+
+          <p>I'd really appreciate your consideration. I've attached my current plan from SOEN Compass for context, and I'm happy to come to office hours to discuss in person.</p>
+
+          <p>Thank you for your time.</p>
+
+          <p>Best,<br />
+          <span class="var var-filled">Amir Ghadimi</span><br />
+          <span class="caption mono tnum">Student ID · 40213847</span></p>
+        </div>
+
+        <div class="tpl-foot">
+          <div class="tpl-foot-l">
+            <span class="badge" style="background: var(--surface); color: var(--text-muted); border: 1px solid var(--border);"><span class="badge-dot" style="background: var(--success);"></span>4 of 4 vars filled</span>
+            <span class="copied"><svg width="11" height="11" viewBox="0 0 11 11" fill="none"><path d="M2 5l2 2 5-6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>Copied 2s ago</span>
+          </div>
+          <div class="flex items-center gap-2">
+            <button class="btn btn-sm btn-secondary focus-ring">
+              <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M3 5h6M3 7h4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+              Copy body
+            </button>
+            <button class="btn btn-sm btn-primary focus-ring">
+              <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><rect x="1.5" y="3" width="9" height="6" rx="1" stroke="currentColor" stroke-width="1.4"/><path d="M1.5 4l4.5 3 4.5-3" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg>
+              Open in mail
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Variable inspector -->
+    <div class="surface rounded-lg mt-5 p-5">
+      <div class="eyebrow mb-3">Variables in this template</div>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+        <div class="surface-2 rounded-md p-3 flex items-center justify-between">
+          <div><span class="mono caption">{{instructor.name}}</span><div class="body-sm mt-1">Professor Bhatt</div></div>
+          <span class="caption">auto · from course</span>
+        </div>
+        <div class="surface-2 rounded-md p-3 flex items-center justify-between">
+          <div><span class="mono caption">{{course.code}}</span><div class="body-sm mt-1">SOEN 341</div></div>
+          <span class="caption">auto · from plan</span>
+        </div>
+        <div class="surface-2 rounded-md p-3 flex items-center justify-between">
+          <div><span class="mono caption">{{course.term}}</span><div class="body-sm mt-1">Fall 2026</div></div>
+          <span class="caption">auto · from plan</span>
+        </div>
+        <div class="surface-2 rounded-md p-3 flex items-center justify-between">
+          <div><span class="mono caption">{{prereq.makeup_term}}</span><div class="body-sm mt-1">Summer 2026</div></div>
+          <span class="caption" style="color: var(--warning);">manual · review</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</main>
+<footer class="mx-auto max-w-[1280px] px-8 pb-16 pt-2 caption mono flex items-center justify-between"><span>SOEN Compass · Phase 11 of 12</span><span>next → Phase 12: Auth &amp; error states</span></footer>
+
+<script>
+  document.getElementById('modeLight').addEventListener('click', () => { document.body.classList.remove('dark'); document.getElementById('modeLight').setAttribute('aria-pressed','true'); document.getElementById('modeDark').setAttribute('aria-pressed','false'); });
+  document.getElementById('modeDark').addEventListener('click',  () => { document.body.classList.add('dark');    document.getElementById('modeLight').setAttribute('aria-pressed','false'); document.getElementById('modeDark').setAttribute('aria-pressed','true'); });
+</script>
+</body></html>

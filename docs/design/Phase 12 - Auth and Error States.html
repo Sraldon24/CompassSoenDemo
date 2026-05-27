@@ -1,0 +1,306 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8" /><meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>SOEN Compass — Auth &amp; Error States</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" /><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@400;500;600&family=Geist:wght@400;500;600&display=swap" rel="stylesheet" />
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+  :root { --font-sans:"Geist",ui-sans-serif,system-ui,sans-serif; --font-mono:"Geist Mono",ui-monospace,Menlo,monospace; --r-sm:6px; --r-md:8px; --r-lg:12px; --r-xl:16px; --r-full:9999px;
+    --shadow-sm:0 1px 2px rgba(0,0,0,.06),0 1px 1px rgba(0,0,0,.04); --shadow-md:0 4px 12px rgba(0,0,0,.06),0 2px 4px rgba(0,0,0,.04); --shadow-lg:0 18px 40px rgba(0,0,0,.10),0 4px 12px rgba(0,0,0,.06);
+    --h-sm:28px; --h-md:36px; --h-lg:40px; }
+  .theme-graphite { --bg:oklch(0.990 0.002 240); --surface:oklch(0.980 0.002 240); --surface-2:oklch(0.965 0.003 240); --border:oklch(0.910 0.004 240); --border-strong:oklch(0.840 0.005 240);
+    --text:oklch(0.180 0.005 240); --text-muted:oklch(0.500 0.005 240); --text-subtle:oklch(0.630 0.005 240);
+    --primary:oklch(0.220 0.010 240); --primary-hover:oklch(0.150 0.010 240); --primary-fg:oklch(0.985 0.002 240);
+    --accent:oklch(0.580 0.150 155); --accent-hover:oklch(0.510 0.160 155); --accent-soft:oklch(0.957 0.035 155);
+    --success:oklch(0.595 0.130 158); --success-soft:oklch(0.955 0.025 158);
+    --warning:oklch(0.720 0.140 75); --warning-soft:oklch(0.965 0.030 80);
+    --danger:oklch(0.580 0.195 25); --danger-soft:oklch(0.960 0.025 25); }
+  .theme-graphite.dark { --bg:oklch(0.150 0.004 240); --surface:oklch(0.190 0.005 240); --surface-2:oklch(0.225 0.005 240); --border:oklch(0.280 0.006 240); --border-strong:oklch(0.360 0.007 240);
+    --text:oklch(0.975 0.003 240); --text-muted:oklch(0.700 0.005 240); --text-subtle:oklch(0.570 0.005 240);
+    --primary:oklch(0.975 0.003 240); --primary-hover:oklch(0.900 0.004 240); --primary-fg:oklch(0.150 0.004 240);
+    --accent:oklch(0.725 0.150 155); --accent-hover:oklch(0.780 0.145 155); --accent-soft:oklch(0.278 0.060 155);
+    --success:oklch(0.720 0.135 158); --success-soft:oklch(0.265 0.050 158);
+    --warning:oklch(0.800 0.135 75); --warning-soft:oklch(0.290 0.055 80);
+    --danger:oklch(0.700 0.175 25); --danger-soft:oklch(0.290 0.070 25); }
+
+  html,body{font-family:var(--font-sans);-webkit-font-smoothing:antialiased}
+  body{background:var(--bg);color:var(--text);min-height:100vh}
+  .mono{font-family:var(--font-mono);font-feature-settings:"ss01","cv01"} .tnum{font-variant-numeric:tabular-nums slashed-zero}
+  .eyebrow{font-family:var(--font-mono);font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--text-subtle)}
+  .h1{font-size:30px;line-height:1.1;letter-spacing:-.03em;font-weight:600}
+  .h2{font-size:22px;line-height:1.15;letter-spacing:-.02em;font-weight:600}
+  .h3{font-size:16px;line-height:1.25;letter-spacing:-.01em;font-weight:600}
+  .body{font-size:14px;line-height:1.5} .body-sm{font-size:13px;line-height:1.45}
+  .caption{font-size:12px;line-height:1.4;color:var(--text-muted)}
+  .surface{background:var(--surface);border:1px solid var(--border)}
+  .focus-ring:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:inherit}
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;font-weight:500;white-space:nowrap;transition:background 120ms,border-color 120ms,color 120ms;cursor:pointer}
+  .btn-md{height:var(--h-md);padding:0 16px;font-size:13px;border-radius:var(--r-md)}
+  .btn-lg{height:var(--h-lg);padding:0 22px;font-size:14px;border-radius:var(--r-md)}
+  .btn-primary{background:var(--primary);color:var(--primary-fg)} .btn-primary:hover{background:var(--primary-hover)}
+  .btn-secondary{background:var(--surface);color:var(--text);border:1px solid var(--border)} .btn-secondary:hover{border-color:var(--border-strong);background:var(--surface-2)}
+  .btn-accent{background:var(--accent);color:var(--primary-fg);width:100%} .dark .btn-accent{color:oklch(0.150 0.004 240)}
+  .btn-ghost{background:transparent;color:var(--text-muted)}
+  .pill{display:inline-flex;padding:3px;border-radius:var(--r-full);background:var(--surface-2);border:1px solid var(--border)}
+  .pill button{padding:4px 12px;font-size:12px;font-weight:500;border-radius:var(--r-full);color:var(--text-muted)}
+  .pill button[aria-pressed="true"]{background:var(--surface);color:var(--text)}
+  code.inline{font-family:var(--font-mono);font-size:.9em;padding:1px 5px;border-radius:var(--r-sm);background:var(--accent-soft);color:var(--accent-hover)}
+  .dark code.inline{color:var(--accent)}
+
+  .frame { background: var(--surface-2); border: 1px solid var(--border); border-radius: var(--r-xl); overflow: hidden; }
+  .frame-bar { display: flex; align-items: center; justify-content: space-between; padding: 10px 16px; background: var(--surface); border-bottom: 1px solid var(--border); font-family: var(--font-mono); font-size: 11px; color: var(--text-subtle); }
+  .frame-bar .dots { display: inline-flex; gap: 6px; }
+  .frame-bar .dot { width: 9px; height: 9px; border-radius: 9999px; background: var(--border-strong); }
+  .frame-body { padding: 0; min-height: 480px; display: flex; align-items: center; justify-content: center; background:
+    radial-gradient(ellipse 600px 300px at 50% 0%, color-mix(in oklch, var(--accent) 6%, transparent), transparent 60%),
+    radial-gradient(var(--border) 1px, transparent 1px) 0 0 / 22px 22px,
+    var(--bg);
+  }
+
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--r-xl); box-shadow: var(--shadow-lg); padding: 36px 32px; width: 420px; max-width: calc(100% - 32px); }
+  .card .brand-row { display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 20px; }
+  .card h3 { font-size: 22px; font-weight: 600; letter-spacing: -0.02em; text-align: center; }
+  .card .lead { font-size: 13.5px; color: var(--text-muted); text-align: center; margin-top: 8px; line-height: 1.5; }
+
+  .field { display: block; margin-top: 16px; }
+  .field-label { display: block; font-size: 12px; font-weight: 500; margin-bottom: 6px; color: var(--text); }
+  .input { width: 100%; background: var(--surface); border: 1px solid var(--border); color: var(--text); border-radius: var(--r-md); height: var(--h-md); padding: 0 12px; font-size: 13.5px; transition: border-color 120ms, box-shadow 120ms; }
+  .input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px color-mix(in oklch, var(--accent) 18%, transparent); }
+  .input.error { border-color: var(--danger); }
+  .field-error { color: var(--danger); font-size: 11.5px; margin-top: 6px; display: flex; align-items: center; gap: 4px; }
+
+  .divider { display: flex; align-items: center; gap: 12px; margin: 18px 0; color: var(--text-subtle); }
+  .divider::before, .divider::after { content: ""; flex: 1; height: 1px; background: var(--border); }
+  .divider span { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.16em; text-transform: uppercase; }
+
+  .card .legal { font-size: 11.5px; color: var(--text-subtle); text-align: center; margin-top: 20px; line-height: 1.5; }
+  .card .legal a { color: var(--text-muted); text-decoration: underline; }
+
+  /* ============ ERROR / EMPTY PAGE STATES ============ */
+  .err-card { width: 480px; max-width: calc(100% - 32px); text-align: center; padding: 56px 32px; }
+  .err-num { font-family: var(--font-mono); font-size: 96px; font-weight: 600; letter-spacing: -0.06em; line-height: 1; color: var(--text); font-variant-numeric: tabular-nums; }
+  .err-num .accent { color: var(--accent); }
+  .err-icon { width: 60px; height: 60px; border-radius: 9999px; background: var(--surface-2); border: 1px solid var(--border); display: inline-flex; align-items: center; justify-content: center; color: var(--text-muted); margin: 0 auto; }
+  .err-icon.warn { background: var(--warning-soft); border-color: color-mix(in oklch, var(--warning) 30%, var(--border)); color: var(--warning); }
+  .err-icon.danger { background: var(--danger-soft); border-color: color-mix(in oklch, var(--danger) 30%, var(--border)); color: var(--danger); }
+  .err-h { font-size: 24px; font-weight: 600; letter-spacing: -0.02em; margin-top: 18px; }
+  .err-sub { color: var(--text-muted); margin-top: 10px; font-size: 14px; line-height: 1.6; max-width: 360px; margin-left: auto; margin-right: auto; }
+  .err-actions { margin-top: 26px; display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+
+  /* loading state */
+  @keyframes shimmer { 0% { background-position: -200% 0; } 100% { background-position: 200% 0; } }
+  .skel { border-radius: var(--r-md); background: linear-gradient(90deg, var(--surface-2) 0%, color-mix(in oklch, var(--surface) 80%, var(--surface-2)) 50%, var(--surface-2) 100%); background-size: 200% 100%; animation: shimmer 1.6s infinite linear; }
+
+  /* magic link "check email" state */
+  .ml-icon { width: 44px; height: 44px; border-radius: var(--r-full); background: var(--accent-soft); color: var(--accent-hover); display: inline-flex; align-items: center; justify-content: center; margin: 0 auto 14px auto; border: 1px solid color-mix(in oklch, var(--accent) 25%, var(--border)); }
+  .dark .ml-icon { color: var(--accent); }
+</style>
+</head>
+<body class="theme-graphite">
+
+<header class="border-b" style="border-color: var(--border);">
+  <div class="mx-auto max-w-[1280px] px-8 py-9 flex items-start justify-between gap-10 flex-wrap">
+    <div class="max-w-2xl">
+      <div class="eyebrow">SOEN Compass · Phase 12</div>
+      <h1 class="h1 mt-3">Auth flow &amp; error states</h1>
+      <p class="body mt-3" style="color: var(--text-muted);">
+        Sign-in, magic-link confirmation, 404, 500, transcript-parse-failed, and a generic loading skeleton. Every state uses the locked tokens — borders, hairlines, no illustrations.
+      </p>
+    </div>
+    <div class="pill">
+      <button id="modeLight" aria-pressed="true" class="focus-ring">Light</button>
+      <button id="modeDark"  aria-pressed="false" class="focus-ring">Dark</button>
+    </div>
+  </div>
+</header>
+
+<main class="mx-auto max-w-[1280px] px-8 py-10 space-y-10">
+
+  <!-- SIGN IN + MAGIC LINK -->
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
+    <div class="frame">
+      <div class="frame-bar"><div class="dots"><span class="dot"></span><span class="dot"></span><span class="dot"></span></div><span>Sign in · entry</span><span></span></div>
+      <div class="frame-body">
+        <div class="card">
+          <div class="brand-row">
+            <svg width="32" height="32" viewBox="0 0 96 96"><circle cx="48" cy="48" r="44" fill="var(--primary)"/><g transform="translate(48 48) rotate(35)"><path d="M 0 -28 L 7 0 L 0 28 L -7 0 Z" fill="var(--primary-fg)"/><path d="M 0 -28 L 7 0 L -7 0 Z" fill="var(--accent)"/><circle r="3.2" fill="var(--primary-fg)"/></g></svg>
+            <span style="font-size: 17px; font-weight: 600; letter-spacing: -0.015em;">Compass</span>
+          </div>
+          <h3>Welcome back</h3>
+          <p class="lead">Sign in with your Concordia account — or use a magic link.</p>
+
+          <button class="btn btn-lg btn-secondary focus-ring" style="width: 100%; margin-top: 22px;">
+            <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M15.5 8.18c0-.62-.05-1.07-.16-1.53H8v2.78h4.31c-.09.72-.55 1.82-1.59 2.55l-.01.1 2.31 1.79.16.01c1.47-1.36 2.32-3.37 2.32-5.7z" fill="#4285F4"/><path d="M8 16c2.1 0 3.86-.69 5.15-1.88l-2.46-1.91c-.66.46-1.54.78-2.69.78a4.67 4.67 0 0 1-4.41-3.21l-.1.01-2.39 1.85-.03.09C2.32 14.18 4.95 16 8 16z" fill="#34A853"/><path d="M3.59 9.78A4.65 4.65 0 0 1 3.33 8c0-.62.11-1.22.25-1.78l-.01-.12L1.16 4.22l-.08.04A8.01 8.01 0 0 0 0 8c0 1.29.31 2.51.85 3.59l2.74-2.13z" fill="#FBBC05"/><path d="M8 3.06c1.61 0 2.7.7 3.32 1.28l2.42-2.36C12.33.71 10.32 0 8 0 4.95 0 2.32 1.82.85 4.41l2.73 2.13A4.69 4.69 0 0 1 8 3.06z" fill="#EA4335"/></svg>
+            Continue with Google
+          </button>
+
+          <div class="divider"><span>or</span></div>
+
+          <div class="field">
+            <label class="field-label">Concordia email</label>
+            <input class="input focus-ring" type="email" placeholder="amir.ghadimi@mail.concordia.ca" />
+          </div>
+          <button class="btn btn-lg btn-accent focus-ring" style="margin-top: 16px;">Email me a magic link →</button>
+
+          <p class="legal">By continuing, you agree to our <a href="#">Terms</a> and <a href="#">Privacy</a>. Not affiliated with Concordia University.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="frame">
+      <div class="frame-bar"><div class="dots"><span class="dot"></span><span class="dot"></span><span class="dot"></span></div><span>Magic link · check inbox</span><span></span></div>
+      <div class="frame-body">
+        <div class="card" style="text-align: center;">
+          <span class="ml-icon"><svg width="22" height="22" viewBox="0 0 22 22" fill="none"><rect x="2" y="5" width="18" height="12" rx="2" stroke="currentColor" stroke-width="1.6"/><path d="M2 7l9 6 9-6" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg></span>
+          <h3>Check your inbox</h3>
+          <p class="lead">We sent a sign-in link to <strong style="color: var(--text); font-weight: 600;">amir.ghadimi@mail.concordia.ca</strong>. It expires in 15 minutes.</p>
+          <button class="btn btn-md btn-secondary focus-ring" style="width: 100%; margin-top: 22px;">Resend (00:42)</button>
+          <button class="btn btn-md btn-ghost focus-ring" style="width: 100%; margin-top: 8px;">Use a different email</button>
+          <p class="legal" style="margin-top: 22px;">Didn't get it? Check spam — or <a href="#">try Google sign-in</a>.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SIGN IN ERROR + TRANSCRIPT PARSE FAILED -->
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
+    <div class="frame">
+      <div class="frame-bar"><div class="dots"><span class="dot"></span><span class="dot"></span><span class="dot"></span></div><span>Sign in · validation error</span><span></span></div>
+      <div class="frame-body">
+        <div class="card">
+          <div class="brand-row">
+            <svg width="32" height="32" viewBox="0 0 96 96"><circle cx="48" cy="48" r="44" fill="var(--primary)"/><g transform="translate(48 48) rotate(35)"><path d="M 0 -28 L 7 0 L 0 28 L -7 0 Z" fill="var(--primary-fg)"/><path d="M 0 -28 L 7 0 L -7 0 Z" fill="var(--accent)"/><circle r="3.2" fill="var(--primary-fg)"/></g></svg>
+            <span style="font-size: 17px; font-weight: 600; letter-spacing: -0.015em;">Compass</span>
+          </div>
+          <h3>Sign in</h3>
+
+          <div class="field">
+            <label class="field-label">Concordia email</label>
+            <input class="input error focus-ring" value="amir.ghadimi@gmail.com" />
+            <div class="field-error"><svg width="11" height="11" viewBox="0 0 11 11" fill="none"><circle cx="5.5" cy="5.5" r="4.5" stroke="currentColor" stroke-width="1.3"/><path d="M5.5 3v3M5.5 7.7v.4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>Use your Concordia email (ends in <code class="inline">@mail.concordia.ca</code>).</div>
+          </div>
+          <button class="btn btn-lg btn-accent focus-ring" style="margin-top: 16px;">Email me a magic link →</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="frame">
+      <div class="frame-bar"><div class="dots"><span class="dot"></span><span class="dot"></span><span class="dot"></span></div><span>Onboarding · transcript parse failed</span><span></span></div>
+      <div class="frame-body">
+        <div class="card">
+          <span class="err-icon warn" style="width: 44px; height: 44px; margin-bottom: 14px;"><svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M10 2l8 16H2L10 2z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><path d="M10 8v4M10 14.5v.4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></span>
+          <h3 style="text-align: left;">We couldn't read part of that transcript</h3>
+          <p class="lead" style="text-align: left;">8 of 12 courses parsed cleanly. The other 4 had unrecognized course codes — they might be a different format than Concordia uses.</p>
+
+          <div style="margin-top: 16px; padding: 12px 14px; background: var(--warning-soft); border: 1px solid color-mix(in oklch, var(--warning) 25%, var(--border)); border-radius: var(--r-md); font-size: 12px; color: var(--warning); font-family: var(--font-mono);">
+            <div style="font-weight: 600;">Unrecognized:</div>
+            <div style="margin-top: 4px; color: var(--text);">SYS-201 · BUS-200 · ELEC275-S2 · ENGR/N-213</div>
+          </div>
+
+          <div class="flex gap-2 mt-5">
+            <button class="btn btn-md btn-secondary focus-ring" style="flex: 1;">Add manually</button>
+            <button class="btn btn-md btn-primary focus-ring" style="flex: 1;">Try a new file</button>
+          </div>
+          <p class="legal" style="margin-top: 16px;">Still stuck? <a href="#">Send us the PDF</a> and we'll fix the parser.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 404 + 500 -->
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
+    <div class="frame">
+      <div class="frame-bar"><div class="dots"><span class="dot"></span><span class="dot"></span><span class="dot"></span></div><span>compass.dev/u/non-existent · 404</span><span></span></div>
+      <div class="frame-body">
+        <div class="err-card">
+          <div class="err-num">4<span class="accent">0</span>4</div>
+          <div class="err-h">This page doesn't exist</div>
+          <p class="err-sub">The link might be broken, or the profile might've been made private. Check the URL or head back home.</p>
+          <div class="err-actions">
+            <button class="btn btn-md btn-secondary focus-ring">← Back</button>
+            <button class="btn btn-md btn-primary focus-ring">Go to dashboard</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="frame">
+      <div class="frame-bar"><div class="dots"><span class="dot"></span><span class="dot"></span><span class="dot"></span></div><span>compass.dev · 500</span><span></span></div>
+      <div class="frame-body">
+        <div class="err-card">
+          <span class="err-icon danger"><svg width="28" height="28" viewBox="0 0 28 28" fill="none"><path d="M14 3l11 22H3L14 3z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M14 11v6M14 19.5v.4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></span>
+          <div class="err-h">Something broke on our end</div>
+          <p class="err-sub">We're already looking into it. Your plan is safe — nothing was lost.</p>
+          <div class="mono caption mt-4 tnum">incident · INC-2026-06-12-A · 13:47 EDT</div>
+          <div class="err-actions">
+            <button class="btn btn-md btn-secondary focus-ring">Reload page</button>
+            <button class="btn btn-md btn-primary focus-ring">Status page</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- LOADING / ACCOUNT LOCKED -->
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
+    <div class="frame">
+      <div class="frame-bar"><div class="dots"><span class="dot"></span><span class="dot"></span><span class="dot"></span></div><span>Dashboard · first load skeleton</span><span></span></div>
+      <div class="frame-body" style="background: var(--bg);">
+        <div style="width: 540px; max-width: calc(100% - 32px); padding: 24px;">
+          <div class="skel" style="width: 180px; height: 14px;"></div>
+          <div class="skel mt-3" style="width: 320px; height: 26px;"></div>
+          <div class="grid grid-cols-3 gap-3 mt-6">
+            <div class="surface rounded-lg p-4">
+              <div class="skel" style="width: 60%; height: 10px;"></div>
+              <div class="skel mt-3" style="width: 50%; height: 22px;"></div>
+              <div class="skel mt-3" style="width: 100%; height: 6px;"></div>
+            </div>
+            <div class="surface rounded-lg p-4">
+              <div class="skel" style="width: 60%; height: 10px;"></div>
+              <div class="skel mt-3" style="width: 50%; height: 22px;"></div>
+              <div class="skel mt-3" style="width: 100%; height: 6px;"></div>
+            </div>
+            <div class="surface rounded-lg p-4">
+              <div class="skel" style="width: 60%; height: 10px;"></div>
+              <div class="skel mt-3" style="width: 50%; height: 22px;"></div>
+              <div class="skel mt-3" style="width: 100%; height: 6px;"></div>
+            </div>
+          </div>
+          <div class="surface rounded-lg p-4 mt-3">
+            <div class="skel" style="width: 200px; height: 14px;"></div>
+            <div class="space-y-2 mt-3">
+              <div class="skel" style="width: 100%; height: 36px;"></div>
+              <div class="skel" style="width: 100%; height: 36px;"></div>
+              <div class="skel" style="width: 100%; height: 36px;"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="frame">
+      <div class="frame-bar"><div class="dots"><span class="dot"></span><span class="dot"></span><span class="dot"></span></div><span>Sign in · account locked</span><span></span></div>
+      <div class="frame-body">
+        <div class="card">
+          <span class="err-icon danger" style="width: 44px; height: 44px; display: flex; margin: 0 auto 14px auto;"><svg width="20" height="20" viewBox="0 0 20 20" fill="none"><rect x="4" y="9" width="12" height="9" rx="1.5" stroke="currentColor" stroke-width="1.5"/><path d="M7 9V6.5a3 3 0 0 1 6 0V9" stroke="currentColor" stroke-width="1.5"/></svg></span>
+          <h3>Account temporarily locked</h3>
+          <p class="lead">Too many sign-in attempts. For your safety we've paused new attempts for 15 minutes.</p>
+          <div style="margin-top: 16px; padding: 10px 14px; background: var(--surface-2); border: 1px solid var(--border); border-radius: var(--r-md); display: flex; align-items: center; justify-content: space-between;">
+            <span class="body-sm">Unlocks in</span>
+            <span class="mono tnum" style="font-size: 18px; font-weight: 600;">14:32</span>
+          </div>
+          <button class="btn btn-md btn-secondary focus-ring" style="width: 100%; margin-top: 14px;">Use magic link instead</button>
+          <p class="legal" style="margin-top: 16px;">Not you? <a href="#">Contact support</a>.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</main>
+<footer class="mx-auto max-w-[1280px] px-8 pb-16 pt-2 caption mono flex items-center justify-between"><span>SOEN Compass · Phase 12 of 12</span><span>full system complete</span></footer>
+<script>
+  document.getElementById('modeLight').addEventListener('click', () => { document.body.classList.remove('dark'); document.getElementById('modeLight').setAttribute('aria-pressed','true'); document.getElementById('modeDark').setAttribute('aria-pressed','false'); });
+  document.getElementById('modeDark').addEventListener('click',  () => { document.body.classList.add('dark');    document.getElementById('modeLight').setAttribute('aria-pressed','false'); document.getElementById('modeDark').setAttribute('aria-pressed','true'); });
+</script>
+</body></html>

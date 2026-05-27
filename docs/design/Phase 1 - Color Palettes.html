@@ -1,0 +1,824 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>SOEN Compass — Phase 1: Color Palettes</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@400;500;600&family=Geist:wght@400;450;500;600;700&display=swap" rel="stylesheet" />
+<script src="https://cdn.tailwindcss.com?plugins=forms"></script>
+<style>
+  :root {
+    --font-sans: "Geist", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    --font-mono: "Geist Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  }
+  html, body { font-family: var(--font-sans); -webkit-font-smoothing: antialiased; }
+  .mono { font-family: var(--font-mono); font-feature-settings: "ss01", "cv11"; }
+
+  /* ---------- PALETTE: Electric Blue ---------- */
+  .p-blue {
+    --bg:           oklch(0.992 0.003 250);
+    --surface:      oklch(0.985 0.004 250);
+    --surface-2:    oklch(0.970 0.006 250);
+    --border:       oklch(0.918 0.010 250);
+    --border-strong:oklch(0.860 0.014 250);
+    --text:         oklch(0.205 0.020 250);
+    --text-muted:   oklch(0.520 0.020 250);
+    --text-subtle:  oklch(0.640 0.018 250);
+    --primary:      oklch(0.560 0.180 252);
+    --primary-hover:oklch(0.495 0.190 252);
+    --primary-soft: oklch(0.955 0.025 252);
+    --primary-fg:   oklch(0.985 0.004 250);
+    --accent:       oklch(0.700 0.150 200);
+    --success:      oklch(0.595 0.135 158);
+    --success-soft: oklch(0.955 0.030 158);
+    --warning:      oklch(0.720 0.150 75);
+    --warning-soft: oklch(0.965 0.035 80);
+    --danger:       oklch(0.580 0.205 25);
+    --danger-soft:  oklch(0.960 0.030 25);
+  }
+  .p-blue.dark {
+    --bg:           oklch(0.165 0.012 252);
+    --surface:      oklch(0.205 0.014 252);
+    --surface-2:    oklch(0.240 0.016 252);
+    --border:       oklch(0.295 0.018 252);
+    --border-strong:oklch(0.380 0.020 252);
+    --text:         oklch(0.970 0.005 250);
+    --text-muted:   oklch(0.700 0.012 250);
+    --text-subtle:  oklch(0.580 0.015 250);
+    --primary:      oklch(0.680 0.170 252);
+    --primary-hover:oklch(0.740 0.165 252);
+    --primary-soft: oklch(0.275 0.060 252);
+    --primary-fg:   oklch(0.140 0.020 252);
+    --accent:       oklch(0.760 0.130 200);
+    --success:      oklch(0.720 0.140 158);
+    --success-soft: oklch(0.265 0.050 158);
+    --warning:      oklch(0.800 0.140 75);
+    --warning-soft: oklch(0.290 0.060 75);
+    --danger:       oklch(0.700 0.180 25);
+    --danger-soft:  oklch(0.290 0.080 25);
+  }
+
+  /* ---------- PALETTE: Graphite + Cyan ---------- */
+  .p-graphite {
+    --bg:           oklch(0.990 0.002 240);
+    --surface:      oklch(0.980 0.002 240);
+    --surface-2:    oklch(0.965 0.003 240);
+    --border:       oklch(0.910 0.004 240);
+    --border-strong:oklch(0.840 0.005 240);
+    --text:         oklch(0.180 0.005 240);
+    --text-muted:   oklch(0.500 0.005 240);
+    --text-subtle:  oklch(0.630 0.005 240);
+    --primary:      oklch(0.220 0.010 240);
+    --primary-hover:oklch(0.150 0.010 240);
+    --primary-soft: oklch(0.955 0.010 200);
+    --primary-fg:   oklch(0.985 0.002 240);
+    --accent:       oklch(0.640 0.130 205);
+    --accent-hover: oklch(0.580 0.140 205);
+    --success:      oklch(0.595 0.130 158);
+    --success-soft: oklch(0.955 0.025 158);
+    --warning:      oklch(0.720 0.140 75);
+    --warning-soft: oklch(0.965 0.030 80);
+    --danger:       oklch(0.580 0.195 25);
+    --danger-soft:  oklch(0.960 0.025 25);
+  }
+  .p-graphite.dark {
+    --bg:           oklch(0.150 0.004 240);
+    --surface:      oklch(0.190 0.005 240);
+    --surface-2:    oklch(0.225 0.005 240);
+    --border:       oklch(0.280 0.006 240);
+    --border-strong:oklch(0.360 0.007 240);
+    --text:         oklch(0.975 0.003 240);
+    --text-muted:   oklch(0.700 0.005 240);
+    --text-subtle:  oklch(0.570 0.005 240);
+    --primary:      oklch(0.975 0.003 240);
+    --primary-hover:oklch(0.900 0.004 240);
+    --primary-soft: oklch(0.270 0.030 205);
+    --primary-fg:   oklch(0.150 0.004 240);
+    --accent:       oklch(0.720 0.135 205);
+    --accent-hover: oklch(0.780 0.130 205);
+    --success:      oklch(0.720 0.135 158);
+    --success-soft: oklch(0.260 0.045 158);
+    --warning:      oklch(0.800 0.135 75);
+    --warning-soft: oklch(0.280 0.055 75);
+    --danger:       oklch(0.700 0.175 25);
+    --danger-soft:  oklch(0.290 0.070 25);
+  }
+
+  /* ---------- PALETTE: Pine ---------- */
+  .p-pine {
+    --bg:           oklch(0.992 0.004 145);
+    --surface:      oklch(0.984 0.006 145);
+    --surface-2:    oklch(0.968 0.008 145);
+    --border:       oklch(0.910 0.012 145);
+    --border-strong:oklch(0.850 0.016 145);
+    --text:         oklch(0.200 0.020 155);
+    --text-muted:   oklch(0.510 0.018 155);
+    --text-subtle:  oklch(0.635 0.014 155);
+    --primary:      oklch(0.485 0.115 158);
+    --primary-hover:oklch(0.420 0.120 158);
+    --primary-soft: oklch(0.955 0.030 158);
+    --primary-fg:   oklch(0.985 0.005 145);
+    --accent:       oklch(0.700 0.135 65);  /* warm sand accent */
+    --success:      oklch(0.595 0.130 158);
+    --success-soft: oklch(0.955 0.030 158);
+    --warning:      oklch(0.720 0.150 75);
+    --warning-soft: oklch(0.965 0.035 80);
+    --danger:       oklch(0.580 0.195 25);
+    --danger-soft:  oklch(0.960 0.030 25);
+  }
+  .p-pine.dark {
+    --bg:           oklch(0.155 0.012 155);
+    --surface:      oklch(0.195 0.014 155);
+    --surface-2:    oklch(0.230 0.016 155);
+    --border:       oklch(0.285 0.018 155);
+    --border-strong:oklch(0.370 0.020 155);
+    --text:         oklch(0.970 0.006 145);
+    --text-muted:   oklch(0.700 0.012 145);
+    --text-subtle:  oklch(0.580 0.014 145);
+    --primary:      oklch(0.680 0.130 158);
+    --primary-hover:oklch(0.740 0.130 158);
+    --primary-soft: oklch(0.270 0.050 158);
+    --primary-fg:   oklch(0.140 0.020 158);
+    --accent:       oklch(0.770 0.130 65);
+    --success:      oklch(0.720 0.140 158);
+    --success-soft: oklch(0.265 0.050 158);
+    --warning:      oklch(0.800 0.140 75);
+    --warning-soft: oklch(0.290 0.060 75);
+    --danger:       oklch(0.700 0.180 25);
+    --danger-soft:  oklch(0.290 0.080 25);
+  }
+
+  /* ---------- Helpers ---------- */
+  .palette-canvas {
+    background: var(--bg);
+    color: var(--text);
+    border-color: var(--border);
+  }
+  .swatch { border: 1px solid color-mix(in oklch, var(--text) 12%, transparent); }
+</style>
+</head>
+<body class="bg-neutral-50 text-neutral-900">
+
+<!-- ============== TOP / META ============== -->
+<header class="border-b border-neutral-200 bg-white">
+  <div class="mx-auto max-w-[1320px] px-8 py-10">
+    <div class="flex items-start justify-between gap-10">
+      <div class="max-w-2xl">
+        <div class="mono text-[11px] uppercase tracking-[0.18em] text-neutral-500">SOEN Compass · Design System</div>
+        <h1 class="mt-3 text-[34px] font-semibold tracking-tight leading-[1.1]">Phase 1 — Color &amp; brand direction</h1>
+        <p class="mt-4 text-[15px] leading-relaxed text-neutral-600">
+          Three palette directions, each shown in light &amp; dark with a sample CourseCard, buttons, badges, and an AI-insight callout so you can judge them in context — not as floating swatches. Pick one and we move to Phase 2.
+        </p>
+      </div>
+      <div class="hidden md:flex flex-col items-end gap-2 text-[12px] text-neutral-500">
+        <div class="mono">geist · geist mono</div>
+        <div class="mono">oklch · wcag aa+</div>
+        <div class="mono">tailwind v4 ready</div>
+      </div>
+    </div>
+
+    <!-- principles strip -->
+    <div class="mt-10 grid grid-cols-2 md:grid-cols-4 gap-6 border-t border-neutral-200 pt-6">
+      <div>
+        <div class="mono text-[10px] uppercase tracking-widest text-neutral-500">Mood</div>
+        <div class="mt-1.5 text-[13px] text-neutral-800">Sharp &amp; technical, with warmth</div>
+      </div>
+      <div>
+        <div class="mono text-[10px] uppercase tracking-widest text-neutral-500">Chroma</div>
+        <div class="mt-1.5 text-[13px] text-neutral-800">~0.13–0.18 on accents</div>
+      </div>
+      <div>
+        <div class="mono text-[10px] uppercase tracking-widest text-neutral-500">Light bg</div>
+        <div class="mt-1.5 text-[13px] text-neutral-800">Off-white, hue-tinted paper</div>
+      </div>
+      <div>
+        <div class="mono text-[10px] uppercase tracking-widest text-neutral-500">Dark bg</div>
+        <div class="mt-1.5 text-[13px] text-neutral-800">Deep slate, hue-tinted</div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- ============== PALETTE SECTIONS ============== -->
+<main class="mx-auto max-w-[1320px] px-8 py-12 space-y-16">
+
+  <!-- ====== Palette 1: ELECTRIC BLUE ====== -->
+  <section data-palette="blue">
+    <div class="flex items-end justify-between gap-6 mb-6">
+      <div>
+        <div class="mono text-[11px] uppercase tracking-[0.16em] text-neutral-500">Option 01</div>
+        <h2 class="mt-1 text-[26px] font-semibold tracking-tight">Electric Blue</h2>
+        <p class="mt-2 max-w-xl text-[14px] text-neutral-600 leading-relaxed">
+          The default-safe direction, elevated. Trustworthy for an academic tool, but the primary is bright enough to feel like a product, not a portal. Hue 252°.
+        </p>
+      </div>
+      <div class="mono text-[11px] text-neutral-500 hidden md:block">
+        primary &nbsp; <span class="text-neutral-800">oklch(0.560 0.180 252)</span>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <!-- LIGHT -->
+      <div class="p-blue palette-canvas rounded-xl border overflow-hidden">
+        <div class="px-5 py-3 border-b flex items-center justify-between" style="border-color:var(--border);">
+          <span class="mono text-[10px] uppercase tracking-widest" style="color:var(--text-subtle);">Light</span>
+          <span class="mono text-[10px]" style="color:var(--text-subtle);">#bg · paper</span>
+        </div>
+        <div class="p-6 space-y-6">
+          <!-- ramps -->
+          <div class="grid grid-cols-6 gap-2">
+            <div><div class="swatch h-12 rounded-md" style="background:var(--bg);"></div><div class="mt-1.5 mono text-[10px]" style="color:var(--text-muted);">bg</div></div>
+            <div><div class="swatch h-12 rounded-md" style="background:var(--surface);"></div><div class="mt-1.5 mono text-[10px]" style="color:var(--text-muted);">surface</div></div>
+            <div><div class="swatch h-12 rounded-md" style="background:var(--surface-2);"></div><div class="mt-1.5 mono text-[10px]" style="color:var(--text-muted);">surface-2</div></div>
+            <div><div class="swatch h-12 rounded-md" style="background:var(--border);"></div><div class="mt-1.5 mono text-[10px]" style="color:var(--text-muted);">border</div></div>
+            <div><div class="swatch h-12 rounded-md" style="background:var(--text-muted);"></div><div class="mt-1.5 mono text-[10px]" style="color:var(--text-muted);">muted</div></div>
+            <div><div class="swatch h-12 rounded-md" style="background:var(--text);"></div><div class="mt-1.5 mono text-[10px]" style="color:var(--text-muted);">text</div></div>
+          </div>
+          <div class="grid grid-cols-6 gap-2">
+            <div><div class="swatch h-12 rounded-md" style="background:var(--primary);"></div><div class="mt-1.5 mono text-[10px]" style="color:var(--text-muted);">primary</div></div>
+            <div><div class="swatch h-12 rounded-md" style="background:var(--primary-soft);"></div><div class="mt-1.5 mono text-[10px]" style="color:var(--text-muted);">primary/soft</div></div>
+            <div><div class="swatch h-12 rounded-md" style="background:var(--accent);"></div><div class="mt-1.5 mono text-[10px]" style="color:var(--text-muted);">accent</div></div>
+            <div><div class="swatch h-12 rounded-md" style="background:var(--success);"></div><div class="mt-1.5 mono text-[10px]" style="color:var(--text-muted);">success</div></div>
+            <div><div class="swatch h-12 rounded-md" style="background:var(--warning);"></div><div class="mt-1.5 mono text-[10px]" style="color:var(--text-muted);">warning</div></div>
+            <div><div class="swatch h-12 rounded-md" style="background:var(--danger);"></div><div class="mt-1.5 mono text-[10px]" style="color:var(--text-muted);">danger</div></div>
+          </div>
+
+          <!-- Sample components -->
+          <div class="pt-2 grid grid-cols-1 md:grid-cols-2 gap-5">
+            <!-- CourseCard -->
+            <div class="rounded-lg p-0 overflow-hidden flex" style="background:var(--surface); border:1px solid var(--border);">
+              <div class="w-1" style="background:var(--primary);"></div>
+              <div class="flex-1 p-4">
+                <div class="flex items-start justify-between gap-3">
+                  <div>
+                    <div class="mono text-[12px] tracking-wide" style="color:var(--text-muted);">COMP 352</div>
+                    <div class="mt-1 text-[15px] font-medium leading-snug">Data Structures &amp; Algorithms</div>
+                  </div>
+                  <span class="text-[11px] font-medium px-2 py-0.5 rounded-full" style="background:var(--primary-soft); color:var(--primary);">Enrolled</span>
+                </div>
+                <div class="mt-3 flex flex-wrap items-center gap-x-3 gap-y-1 text-[12px] whitespace-nowrap" style="color:var(--text-muted);">
+                  <span class="mono">3.5 cr</span>
+                  <span>·</span>
+                  <span>Fall 2026</span>
+                  <span>·</span>
+                  <span>Prof. Bhatt</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- AI Insight callout -->
+            <div class="rounded-lg p-4" style="background:var(--primary-soft); border:1px solid color-mix(in oklch, var(--primary) 25%, transparent);">
+              <div class="flex items-center gap-2">
+                <span class="inline-block h-1.5 w-1.5 rounded-full" style="background:var(--primary);"></span>
+                <span class="mono text-[10px] uppercase tracking-widest whitespace-nowrap" style="color:var(--primary);">AI Insight</span>
+              </div>
+              <p class="mt-2 text-[13px] leading-relaxed" style="color:var(--text);">
+                Heads up — taking <span class="mono">SOEN 341</span> with <span class="mono">COMP 352</span> in the same term puts your workload at <strong>Heavy</strong>.
+              </p>
+            </div>
+          </div>
+
+          <!-- Buttons + badges -->
+          <div class="space-y-3">
+            <div class="flex flex-wrap items-center gap-2">
+              <button class="text-[13px] font-medium px-3.5 py-2 rounded-md whitespace-nowrap" style="background:var(--primary); color:var(--primary-fg);">Add to plan</button>
+              <button class="text-[13px] font-medium px-3.5 py-2 rounded-md whitespace-nowrap" style="background:var(--surface); color:var(--text); border:1px solid var(--border);">Details</button>
+              <button class="text-[13px] font-medium px-3 py-2 rounded-md whitespace-nowrap" style="color:var(--text-muted);">Skip</button>
+            </div>
+            <div class="flex flex-wrap items-center gap-2">
+              <span class="inline-flex items-center gap-1.5 text-[11px] font-medium px-2 py-0.5 rounded-full whitespace-nowrap" style="background:var(--success-soft); color:var(--success);"><span class="h-1.5 w-1.5 rounded-full" style="background:var(--success);"></span>Done</span>
+              <span class="inline-flex items-center gap-1.5 text-[11px] font-medium px-2 py-0.5 rounded-full whitespace-nowrap" style="background:var(--warning-soft); color:var(--warning);"><span class="h-1.5 w-1.5 rounded-full" style="background:var(--warning);"></span>Warning</span>
+              <span class="inline-flex items-center gap-1.5 text-[11px] font-medium px-2 py-0.5 rounded-full whitespace-nowrap" style="background:var(--danger-soft); color:var(--danger);"><span class="h-1.5 w-1.5 rounded-full" style="background:var(--danger);"></span>Prereq missing</span>
+              <span class="inline-flex items-center gap-1.5 text-[11px] font-medium px-2 py-0.5 rounded-full whitespace-nowrap" style="background:var(--primary-soft); color:var(--primary);"><span class="h-1.5 w-1.5 rounded-full" style="background:var(--primary);"></span>Planned</span>
+            </div>
+          </div>
+
+          <!-- Progress bar -->
+          <div>
+            <div class="flex items-baseline justify-between mb-2">
+              <span class="text-[12px] whitespace-nowrap" style="color:var(--text-muted);">Degree progress</span>
+              <span class="mono text-[12px] whitespace-nowrap" style="color:var(--text);">87 / 120 cr</span>
+            </div>
+            <div class="h-2 rounded-full overflow-hidden" style="background:var(--surface-2);">
+              <div class="h-full rounded-full" style="width:72%; background:var(--primary);"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- DARK -->
+      <div class="p-blue dark palette-canvas rounded-xl border overflow-hidden">
+        <div class="px-5 py-3 border-b flex items-center justify-between" style="border-color:var(--border);">
+          <span class="mono text-[10px] uppercase tracking-widest" style="color:var(--text-subtle);">Dark</span>
+          <span class="mono text-[10px]" style="color:var(--text-subtle);">#bg · slate · hue-tinted</span>
+        </div>
+        <div class="p-6 space-y-6">
+          <div class="grid grid-cols-6 gap-2">
+            <div><div class="swatch h-12 rounded-md" style="background:var(--bg);"></div><div class="mt-1.5 mono text-[10px]" style="color:var(--text-muted);">bg</div></div>
+            <div><div class="swatch h-12 rounded-md" style="background:var(--surface);"></div><div class="mt-1.5 mono text-[10px]" style="color:var(--text-muted);">surface</div></div>
+            <div><div class="swatch h-12 rounded-md" style="background:var(--surface-2);"></div><div class="mt-1.5 mono text-[10px]" style="color:var(--text-muted);">surface-2</div></div>
+            <div><div class="swatch h-12 rounded-md" style="background:var(--border);"></div><div class="mt-1.5 mono text-[10px]" style="color:var(--text-muted);">border</div></div>
+            <div><div class="swatch h-12 rounded-md" style="background:var(--text-muted);"></div><div class="mt-1.5 mono text-[10px]" style="color:var(--text-muted);">muted</div></div>
+            <div><div class="swatch h-12 rounded-md" style="background:var(--text);"></div><div class="mt-1.5 mono text-[10px]" style="color:var(--text-muted);">text</div></div>
+          </div>
+          <div class="grid grid-cols-6 gap-2">
+            <div><div class="swatch h-12 rounded-md" style="background:var(--primary);"></div><div class="mt-1.5 mono text-[10px]" style="color:var(--text-muted);">primary</div></div>
+            <div><div class="swatch h-12 rounded-md" style="background:var(--primary-soft);"></div><div class="mt-1.5 mono text-[10px]" style="color:var(--text-muted);">primary/soft</div></div>
+            <div><div class="swatch h-12 rounded-md" style="background:var(--accent);"></div><div class="mt-1.5 mono text-[10px]" style="color:var(--text-muted);">accent</div></div>
+            <div><div class="swatch h-12 rounded-md" style="background:var(--success);"></div><div class="mt-1.5 mono text-[10px]" style="color:var(--text-muted);">success</div></div>
+            <div><div class="swatch h-12 rounded-md" style="background:var(--warning);"></div><div class="mt-1.5 mono text-[10px]" style="color:var(--text-muted);">warning</div></div>
+            <div><div class="swatch h-12 rounded-md" style="background:var(--danger);"></div><div class="mt-1.5 mono text-[10px]" style="color:var(--text-muted);">danger</div></div>
+          </div>
+
+          <div class="pt-2 grid grid-cols-1 md:grid-cols-2 gap-5">
+            <div class="rounded-lg overflow-hidden flex" style="background:var(--surface); border:1px solid var(--border);">
+              <div class="w-1" style="background:var(--primary);"></div>
+              <div class="flex-1 p-4">
+                <div class="flex items-start justify-between gap-3">
+                  <div>
+                    <div class="mono text-[12px] tracking-wide" style="color:var(--text-muted);">COMP 352</div>
+                    <div class="mt-1 text-[15px] font-medium leading-snug">Data Structures &amp; Algorithms</div>
+                  </div>
+                  <span class="text-[11px] font-medium px-2 py-0.5 rounded-full" style="background:var(--primary-soft); color:var(--primary);">Enrolled</span>
+                </div>
+                <div class="mt-3 flex flex-wrap items-center gap-x-3 gap-y-1 text-[12px] whitespace-nowrap" style="color:var(--text-muted);">
+                  <span class="mono">3.5 cr</span>
+                  <span>·</span>
+                  <span>Fall 2026</span>
+                  <span>·</span>
+                  <span>Prof. Bhatt</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="rounded-lg p-4" style="background:var(--primary-soft); border:1px solid color-mix(in oklch, var(--primary) 35%, transparent);">
+              <div class="flex items-center gap-2">
+                <span class="inline-block h-1.5 w-1.5 rounded-full" style="background:var(--primary);"></span>
+                <span class="mono text-[10px] uppercase tracking-widest whitespace-nowrap" style="color:var(--primary);">AI Insight</span>
+              </div>
+              <p class="mt-2 text-[13px] leading-relaxed" style="color:var(--text);">
+                Heads up — taking <span class="mono">SOEN 341</span> with <span class="mono">COMP 352</span> in the same term puts your workload at <strong>Heavy</strong>.
+              </p>
+            </div>
+          </div>
+
+          <div class="space-y-3">
+            <div class="flex flex-wrap items-center gap-2">
+              <button class="text-[13px] font-medium px-3.5 py-2 rounded-md whitespace-nowrap" style="background:var(--primary); color:var(--primary-fg);">Add to plan</button>
+              <button class="text-[13px] font-medium px-3.5 py-2 rounded-md whitespace-nowrap" style="background:var(--surface-2); color:var(--text); border:1px solid var(--border);">Details</button>
+              <button class="text-[13px] font-medium px-3 py-2 rounded-md whitespace-nowrap" style="color:var(--text-muted);">Skip</button>
+            </div>
+            <div class="flex flex-wrap items-center gap-2">
+              <span class="inline-flex items-center gap-1.5 text-[11px] font-medium px-2 py-0.5 rounded-full whitespace-nowrap" style="background:var(--success-soft); color:var(--success);"><span class="h-1.5 w-1.5 rounded-full" style="background:var(--success);"></span>Done</span>
+              <span class="inline-flex items-center gap-1.5 text-[11px] font-medium px-2 py-0.5 rounded-full whitespace-nowrap" style="background:var(--warning-soft); color:var(--warning);"><span class="h-1.5 w-1.5 rounded-full" style="background:var(--warning);"></span>Warning</span>
+              <span class="inline-flex items-center gap-1.5 text-[11px] font-medium px-2 py-0.5 rounded-full whitespace-nowrap" style="background:var(--danger-soft); color:var(--danger);"><span class="h-1.5 w-1.5 rounded-full" style="background:var(--danger);"></span>Prereq missing</span>
+              <span class="inline-flex items-center gap-1.5 text-[11px] font-medium px-2 py-0.5 rounded-full whitespace-nowrap" style="background:var(--primary-soft); color:var(--primary);"><span class="h-1.5 w-1.5 rounded-full" style="background:var(--primary);"></span>Planned</span>
+            </div>
+          </div>
+
+          <div>
+            <div class="flex items-baseline justify-between mb-2">
+              <span class="text-[12px] whitespace-nowrap" style="color:var(--text-muted);">Degree progress</span>
+              <span class="mono text-[12px] whitespace-nowrap" style="color:var(--text);">87 / 120 cr</span>
+            </div>
+            <div class="h-2 rounded-full overflow-hidden" style="background:var(--surface-2);">
+              <div class="h-full rounded-full" style="width:72%; background:var(--primary);"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- OKLCH spec table -->
+    <details class="mt-5 group">
+      <summary class="cursor-pointer list-none flex items-center gap-2 text-[12px] text-neutral-500 hover:text-neutral-800">
+        <span class="mono">›</span><span>OKLCH tokens</span>
+      </summary>
+      <div class="mt-3 mono text-[11px] grid grid-cols-2 md:grid-cols-3 gap-x-8 gap-y-1 text-neutral-600">
+        <div>primary <span class="text-neutral-900">oklch(0.560 0.180 252)</span></div>
+        <div>primary/dark <span class="text-neutral-900">oklch(0.680 0.170 252)</span></div>
+        <div>accent (cyan) <span class="text-neutral-900">oklch(0.700 0.150 200)</span></div>
+        <div>success <span class="text-neutral-900">oklch(0.595 0.135 158)</span></div>
+        <div>warning <span class="text-neutral-900">oklch(0.720 0.150 75)</span></div>
+        <div>danger <span class="text-neutral-900">oklch(0.580 0.205 25)</span></div>
+        <div>bg/light <span class="text-neutral-900">oklch(0.992 0.003 250)</span></div>
+        <div>bg/dark <span class="text-neutral-900">oklch(0.165 0.012 252)</span></div>
+        <div>text/light <span class="text-neutral-900">oklch(0.205 0.020 250)</span></div>
+      </div>
+    </details>
+  </section>
+
+  <!-- ====== Palette 2: GRAPHITE + CYAN ====== -->
+  <section data-palette="graphite">
+    <div class="flex items-end justify-between gap-6 mb-6">
+      <div>
+        <div class="mono text-[11px] uppercase tracking-[0.16em] text-neutral-500">Option 02</div>
+        <h2 class="mt-1 text-[26px] font-semibold tracking-tight">Graphite + Cyan</h2>
+        <p class="mt-2 max-w-xl text-[14px] text-neutral-600 leading-relaxed">
+          Vercel-leaning. Primary is near-black ink, cyan is the single accent. Restrained, dense, premium — leaves all the color budget for status and data viz.
+        </p>
+      </div>
+      <div class="mono text-[11px] text-neutral-500 hidden md:block">
+        primary &nbsp; <span class="text-neutral-800">oklch(0.220 0.010 240)</span> · accent <span class="text-neutral-800">oklch(0.640 0.130 205)</span>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <!-- LIGHT -->
+      <div class="p-graphite palette-canvas rounded-xl border overflow-hidden">
+        <div class="px-5 py-3 border-b flex items-center justify-between" style="border-color:var(--border);">
+          <span class="mono text-[10px] uppercase tracking-widest" style="color:var(--text-subtle);">Light</span>
+          <span class="mono text-[10px]" style="color:var(--text-subtle);">#bg · neutral paper</span>
+        </div>
+        <div class="p-6 space-y-6">
+          <div class="grid grid-cols-6 gap-2">
+            <div><div class="swatch h-12 rounded-md" style="background:var(--bg);"></div><div class="mt-1.5 mono text-[10px]" style="color:var(--text-muted);">bg</div></div>
+            <div><div class="swatch h-12 rounded-md" style="background:var(--surface);"></div><div class="mt-1.5 mono text-[10px]" style="color:var(--text-muted);">surface</div></div>
+            <div><div class="swatch h-12 rounded-md" style="background:var(--surface-2);"></div><div class="mt-1.5 mono text-[10px]" style="color:var(--text-muted);">surface-2</div></div>
+            <div><div class="swatch h-12 rounded-md" style="background:var(--border);"></div><div class="mt-1.5 mono text-[10px]" style="color:var(--text-muted);">border</div></div>
+            <div><div class="swatch h-12 rounded-md" style="background:var(--text-muted);"></div><div class="mt-1.5 mono text-[10px]" style="color:var(--text-muted);">muted</div></div>
+            <div><div class="swatch h-12 rounded-md" style="background:var(--text);"></div><div class="mt-1.5 mono text-[10px]" style="color:var(--text-muted);">text</div></div>
+          </div>
+          <div class="grid grid-cols-6 gap-2">
+            <div><div class="swatch h-12 rounded-md" style="background:var(--primary);"></div><div class="mt-1.5 mono text-[10px]" style="color:var(--text-muted);">primary</div></div>
+            <div><div class="swatch h-12 rounded-md" style="background:var(--accent);"></div><div class="mt-1.5 mono text-[10px]" style="color:var(--text-muted);">accent</div></div>
+            <div><div class="swatch h-12 rounded-md" style="background:var(--primary-soft);"></div><div class="mt-1.5 mono text-[10px]" style="color:var(--text-muted);">accent/soft</div></div>
+            <div><div class="swatch h-12 rounded-md" style="background:var(--success);"></div><div class="mt-1.5 mono text-[10px]" style="color:var(--text-muted);">success</div></div>
+            <div><div class="swatch h-12 rounded-md" style="background:var(--warning);"></div><div class="mt-1.5 mono text-[10px]" style="color:var(--text-muted);">warning</div></div>
+            <div><div class="swatch h-12 rounded-md" style="background:var(--danger);"></div><div class="mt-1.5 mono text-[10px]" style="color:var(--text-muted);">danger</div></div>
+          </div>
+
+          <div class="pt-2 grid grid-cols-1 md:grid-cols-2 gap-5">
+            <div class="rounded-lg overflow-hidden flex" style="background:var(--surface); border:1px solid var(--border);">
+              <div class="w-1" style="background:var(--accent);"></div>
+              <div class="flex-1 p-4">
+                <div class="flex items-start justify-between gap-3">
+                  <div>
+                    <div class="mono text-[12px] tracking-wide" style="color:var(--text-muted);">COMP 352</div>
+                    <div class="mt-1 text-[15px] font-medium leading-snug">Data Structures &amp; Algorithms</div>
+                  </div>
+                  <span class="text-[11px] font-medium px-2 py-0.5 rounded-full" style="background:var(--primary-soft); color:var(--accent-hover);">Enrolled</span>
+                </div>
+                <div class="mt-3 flex flex-wrap items-center gap-x-3 gap-y-1 text-[12px] whitespace-nowrap" style="color:var(--text-muted);">
+                  <span class="mono">3.5 cr</span><span>·</span><span>Fall 2026</span><span>·</span><span>Prof. Bhatt</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="rounded-lg p-4" style="background:var(--primary-soft); border:1px solid color-mix(in oklch, var(--accent) 25%, transparent);">
+              <div class="flex items-center gap-2">
+                <span class="inline-block h-1.5 w-1.5 rounded-full" style="background:var(--accent);"></span>
+                <span class="mono text-[10px] uppercase tracking-widest whitespace-nowrap" style="color:var(--accent-hover);">AI Insight</span>
+              </div>
+              <p class="mt-2 text-[13px] leading-relaxed" style="color:var(--text);">
+                Heads up — taking <span class="mono">SOEN 341</span> with <span class="mono">COMP 352</span> in the same term puts your workload at <strong>Heavy</strong>.
+              </p>
+            </div>
+          </div>
+
+          <div class="space-y-3">
+            <div class="flex flex-wrap items-center gap-2">
+              <button class="text-[13px] font-medium px-3.5 py-2 rounded-md whitespace-nowrap" style="background:var(--primary); color:var(--primary-fg);">Add to plan</button>
+              <button class="text-[13px] font-medium px-3.5 py-2 rounded-md whitespace-nowrap" style="background:var(--surface); color:var(--text); border:1px solid var(--border);">Details</button>
+              <button class="text-[13px] font-medium px-3 py-2 rounded-md whitespace-nowrap" style="color:var(--text-muted);">Skip</button>
+            </div>
+            <div class="flex flex-wrap items-center gap-2">
+              <span class="inline-flex items-center gap-1.5 text-[11px] font-medium px-2 py-0.5 rounded-full whitespace-nowrap" style="background:var(--success-soft); color:var(--success);"><span class="h-1.5 w-1.5 rounded-full" style="background:var(--success);"></span>Done</span>
+              <span class="inline-flex items-center gap-1.5 text-[11px] font-medium px-2 py-0.5 rounded-full whitespace-nowrap" style="background:var(--warning-soft); color:var(--warning);"><span class="h-1.5 w-1.5 rounded-full" style="background:var(--warning);"></span>Warning</span>
+              <span class="inline-flex items-center gap-1.5 text-[11px] font-medium px-2 py-0.5 rounded-full whitespace-nowrap" style="background:var(--danger-soft); color:var(--danger);"><span class="h-1.5 w-1.5 rounded-full" style="background:var(--danger);"></span>Prereq missing</span>
+              <span class="inline-flex items-center gap-1.5 text-[11px] font-medium px-2 py-0.5 rounded-full whitespace-nowrap" style="background:var(--primary-soft); color:var(--primary);"><span class="h-1.5 w-1.5 rounded-full" style="background:var(--primary);"></span>Planned</span>
+            </div>
+          </div>
+
+          <div>
+            <div class="flex items-baseline justify-between mb-2">
+              <span class="text-[12px] whitespace-nowrap" style="color:var(--text-muted);">Degree progress</span>
+              <span class="mono text-[12px] whitespace-nowrap" style="color:var(--text);">87 / 120 cr</span>
+            </div>
+            <div class="h-2 rounded-full overflow-hidden" style="background:var(--surface-2);">
+              <div class="h-full rounded-full" style="width:72%; background:var(--accent);"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- DARK -->
+      <div class="p-graphite dark palette-canvas rounded-xl border overflow-hidden">
+        <div class="px-5 py-3 border-b flex items-center justify-between" style="border-color:var(--border);">
+          <span class="mono text-[10px] uppercase tracking-widest" style="color:var(--text-subtle);">Dark</span>
+          <span class="mono text-[10px]" style="color:var(--text-subtle);">#bg · graphite</span>
+        </div>
+        <div class="p-6 space-y-6">
+          <div class="grid grid-cols-6 gap-2">
+            <div><div class="swatch h-12 rounded-md" style="background:var(--bg);"></div><div class="mt-1.5 mono text-[10px]" style="color:var(--text-muted);">bg</div></div>
+            <div><div class="swatch h-12 rounded-md" style="background:var(--surface);"></div><div class="mt-1.5 mono text-[10px]" style="color:var(--text-muted);">surface</div></div>
+            <div><div class="swatch h-12 rounded-md" style="background:var(--surface-2);"></div><div class="mt-1.5 mono text-[10px]" style="color:var(--text-muted);">surface-2</div></div>
+            <div><div class="swatch h-12 rounded-md" style="background:var(--border);"></div><div class="mt-1.5 mono text-[10px]" style="color:var(--text-muted);">border</div></div>
+            <div><div class="swatch h-12 rounded-md" style="background:var(--text-muted);"></div><div class="mt-1.5 mono text-[10px]" style="color:var(--text-muted);">muted</div></div>
+            <div><div class="swatch h-12 rounded-md" style="background:var(--text);"></div><div class="mt-1.5 mono text-[10px]" style="color:var(--text-muted);">text</div></div>
+          </div>
+          <div class="grid grid-cols-6 gap-2">
+            <div><div class="swatch h-12 rounded-md" style="background:var(--primary);"></div><div class="mt-1.5 mono text-[10px]" style="color:var(--text-muted);">primary</div></div>
+            <div><div class="swatch h-12 rounded-md" style="background:var(--accent);"></div><div class="mt-1.5 mono text-[10px]" style="color:var(--text-muted);">accent</div></div>
+            <div><div class="swatch h-12 rounded-md" style="background:var(--primary-soft);"></div><div class="mt-1.5 mono text-[10px]" style="color:var(--text-muted);">accent/soft</div></div>
+            <div><div class="swatch h-12 rounded-md" style="background:var(--success);"></div><div class="mt-1.5 mono text-[10px]" style="color:var(--text-muted);">success</div></div>
+            <div><div class="swatch h-12 rounded-md" style="background:var(--warning);"></div><div class="mt-1.5 mono text-[10px]" style="color:var(--text-muted);">warning</div></div>
+            <div><div class="swatch h-12 rounded-md" style="background:var(--danger);"></div><div class="mt-1.5 mono text-[10px]" style="color:var(--text-muted);">danger</div></div>
+          </div>
+
+          <div class="pt-2 grid grid-cols-1 md:grid-cols-2 gap-5">
+            <div class="rounded-lg overflow-hidden flex" style="background:var(--surface); border:1px solid var(--border);">
+              <div class="w-1" style="background:var(--accent);"></div>
+              <div class="flex-1 p-4">
+                <div class="flex items-start justify-between gap-3">
+                  <div>
+                    <div class="mono text-[12px] tracking-wide" style="color:var(--text-muted);">COMP 352</div>
+                    <div class="mt-1 text-[15px] font-medium leading-snug">Data Structures &amp; Algorithms</div>
+                  </div>
+                  <span class="text-[11px] font-medium px-2 py-0.5 rounded-full" style="background:var(--primary-soft); color:var(--accent);">Enrolled</span>
+                </div>
+                <div class="mt-3 flex flex-wrap items-center gap-x-3 gap-y-1 text-[12px] whitespace-nowrap" style="color:var(--text-muted);">
+                  <span class="mono">3.5 cr</span><span>·</span><span>Fall 2026</span><span>·</span><span>Prof. Bhatt</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="rounded-lg p-4" style="background:var(--primary-soft); border:1px solid color-mix(in oklch, var(--accent) 35%, transparent);">
+              <div class="flex items-center gap-2">
+                <span class="inline-block h-1.5 w-1.5 rounded-full" style="background:var(--accent);"></span>
+                <span class="mono text-[10px] uppercase tracking-widest whitespace-nowrap" style="color:var(--accent);">AI Insight</span>
+              </div>
+              <p class="mt-2 text-[13px] leading-relaxed" style="color:var(--text);">
+                Heads up — taking <span class="mono">SOEN 341</span> with <span class="mono">COMP 352</span> in the same term puts your workload at <strong>Heavy</strong>.
+              </p>
+            </div>
+          </div>
+
+          <div class="space-y-3">
+            <div class="flex flex-wrap items-center gap-2">
+              <button class="text-[13px] font-medium px-3.5 py-2 rounded-md whitespace-nowrap" style="background:var(--primary); color:var(--primary-fg);">Add to plan</button>
+              <button class="text-[13px] font-medium px-3.5 py-2 rounded-md whitespace-nowrap" style="background:var(--surface-2); color:var(--text); border:1px solid var(--border);">Details</button>
+              <button class="text-[13px] font-medium px-3 py-2 rounded-md whitespace-nowrap" style="color:var(--text-muted);">Skip</button>
+            </div>
+            <div class="flex flex-wrap items-center gap-2">
+              <span class="inline-flex items-center gap-1.5 text-[11px] font-medium px-2 py-0.5 rounded-full whitespace-nowrap" style="background:var(--success-soft); color:var(--success);"><span class="h-1.5 w-1.5 rounded-full" style="background:var(--success);"></span>Done</span>
+              <span class="inline-flex items-center gap-1.5 text-[11px] font-medium px-2 py-0.5 rounded-full whitespace-nowrap" style="background:var(--warning-soft); color:var(--warning);"><span class="h-1.5 w-1.5 rounded-full" style="background:var(--warning);"></span>Warning</span>
+              <span class="inline-flex items-center gap-1.5 text-[11px] font-medium px-2 py-0.5 rounded-full whitespace-nowrap" style="background:var(--danger-soft); color:var(--danger);"><span class="h-1.5 w-1.5 rounded-full" style="background:var(--danger);"></span>Prereq missing</span>
+              <span class="inline-flex items-center gap-1.5 text-[11px] font-medium px-2 py-0.5 rounded-full whitespace-nowrap" style="background:var(--primary-soft); color:var(--primary);"><span class="h-1.5 w-1.5 rounded-full" style="background:var(--primary);"></span>Planned</span>
+            </div>
+          </div>
+
+          <div>
+            <div class="flex items-baseline justify-between mb-2">
+              <span class="text-[12px] whitespace-nowrap" style="color:var(--text-muted);">Degree progress</span>
+              <span class="mono text-[12px] whitespace-nowrap" style="color:var(--text);">87 / 120 cr</span>
+            </div>
+            <div class="h-2 rounded-full overflow-hidden" style="background:var(--surface-2);">
+              <div class="h-full rounded-full" style="width:72%; background:var(--accent);"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <details class="mt-5 group">
+      <summary class="cursor-pointer list-none flex items-center gap-2 text-[12px] text-neutral-500 hover:text-neutral-800">
+        <span class="mono">›</span><span>OKLCH tokens</span>
+      </summary>
+      <div class="mt-3 mono text-[11px] grid grid-cols-2 md:grid-cols-3 gap-x-8 gap-y-1 text-neutral-600">
+        <div>primary/light <span class="text-neutral-900">oklch(0.220 0.010 240)</span></div>
+        <div>primary/dark <span class="text-neutral-900">oklch(0.975 0.003 240)</span></div>
+        <div>accent <span class="text-neutral-900">oklch(0.640 0.130 205)</span></div>
+        <div>success <span class="text-neutral-900">oklch(0.595 0.130 158)</span></div>
+        <div>warning <span class="text-neutral-900">oklch(0.720 0.140 75)</span></div>
+        <div>danger <span class="text-neutral-900">oklch(0.580 0.195 25)</span></div>
+        <div>bg/light <span class="text-neutral-900">oklch(0.990 0.002 240)</span></div>
+        <div>bg/dark <span class="text-neutral-900">oklch(0.150 0.004 240)</span></div>
+        <div>text/light <span class="text-neutral-900">oklch(0.180 0.005 240)</span></div>
+      </div>
+    </details>
+  </section>
+
+  <!-- ====== Palette 3: PINE ====== -->
+  <section data-palette="pine">
+    <div class="flex items-end justify-between gap-6 mb-6">
+      <div>
+        <div class="mono text-[11px] uppercase tracking-[0.16em] text-neutral-500">Option 03</div>
+        <h2 class="mt-1 text-[26px] font-semibold tracking-tight">Pine</h2>
+        <p class="mt-2 max-w-xl text-[14px] text-neutral-600 leading-relaxed">
+          Deep, grounded green with a warm sand accent. Reads as “growth + progress,” distinct from every other edu app on the planet. The most personality of the three.
+        </p>
+      </div>
+      <div class="mono text-[11px] text-neutral-500 hidden md:block">
+        primary &nbsp; <span class="text-neutral-800">oklch(0.485 0.115 158)</span> · accent <span class="text-neutral-800">oklch(0.700 0.135 65)</span>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <!-- LIGHT -->
+      <div class="p-pine palette-canvas rounded-xl border overflow-hidden">
+        <div class="px-5 py-3 border-b flex items-center justify-between" style="border-color:var(--border);">
+          <span class="mono text-[10px] uppercase tracking-widest" style="color:var(--text-subtle);">Light</span>
+          <span class="mono text-[10px]" style="color:var(--text-subtle);">#bg · warm paper</span>
+        </div>
+        <div class="p-6 space-y-6">
+          <div class="grid grid-cols-6 gap-2">
+            <div><div class="swatch h-12 rounded-md" style="background:var(--bg);"></div><div class="mt-1.5 mono text-[10px]" style="color:var(--text-muted);">bg</div></div>
+            <div><div class="swatch h-12 rounded-md" style="background:var(--surface);"></div><div class="mt-1.5 mono text-[10px]" style="color:var(--text-muted);">surface</div></div>
+            <div><div class="swatch h-12 rounded-md" style="background:var(--surface-2);"></div><div class="mt-1.5 mono text-[10px]" style="color:var(--text-muted);">surface-2</div></div>
+            <div><div class="swatch h-12 rounded-md" style="background:var(--border);"></div><div class="mt-1.5 mono text-[10px]" style="color:var(--text-muted);">border</div></div>
+            <div><div class="swatch h-12 rounded-md" style="background:var(--text-muted);"></div><div class="mt-1.5 mono text-[10px]" style="color:var(--text-muted);">muted</div></div>
+            <div><div class="swatch h-12 rounded-md" style="background:var(--text);"></div><div class="mt-1.5 mono text-[10px]" style="color:var(--text-muted);">text</div></div>
+          </div>
+          <div class="grid grid-cols-6 gap-2">
+            <div><div class="swatch h-12 rounded-md" style="background:var(--primary);"></div><div class="mt-1.5 mono text-[10px]" style="color:var(--text-muted);">primary</div></div>
+            <div><div class="swatch h-12 rounded-md" style="background:var(--primary-soft);"></div><div class="mt-1.5 mono text-[10px]" style="color:var(--text-muted);">primary/soft</div></div>
+            <div><div class="swatch h-12 rounded-md" style="background:var(--accent);"></div><div class="mt-1.5 mono text-[10px]" style="color:var(--text-muted);">accent (sand)</div></div>
+            <div><div class="swatch h-12 rounded-md" style="background:var(--success);"></div><div class="mt-1.5 mono text-[10px]" style="color:var(--text-muted);">success</div></div>
+            <div><div class="swatch h-12 rounded-md" style="background:var(--warning);"></div><div class="mt-1.5 mono text-[10px]" style="color:var(--text-muted);">warning</div></div>
+            <div><div class="swatch h-12 rounded-md" style="background:var(--danger);"></div><div class="mt-1.5 mono text-[10px]" style="color:var(--text-muted);">danger</div></div>
+          </div>
+
+          <div class="pt-2 grid grid-cols-1 md:grid-cols-2 gap-5">
+            <div class="rounded-lg overflow-hidden flex" style="background:var(--surface); border:1px solid var(--border);">
+              <div class="w-1" style="background:var(--primary);"></div>
+              <div class="flex-1 p-4">
+                <div class="flex items-start justify-between gap-3">
+                  <div>
+                    <div class="mono text-[12px] tracking-wide" style="color:var(--text-muted);">COMP 352</div>
+                    <div class="mt-1 text-[15px] font-medium leading-snug">Data Structures &amp; Algorithms</div>
+                  </div>
+                  <span class="text-[11px] font-medium px-2 py-0.5 rounded-full" style="background:var(--primary-soft); color:var(--primary);">Enrolled</span>
+                </div>
+                <div class="mt-3 flex flex-wrap items-center gap-x-3 gap-y-1 text-[12px] whitespace-nowrap" style="color:var(--text-muted);">
+                  <span class="mono">3.5 cr</span><span>·</span><span>Fall 2026</span><span>·</span><span>Prof. Bhatt</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="rounded-lg p-4" style="background:var(--primary-soft); border:1px solid color-mix(in oklch, var(--primary) 25%, transparent);">
+              <div class="flex items-center gap-2">
+                <span class="inline-block h-1.5 w-1.5 rounded-full" style="background:var(--primary);"></span>
+                <span class="mono text-[10px] uppercase tracking-widest whitespace-nowrap" style="color:var(--primary);">AI Insight</span>
+              </div>
+              <p class="mt-2 text-[13px] leading-relaxed" style="color:var(--text);">
+                Heads up — taking <span class="mono">SOEN 341</span> with <span class="mono">COMP 352</span> in the same term puts your workload at <strong>Heavy</strong>.
+              </p>
+            </div>
+          </div>
+
+          <div class="space-y-3">
+            <div class="flex flex-wrap items-center gap-2">
+              <button class="text-[13px] font-medium px-3.5 py-2 rounded-md whitespace-nowrap" style="background:var(--primary); color:var(--primary-fg);">Add to plan</button>
+              <button class="text-[13px] font-medium px-3.5 py-2 rounded-md whitespace-nowrap" style="background:var(--surface); color:var(--text); border:1px solid var(--border);">Details</button>
+              <button class="text-[13px] font-medium px-3 py-2 rounded-md whitespace-nowrap" style="color:var(--text-muted);">Skip</button>
+            </div>
+            <div class="flex flex-wrap items-center gap-2">
+              <span class="inline-flex items-center gap-1.5 text-[11px] font-medium px-2 py-0.5 rounded-full whitespace-nowrap" style="background:var(--success-soft); color:var(--success);"><span class="h-1.5 w-1.5 rounded-full" style="background:var(--success);"></span>Done</span>
+              <span class="inline-flex items-center gap-1.5 text-[11px] font-medium px-2 py-0.5 rounded-full whitespace-nowrap" style="background:var(--warning-soft); color:var(--warning);"><span class="h-1.5 w-1.5 rounded-full" style="background:var(--warning);"></span>Warning</span>
+              <span class="inline-flex items-center gap-1.5 text-[11px] font-medium px-2 py-0.5 rounded-full whitespace-nowrap" style="background:var(--danger-soft); color:var(--danger);"><span class="h-1.5 w-1.5 rounded-full" style="background:var(--danger);"></span>Prereq missing</span>
+              <span class="inline-flex items-center gap-1.5 text-[11px] font-medium px-2 py-0.5 rounded-full whitespace-nowrap" style="background:var(--primary-soft); color:var(--primary);"><span class="h-1.5 w-1.5 rounded-full" style="background:var(--primary);"></span>Planned</span>
+            </div>
+          </div>
+
+          <div>
+            <div class="flex items-baseline justify-between mb-2">
+              <span class="text-[12px] whitespace-nowrap" style="color:var(--text-muted);">Degree progress</span>
+              <span class="mono text-[12px] whitespace-nowrap" style="color:var(--text);">87 / 120 cr</span>
+            </div>
+            <div class="h-2 rounded-full overflow-hidden" style="background:var(--surface-2);">
+              <div class="h-full rounded-full" style="width:72%; background:var(--primary);"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- DARK -->
+      <div class="p-pine dark palette-canvas rounded-xl border overflow-hidden">
+        <div class="px-5 py-3 border-b flex items-center justify-between" style="border-color:var(--border);">
+          <span class="mono text-[10px] uppercase tracking-widest" style="color:var(--text-subtle);">Dark</span>
+          <span class="mono text-[10px]" style="color:var(--text-subtle);">#bg · pine-tinted</span>
+        </div>
+        <div class="p-6 space-y-6">
+          <div class="grid grid-cols-6 gap-2">
+            <div><div class="swatch h-12 rounded-md" style="background:var(--bg);"></div><div class="mt-1.5 mono text-[10px]" style="color:var(--text-muted);">bg</div></div>
+            <div><div class="swatch h-12 rounded-md" style="background:var(--surface);"></div><div class="mt-1.5 mono text-[10px]" style="color:var(--text-muted);">surface</div></div>
+            <div><div class="swatch h-12 rounded-md" style="background:var(--surface-2);"></div><div class="mt-1.5 mono text-[10px]" style="color:var(--text-muted);">surface-2</div></div>
+            <div><div class="swatch h-12 rounded-md" style="background:var(--border);"></div><div class="mt-1.5 mono text-[10px]" style="color:var(--text-muted);">border</div></div>
+            <div><div class="swatch h-12 rounded-md" style="background:var(--text-muted);"></div><div class="mt-1.5 mono text-[10px]" style="color:var(--text-muted);">muted</div></div>
+            <div><div class="swatch h-12 rounded-md" style="background:var(--text);"></div><div class="mt-1.5 mono text-[10px]" style="color:var(--text-muted);">text</div></div>
+          </div>
+          <div class="grid grid-cols-6 gap-2">
+            <div><div class="swatch h-12 rounded-md" style="background:var(--primary);"></div><div class="mt-1.5 mono text-[10px]" style="color:var(--text-muted);">primary</div></div>
+            <div><div class="swatch h-12 rounded-md" style="background:var(--primary-soft);"></div><div class="mt-1.5 mono text-[10px]" style="color:var(--text-muted);">primary/soft</div></div>
+            <div><div class="swatch h-12 rounded-md" style="background:var(--accent);"></div><div class="mt-1.5 mono text-[10px]" style="color:var(--text-muted);">accent (sand)</div></div>
+            <div><div class="swatch h-12 rounded-md" style="background:var(--success);"></div><div class="mt-1.5 mono text-[10px]" style="color:var(--text-muted);">success</div></div>
+            <div><div class="swatch h-12 rounded-md" style="background:var(--warning);"></div><div class="mt-1.5 mono text-[10px]" style="color:var(--text-muted);">warning</div></div>
+            <div><div class="swatch h-12 rounded-md" style="background:var(--danger);"></div><div class="mt-1.5 mono text-[10px]" style="color:var(--text-muted);">danger</div></div>
+          </div>
+
+          <div class="pt-2 grid grid-cols-1 md:grid-cols-2 gap-5">
+            <div class="rounded-lg overflow-hidden flex" style="background:var(--surface); border:1px solid var(--border);">
+              <div class="w-1" style="background:var(--primary);"></div>
+              <div class="flex-1 p-4">
+                <div class="flex items-start justify-between gap-3">
+                  <div>
+                    <div class="mono text-[12px] tracking-wide" style="color:var(--text-muted);">COMP 352</div>
+                    <div class="mt-1 text-[15px] font-medium leading-snug">Data Structures &amp; Algorithms</div>
+                  </div>
+                  <span class="text-[11px] font-medium px-2 py-0.5 rounded-full" style="background:var(--primary-soft); color:var(--primary);">Enrolled</span>
+                </div>
+                <div class="mt-3 flex flex-wrap items-center gap-x-3 gap-y-1 text-[12px] whitespace-nowrap" style="color:var(--text-muted);">
+                  <span class="mono">3.5 cr</span><span>·</span><span>Fall 2026</span><span>·</span><span>Prof. Bhatt</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="rounded-lg p-4" style="background:var(--primary-soft); border:1px solid color-mix(in oklch, var(--primary) 35%, transparent);">
+              <div class="flex items-center gap-2">
+                <span class="inline-block h-1.5 w-1.5 rounded-full" style="background:var(--primary);"></span>
+                <span class="mono text-[10px] uppercase tracking-widest whitespace-nowrap" style="color:var(--primary);">AI Insight</span>
+              </div>
+              <p class="mt-2 text-[13px] leading-relaxed" style="color:var(--text);">
+                Heads up — taking <span class="mono">SOEN 341</span> with <span class="mono">COMP 352</span> in the same term puts your workload at <strong>Heavy</strong>.
+              </p>
+            </div>
+          </div>
+
+          <div class="space-y-3">
+            <div class="flex flex-wrap items-center gap-2">
+              <button class="text-[13px] font-medium px-3.5 py-2 rounded-md whitespace-nowrap" style="background:var(--primary); color:var(--primary-fg);">Add to plan</button>
+              <button class="text-[13px] font-medium px-3.5 py-2 rounded-md whitespace-nowrap" style="background:var(--surface-2); color:var(--text); border:1px solid var(--border);">Details</button>
+              <button class="text-[13px] font-medium px-3 py-2 rounded-md whitespace-nowrap" style="color:var(--text-muted);">Skip</button>
+            </div>
+            <div class="flex flex-wrap items-center gap-2">
+              <span class="inline-flex items-center gap-1.5 text-[11px] font-medium px-2 py-0.5 rounded-full whitespace-nowrap" style="background:var(--success-soft); color:var(--success);"><span class="h-1.5 w-1.5 rounded-full" style="background:var(--success);"></span>Done</span>
+              <span class="inline-flex items-center gap-1.5 text-[11px] font-medium px-2 py-0.5 rounded-full whitespace-nowrap" style="background:var(--warning-soft); color:var(--warning);"><span class="h-1.5 w-1.5 rounded-full" style="background:var(--warning);"></span>Warning</span>
+              <span class="inline-flex items-center gap-1.5 text-[11px] font-medium px-2 py-0.5 rounded-full whitespace-nowrap" style="background:var(--danger-soft); color:var(--danger);"><span class="h-1.5 w-1.5 rounded-full" style="background:var(--danger);"></span>Prereq missing</span>
+              <span class="inline-flex items-center gap-1.5 text-[11px] font-medium px-2 py-0.5 rounded-full whitespace-nowrap" style="background:var(--primary-soft); color:var(--primary);"><span class="h-1.5 w-1.5 rounded-full" style="background:var(--primary);"></span>Planned</span>
+            </div>
+          </div>
+
+          <div>
+            <div class="flex items-baseline justify-between mb-2">
+              <span class="text-[12px] whitespace-nowrap" style="color:var(--text-muted);">Degree progress</span>
+              <span class="mono text-[12px] whitespace-nowrap" style="color:var(--text);">87 / 120 cr</span>
+            </div>
+            <div class="h-2 rounded-full overflow-hidden" style="background:var(--surface-2);">
+              <div class="h-full rounded-full" style="width:72%; background:var(--primary);"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <details class="mt-5 group">
+      <summary class="cursor-pointer list-none flex items-center gap-2 text-[12px] text-neutral-500 hover:text-neutral-800">
+        <span class="mono">›</span><span>OKLCH tokens</span>
+      </summary>
+      <div class="mt-3 mono text-[11px] grid grid-cols-2 md:grid-cols-3 gap-x-8 gap-y-1 text-neutral-600">
+        <div>primary/light <span class="text-neutral-900">oklch(0.485 0.115 158)</span></div>
+        <div>primary/dark <span class="text-neutral-900">oklch(0.680 0.130 158)</span></div>
+        <div>accent (sand) <span class="text-neutral-900">oklch(0.700 0.135 65)</span></div>
+        <div>success <span class="text-neutral-900">oklch(0.595 0.130 158)</span></div>
+        <div>warning <span class="text-neutral-900">oklch(0.720 0.150 75)</span></div>
+        <div>danger <span class="text-neutral-900">oklch(0.580 0.195 25)</span></div>
+        <div>bg/light <span class="text-neutral-900">oklch(0.992 0.004 145)</span></div>
+        <div>bg/dark <span class="text-neutral-900">oklch(0.155 0.012 155)</span></div>
+        <div>text/light <span class="text-neutral-900">oklch(0.200 0.020 155)</span></div>
+      </div>
+    </details>
+  </section>
+
+  <!-- ============== DECISION BAR ============== -->
+  <section class="rounded-xl border border-neutral-200 bg-white p-8">
+    <div class="flex items-start justify-between gap-8 flex-wrap">
+      <div class="max-w-xl">
+        <div class="mono text-[11px] uppercase tracking-[0.16em] text-neutral-500">Next</div>
+        <h3 class="mt-1 text-[20px] font-semibold tracking-tight">Pick a direction → I'll lock the tokens &amp; move to Phase 2</h3>
+        <p class="mt-2 text-[14px] text-neutral-600 leading-relaxed">
+          Phase 2 covers type scale (12 → 36), spacing scale (4px base), and finalized button / input / card sizing. Once you tell me which palette wins (Blue, Graphite, or Pine), I'll bake the tokens into a single source-of-truth file and we won't revisit color.
+        </p>
+        <p class="mt-3 text-[13px] text-neutral-500">
+          Want a tweak on the winning one (e.g. <span class="mono">"Blue, but cooler/darker primary"</span>, or <span class="mono">"Graphite, swap cyan for violet"</span>)? Say so and I'll iterate before locking.
+        </p>
+      </div>
+      <div class="text-[12px] text-neutral-500 space-y-1.5 mono">
+        <div>☐ &nbsp;Option 01 — Electric Blue</div>
+        <div>☐ &nbsp;Option 02 — Graphite + Cyan</div>
+        <div>☐ &nbsp;Option 03 — Pine</div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="mx-auto max-w-[1320px] px-8 pb-16 pt-2 text-[11px] text-neutral-500 mono flex items-center justify-between">
+  <span>SOEN Compass · Phase 1 of 7</span>
+  <span>next → Phase 2: Typography &amp; spacing</span>
+</footer>
+
+</body>
+</html>
