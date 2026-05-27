@@ -10,10 +10,13 @@ services:
     ports:
       - "5432:5432"
     volumes:
-      - ./postgres-data:/var/lib/postgresql/data
+      - compass-postgres-data:/var/lib/postgresql/data
       - ./scripts/db-init:/docker-entrypoint-initdb.d:ro
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U compass -d compass_dev"]
       interval: 5s
       timeout: 5s
       retries: 10
+
+volumes:
+  compass-postgres-data:
