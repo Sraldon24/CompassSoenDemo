@@ -1,0 +1,50 @@
+[
+  {
+    "code": "MATH 203",
+    "title": "Differential & Integral Calculus I",
+    "credits": 3,
+    "prereqText": "Cégep Math 103",
+    "plannedTerm": "CÉGEP exempt",
+    "status": "✅ Exempt (verify in Hub)"
+  },
+  {
+    "code": "MATH 204",
+    "title": "Vectors and Matrices",
+    "credits": 3,
+    "prereqText": "None",
+    "plannedTerm": "Fall 2026",
+    "status": "In Progress"
+  },
+  {
+    "code": "MATH 205",
+    "title": "Differential & Integral Calculus II",
+    "credits": 3,
+    "prereqText": "MATH 203",
+    "plannedTerm": "Winter 2027",
+    "status": "Recommended add"
+  },
+  {
+    "code": "PHYS 204",
+    "title": "Mechanics",
+    "credits": 3,
+    "prereqText": "MATH 203 (co-req OK)",
+    "plannedTerm": "Winter 2027",
+    "status": "Planned"
+  },
+  {
+    "code": "PHYS 205",
+    "title": "Electricity & Magnetism",
+    "credits": 3,
+    "prereqText": "MATH 203 + PHYS 204 done",
+    "plannedTerm": "Summer 2027",
+    "status": "Planned"
+  },
+  {
+    "code": "CHEM 205",
+    "title": "General Chemistry",
+    "credits": 3,
+    "prereqText": "None",
+    "plannedTerm": "Fall 2028",
+    "status": "Planned"
+  }
+]

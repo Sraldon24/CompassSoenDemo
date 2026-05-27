@@ -1,0 +1,254 @@
+[
+  {
+    "code": "PHYS 284",
+    "title": "Introduction to Astronomy",
+    "credits": 3,
+    "category": "nat_sci_elective",
+    "prereqText": "None",
+    "difficulty": "light",
+    "notes": "⭐ TOP PICK - no textbook needed, GPA-friendly, 100% online"
+  },
+  {
+    "code": "GEOL 206",
+    "title": "Earthquakes, Volcanoes, Plate Tectonics",
+    "credits": 3,
+    "category": "nat_sci_elective",
+    "prereqText": "None",
+    "difficulty": "light",
+    "notes": "Popular GPA-friendly option"
+  },
+  {
+    "code": "GEOL 208",
+    "title": "The Earth, Moon and the Planets",
+    "credits": 3,
+    "category": "nat_sci_elective",
+    "prereqText": "None",
+    "difficulty": "light",
+    "notes": "Fun alternative to PHYS 284"
+  },
+  {
+    "code": "PHYS 273",
+    "title": "Energy and Environment",
+    "credits": 3,
+    "category": "nat_sci_elective",
+    "prereqText": "None",
+    "difficulty": "medium",
+    "notes": "Decent for climate-interested students"
+  },
+  {
+    "code": "BIOL 201",
+    "title": "Introductory Biology",
+    "credits": 3,
+    "category": "nat_sci_elective",
+    "prereqText": "None",
+    "difficulty": "medium",
+    "notes": "Foundation for further bio courses"
+  },
+  {
+    "code": "BIOL 202",
+    "title": "General Biology I",
+    "credits": 3,
+    "category": "nat_sci_elective",
+    "prereqText": "None",
+    "difficulty": "medium",
+    "notes": "Alternative to 201"
+  },
+  {
+    "code": "BIOL 261",
+    "title": "Molecular and General Genetics",
+    "credits": 3,
+    "category": "nat_sci_elective",
+    "prereqText": "BIOL 201/202",
+    "difficulty": "medium",
+    "notes": "Heavier - genetics focus"
+  },
+  {
+    "code": "CHEM 206",
+    "title": "Chemistry of Solutions",
+    "credits": 3,
+    "category": "nat_sci_elective",
+    "prereqText": "None",
+    "difficulty": "medium",
+    "notes": "If you liked chemistry"
+  },
+  {
+    "code": "PHYS 252",
+    "title": "Optics",
+    "credits": 3,
+    "category": "nat_sci_elective",
+    "prereqText": "Basic physics",
+    "difficulty": "hard",
+    "notes": "Skip unless physics-inclined"
+  },
+  {
+    "code": "PHYS 260",
+    "title": "Introductory Biophysics",
+    "credits": 3,
+    "category": "nat_sci_elective",
+    "prereqText": "Basic physics",
+    "difficulty": "medium",
+    "notes": "Bio + physics crossover"
+  },
+  {
+    "code": "COMP 345",
+    "title": "Advanced Program Design with C++",
+    "credits": 4,
+    "category": "soen_elective",
+    "prereqText": "COMP 352 (concurrent OK)",
+    "difficulty": null,
+    "notes": "Only major elective w/ concurrent prereq. Heavy C++ project."
+  },
+  {
+    "code": "COMP 472",
+    "title": "Artificial Intelligence",
+    "credits": 4,
+    "category": "soen_elective",
+    "prereqText": "COMP 352",
+    "difficulty": null,
+    "notes": "Take with Kosseim"
+  },
+  {
+    "code": "COMP 473",
+    "title": "Pattern Recognition",
+    "credits": 4,
+    "category": "soen_elective",
+    "prereqText": "COMP 352",
+    "difficulty": null,
+    "notes": "Math-heavy, overlaps COMP 432"
+  },
+  {
+    "code": "COMP 474",
+    "title": "Intelligent Systems",
+    "credits": 4,
+    "category": "soen_elective",
+    "prereqText": "COMP 352",
+    "difficulty": null,
+    "notes": "Take with Witte = easy A"
+  },
+  {
+    "code": "COMP 479",
+    "title": "Information Retrieval & Web Search",
+    "credits": 4,
+    "category": "soen_elective",
+    "prereqText": "COMP 352 + ENGR 371",
+    "difficulty": null,
+    "notes": "Exam-heavy, see AI Track tab"
+  },
+  {
+    "code": "COMP 371",
+    "title": "Computer Graphics",
+    "credits": 4,
+    "category": "soen_elective",
+    "prereqText": "COMP 232+352",
+    "difficulty": null,
+    "notes": "Graphics-focused"
+  },
+  {
+    "code": "COMP 376",
+    "title": "Introduction to Game Development",
+    "credits": 4,
+    "category": "soen_elective",
+    "prereqText": "COMP 352",
+    "difficulty": null,
+    "notes": "Game dev specialization"
+  },
+  {
+    "code": "COMP 426",
+    "title": "Multicore Programming",
+    "credits": 4,
+    "category": "soen_elective",
+    "prereqText": "COMP 346",
+    "difficulty": null,
+    "notes": "Performance/parallel programming"
+  },
+  {
+    "code": "COMP 442",
+    "title": "Compiler Design",
+    "credits": 4,
+    "category": "soen_elective",
+    "prereqText": "COMP 335+348",
+    "difficulty": null,
+    "notes": "Compiler internals"
+  },
+  {
+    "code": "COMP 445",
+    "title": "Data Communication and Computer Networks",
+    "credits": 4,
+    "category": "soen_elective",
+    "prereqText": "COMP 346",
+    "difficulty": null,
+    "notes": "Networking deep dive"
+  },
+  {
+    "code": "COMP 451",
+    "title": "Database Design",
+    "credits": 4,
+    "category": "soen_elective",
+    "prereqText": "COMP 353",
+    "difficulty": null,
+    "notes": "Advanced DB design"
+  },
+  {
+    "code": "SOEN 422",
+    "title": "Embedded Systems and Software",
+    "credits": 4,
+    "category": "soen_elective",
+    "prereqText": "COMP 346+SOEN 228",
+    "difficulty": null,
+    "notes": "IoT / embedded"
+  },
+  {
+    "code": "SOEN 423",
+    "title": "Distributed Systems",
+    "credits": 4,
+    "category": "soen_elective",
+    "prereqText": "COMP 346",
+    "difficulty": null,
+    "notes": "Cloud / scaled systems - good w/ AI track"
+  },
+  {
+    "code": "SOEN 387",
+    "title": "Web-Based Enterprise Application Design",
+    "credits": 4,
+    "category": "soen_elective",
+    "prereqText": "SOEN 341",
+    "difficulty": null,
+    "notes": "Enterprise web dev"
+  },
+  {
+    "code": "SOEN 487",
+    "title": "Web Services & Applications",
+    "credits": 4,
+    "category": "soen_elective",
+    "prereqText": "SOEN 387",
+    "difficulty": null,
+    "notes": "Web services / APIs"
+  },
+  {
+    "code": "SOEN 448",
+    "title": "Management of Evolving Systems",
+    "credits": 3,
+    "category": "soen_elective",
+    "prereqText": "SOEN 343",
+    "difficulty": null,
+    "notes": "Light 3-cr option"
+  },
+  {
+    "code": "ENGR 245",
+    "title": "Mechanical Analysis",
+    "credits": 3,
+    "category": "nat_sci_elective",
+    "prereqText": "PHYS 204 done",
+    "difficulty": null,
+    "notes": "Direct continuation of PHYS 204 - take Fall 2027 or Summer 2027"
+  },
+  {
+    "code": "MIAE 221",
+    "title": "Materials Science",
+    "credits": 3,
+    "category": "nat_sci_elective",
+    "prereqText": "CHEM 205 done",
+    "difficulty": null,
+    "notes": "Memorization-heavy, only take if you took CHEM 205 first"
+  }
+]

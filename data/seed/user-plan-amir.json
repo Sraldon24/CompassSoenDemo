@@ -1,0 +1,261 @@
+[
+  {
+    "courseCode": "ENGR 201",
+    "term": "Fall 2026",
+    "year": 2026,
+    "status": "enrolled",
+    "notes": "Section EC online"
+  },
+  {
+    "courseCode": "ENGR 202",
+    "term": "Fall 2026",
+    "year": 2026,
+    "status": "enrolled",
+    "notes": "Section H"
+  },
+  {
+    "courseCode": "ENGR 301",
+    "term": "Fall 2026",
+    "year": 2026,
+    "status": "enrolled",
+    "notes": "⚠️ Normally Y4 - confirm OK"
+  },
+  {
+    "courseCode": "MATH 204",
+    "term": "Fall 2026",
+    "year": 2026,
+    "status": "enrolled",
+    "notes": "Section B - Mon evening"
+  },
+  {
+    "courseCode": "PHIL 235",
+    "term": "Fall 2026",
+    "year": 2026,
+    "status": "enrolled",
+    "notes": "Section EC online - Humanities slot"
+  },
+  {
+    "courseCode": "COMP 232",
+    "term": "Winter 2027",
+    "year": 2027,
+    "status": "planned",
+    "notes": "🔄 Drop when transfer credit appears (already transferred May 2026)"
+  },
+  {
+    "courseCode": "COMP 348",
+    "term": "Winter 2027",
+    "year": 2027,
+    "status": "planned",
+    "notes": "🔒 LOCKED - Section E"
+  },
+  {
+    "courseCode": "COMP 352",
+    "term": "Winter 2027",
+    "year": 2027,
+    "status": "planned",
+    "notes": "⚠️ Drop if EWT passes (swap to ENCS 282)"
+  },
+  {
+    "courseCode": "PHYS 204",
+    "term": "Winter 2027",
+    "year": 2027,
+    "status": "planned",
+    "notes": "🔒 LOCKED - online (Laszlo Kalman)"
+  },
+  {
+    "courseCode": "MATH 205",
+    "term": "Winter 2027",
+    "year": 2027,
+    "status": "planned",
+    "notes": "⭐ ADD - replaces COMP 232 after transfer clears"
+  },
+  {
+    "courseCode": "PHYS 284",
+    "term": "Winter 2027",
+    "year": 2027,
+    "status": "planned",
+    "notes": "🟢 ADD - online no prereq, GPA-friendly, counts toward 120"
+  },
+  {
+    "courseCode": "COMP 345",
+    "term": "Winter 2027",
+    "year": 2027,
+    "status": "planned",
+    "notes": "⚠️ Only if comfortable with 4 heavy CS courses"
+  },
+  {
+    "courseCode": "ENCS 282",
+    "term": "Winter 2027",
+    "year": 2027,
+    "status": "planned",
+    "notes": "✅ ADD via swap only if EWT passed before Nov 2026"
+  },
+  {
+    "courseCode": "SOEN 228",
+    "term": "Summer 2027",
+    "year": 2027,
+    "status": "planned",
+    "notes": "Heavy 7hr labs - take with light load"
+  },
+  {
+    "courseCode": "PHYS 205",
+    "term": "Summer 2027",
+    "year": 2027,
+    "status": "planned",
+    "notes": "Needs PHYS 204 done"
+  },
+  {
+    "courseCode": "SOEN 341",
+    "term": "Fall 2027",
+    "year": 2027,
+    "status": "planned",
+    "notes": "Needs COMP 352 + ENCS 282 (concurrent OK)"
+  },
+  {
+    "courseCode": "COMP 335",
+    "term": "Fall 2027",
+    "year": 2027,
+    "status": "planned",
+    "notes": "Needs COMP 232+249"
+  },
+  {
+    "courseCode": "ENGR 213",
+    "term": "Fall 2027",
+    "year": 2027,
+    "status": "planned",
+    "notes": "Needs MATH 205"
+  },
+  {
+    "courseCode": "ENGR 233",
+    "term": "Fall 2027",
+    "year": 2027,
+    "status": "planned",
+    "notes": "Needs MATH 204+205"
+  },
+  {
+    "courseCode": "ENGR 245",
+    "term": "Fall 2027",
+    "year": 2027,
+    "status": "planned",
+    "notes": "⭐ Engineering & Nat Sci Group slot - needs PHYS 204"
+  },
+  {
+    "courseCode": "COMP 346",
+    "term": "Winter 2028",
+    "year": 2028,
+    "status": "planned",
+    "notes": "Needs SOEN 228 + COMP 352"
+  },
+  {
+    "courseCode": "SOEN 342",
+    "term": "Winter 2028",
+    "year": 2028,
+    "status": "planned",
+    "notes": "Needs SOEN 341"
+  },
+  {
+    "courseCode": "ELEC 275",
+    "term": "Winter 2028",
+    "year": 2028,
+    "status": "planned",
+    "notes": "Needs PHYS 205"
+  },
+  {
+    "courseCode": "ENGR 371",
+    "term": "Winter 2028",
+    "year": 2028,
+    "status": "planned",
+    "notes": "Needs ENGR 213+233"
+  },
+  {
+    "courseCode": "SOEN 331",
+    "term": "Winter 2028",
+    "year": 2028,
+    "status": "planned",
+    "notes": "Needs COMP 232+249"
+  },
+  {
+    "courseCode": "SOEN 343",
+    "term": "Fall 2028",
+    "year": 2028,
+    "status": "planned",
+    "notes": "Needs SOEN 341+342"
+  },
+  {
+    "courseCode": "SOEN 363",
+    "term": "Fall 2028",
+    "year": 2028,
+    "status": "planned",
+    "notes": "Needs COMP 352"
+  },
+  {
+    "courseCode": "SOEN 384",
+    "term": "Fall 2028",
+    "year": 2028,
+    "status": "planned",
+    "notes": "Needs SOEN 341+ENCS 282"
+  },
+  {
+    "courseCode": "COMP 432",
+    "term": "Fall 2028",
+    "year": 2028,
+    "status": "planned",
+    "notes": "🤖 NEW core - AI track foundation"
+  },
+  {
+    "courseCode": "CHEM 205",
+    "term": "Fall 2028",
+    "year": 2028,
+    "status": "planned",
+    "notes": "Can be done anywhere"
+  },
+  {
+    "courseCode": "SOEN 345",
+    "term": "Winter 2029",
+    "year": 2029,
+    "status": "planned",
+    "notes": "Needs SOEN 343"
+  },
+  {
+    "courseCode": "SOEN 357",
+    "term": "Winter 2029",
+    "year": 2029,
+    "status": "planned",
+    "notes": "Needs SOEN 341"
+  },
+  {
+    "courseCode": "SOEN 390",
+    "term": "Winter 2029",
+    "year": 2029,
+    "status": "planned",
+    "notes": "Needs SOEN 345+357 (concurrent OK)"
+  },
+  {
+    "courseCode": "SOEN 321",
+    "term": "Winter 2029",
+    "year": 2029,
+    "status": "planned",
+    "notes": "Needs COMP 346"
+  },
+  {
+    "courseCode": "COMP 472",
+    "term": "Winter 2029",
+    "year": 2029,
+    "status": "planned",
+    "notes": "🤖 AI Track - verify Kosseim teaching!"
+  },
+  {
+    "courseCode": "COMP 474",
+    "term": "Fall 2029",
+    "year": 2029,
+    "status": "planned",
+    "notes": "🤖 AI Track - Witte = easy A"
+  },
+  {
+    "courseCode": "ENGR 392",
+    "term": "Winter 2030",
+    "year": 2030,
+    "status": "planned",
+    "notes": "Needs ENCS 282 done"
+  }
+]

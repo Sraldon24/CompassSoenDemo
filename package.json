@@ -25,9 +25,11 @@
     "db:migrate": "drizzle-kit migrate",
     "db:push": "drizzle-kit push",
     "db:studio": "drizzle-kit studio",
-    "db:seed": "tsx scripts/seed-courses.ts",
-    "scrape:courses": "tsx scripts/scrape-concordia.ts",
-    "scrape:reddit": "tsx scripts/scrape-reddit.ts",
+    "db:seed": "tsx --import ./scripts/load-env.ts scripts/seed-courses.ts",
+    "seed:parse": "tsx scripts/parse-excel.ts",
+    "seed:user-plan": "tsx --import ./scripts/load-env.ts scripts/seed-user-plan.ts",
+    "scrape:courses": "tsx --import ./scripts/load-env.ts scripts/scrape-concordia.ts",
+    "scrape:reddit": "tsx --import ./scripts/load-env.ts scripts/scrape-reddit.ts",
     "prepare": "husky || true"
   },
   "dependencies": {
@@ -62,9 +64,11 @@
     "@types/pg": "^8.20.0",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "@vitest/coverage-v8": "^4.1.7",
     "drizzle-kit": "^0.31.10",
     "tailwindcss": "^4",
     "tsx": "^4.22.3",
-    "typescript": "^5"
+    "typescript": "^5",
+    "vitest": "^4.1.7"
   }
 }

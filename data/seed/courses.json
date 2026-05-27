@@ -1,0 +1,856 @@
+[
+  {
+    "code": "BIOL 201",
+    "title": "Introductory Biology",
+    "credits": 3,
+    "category": "nat_sci_elective",
+    "prereqs": {
+      "all": [],
+      "any": [],
+      "concurrent": [],
+      "notes": "None"
+    },
+    "unlocks": [],
+    "notes": "Foundation for further bio courses"
+  },
+  {
+    "code": "BIOL 202",
+    "title": "General Biology I",
+    "credits": 3,
+    "category": "nat_sci_elective",
+    "prereqs": {
+      "all": [],
+      "any": [],
+      "concurrent": [],
+      "notes": "None"
+    },
+    "unlocks": [],
+    "notes": "Alternative to 201"
+  },
+  {
+    "code": "BIOL 261",
+    "title": "Molecular and General Genetics",
+    "credits": 3,
+    "category": "nat_sci_elective",
+    "prereqs": {
+      "all": [],
+      "any": ["BIOL 201", "BIOL 202"],
+      "concurrent": [],
+      "notes": "BIOL 201/202"
+    },
+    "unlocks": [],
+    "notes": "Heavier - genetics focus"
+  },
+  {
+    "code": "CHEM 205",
+    "title": "General Chemistry",
+    "credits": 3,
+    "category": "deficiency",
+    "prereqs": {
+      "all": [],
+      "any": [],
+      "concurrent": [],
+      "notes": "Can be done anywhere"
+    },
+    "unlocks": ["MIAE 221"],
+    "notes": "Can be done anywhere"
+  },
+  {
+    "code": "CHEM 206",
+    "title": "Chemistry of Solutions",
+    "credits": 3,
+    "category": "nat_sci_elective",
+    "prereqs": {
+      "all": [],
+      "any": [],
+      "concurrent": [],
+      "notes": "None"
+    },
+    "unlocks": [],
+    "notes": "If you liked chemistry"
+  },
+  {
+    "code": "COMP 232",
+    "title": "Mathematics for Computer Science",
+    "credits": 3,
+    "category": "se_core",
+    "prereqs": {
+      "all": ["MATH 204"],
+      "any": [],
+      "concurrent": [],
+      "notes": "🔄 Drop when transfer credit appears (already transferred May 2026)"
+    },
+    "unlocks": ["COMP 335", "COMP 352", "SOEN 331"],
+    "notes": "🔄 Drop when transfer credit appears (already transferred May 2026)"
+  },
+  {
+    "code": "COMP 335",
+    "title": "Introduction to Theoretical CS",
+    "credits": 3,
+    "category": "se_core",
+    "prereqs": {
+      "all": ["COMP 232"],
+      "any": [],
+      "concurrent": [],
+      "notes": "Needs COMP 232+249"
+    },
+    "unlocks": ["COMP 442"],
+    "notes": "Needs COMP 232+249"
+  },
+  {
+    "code": "COMP 345",
+    "title": "Advanced Program Design with C++",
+    "credits": 4,
+    "category": "soen_elective",
+    "prereqs": {
+      "all": [],
+      "any": [],
+      "concurrent": [],
+      "notes": "⚠️ Only if comfortable with 4 heavy CS courses"
+    },
+    "unlocks": [],
+    "notes": "⚠️ Only if comfortable with 4 heavy CS courses"
+  },
+  {
+    "code": "COMP 346",
+    "title": "Operating Systems",
+    "credits": 4,
+    "category": "se_core",
+    "prereqs": {
+      "all": ["SOEN 228", "COMP 352"],
+      "any": [],
+      "concurrent": [],
+      "notes": "Needs SOEN 228 + COMP 352"
+    },
+    "unlocks": ["SOEN 321", "COMP 426", "COMP 445"],
+    "notes": "Needs SOEN 228 + COMP 352"
+  },
+  {
+    "code": "COMP 348",
+    "title": "Principles of Programming Languages",
+    "credits": 3,
+    "category": "se_core",
+    "prereqs": {
+      "all": [],
+      "any": [],
+      "concurrent": [],
+      "notes": "🔒 LOCKED - Section E"
+    },
+    "unlocks": ["COMP 442"],
+    "notes": "🔒 LOCKED - Section E"
+  },
+  {
+    "code": "COMP 352",
+    "title": "Data Structures and Algorithms",
+    "credits": 3,
+    "category": "se_core",
+    "prereqs": {
+      "all": ["COMP 232"],
+      "any": [],
+      "concurrent": [],
+      "notes": "⚠️ Drop if EWT passes (swap to ENCS 282)"
+    },
+    "unlocks": [],
+    "notes": "⚠️ Drop if EWT passes (swap to ENCS 282)"
+  },
+  {
+    "code": "COMP 371",
+    "title": "Computer Graphics",
+    "credits": 4,
+    "category": "soen_elective",
+    "prereqs": {
+      "all": ["COMP 232"],
+      "any": [],
+      "concurrent": [],
+      "notes": "COMP 232+352"
+    },
+    "unlocks": [],
+    "notes": "Graphics-focused"
+  },
+  {
+    "code": "COMP 376",
+    "title": "Introduction to Game Development",
+    "credits": 4,
+    "category": "soen_elective",
+    "prereqs": {
+      "all": ["COMP 352"],
+      "any": [],
+      "concurrent": [],
+      "notes": "COMP 352"
+    },
+    "unlocks": [],
+    "notes": "Game dev specialization"
+  },
+  {
+    "code": "COMP 426",
+    "title": "Multicore Programming",
+    "credits": 4,
+    "category": "soen_elective",
+    "prereqs": {
+      "all": ["COMP 346"],
+      "any": [],
+      "concurrent": [],
+      "notes": "COMP 346"
+    },
+    "unlocks": [],
+    "notes": "Performance/parallel programming"
+  },
+  {
+    "code": "COMP 432",
+    "title": "Machine Learning",
+    "credits": 4,
+    "category": "se_core",
+    "prereqs": {
+      "all": [],
+      "any": [],
+      "concurrent": [],
+      "notes": "🤖 NEW core - AI track foundation"
+    },
+    "unlocks": [],
+    "notes": "🤖 NEW core - AI track foundation"
+  },
+  {
+    "code": "COMP 442",
+    "title": "Compiler Design",
+    "credits": 4,
+    "category": "soen_elective",
+    "prereqs": {
+      "all": ["COMP 335"],
+      "any": [],
+      "concurrent": [],
+      "notes": "COMP 335+348"
+    },
+    "unlocks": [],
+    "notes": "Compiler internals"
+  },
+  {
+    "code": "COMP 445",
+    "title": "Data Communication and Computer Networks",
+    "credits": 4,
+    "category": "soen_elective",
+    "prereqs": {
+      "all": ["COMP 346"],
+      "any": [],
+      "concurrent": [],
+      "notes": "COMP 346"
+    },
+    "unlocks": [],
+    "notes": "Networking deep dive"
+  },
+  {
+    "code": "COMP 451",
+    "title": "Database Design",
+    "credits": 4,
+    "category": "soen_elective",
+    "prereqs": {
+      "all": ["COMP 353"],
+      "any": [],
+      "concurrent": [],
+      "notes": "COMP 353"
+    },
+    "unlocks": [],
+    "notes": "Advanced DB design"
+  },
+  {
+    "code": "COMP 472",
+    "title": "Artificial Intelligence",
+    "credits": 4,
+    "category": "soen_elective",
+    "prereqs": {
+      "all": [],
+      "any": [],
+      "concurrent": [],
+      "notes": "🤖 AI Track - verify Kosseim teaching!"
+    },
+    "unlocks": [],
+    "notes": "🤖 AI Track - verify Kosseim teaching!"
+  },
+  {
+    "code": "COMP 473",
+    "title": "Pattern Recognition",
+    "credits": 4,
+    "category": "soen_elective",
+    "prereqs": {
+      "all": ["COMP 352"],
+      "any": [],
+      "concurrent": [],
+      "notes": "COMP 352"
+    },
+    "unlocks": [],
+    "notes": "Math-heavy, overlaps COMP 432"
+  },
+  {
+    "code": "COMP 474",
+    "title": "Intelligent Systems",
+    "credits": 4,
+    "category": "soen_elective",
+    "prereqs": {
+      "all": [],
+      "any": [],
+      "concurrent": [],
+      "notes": "🤖 AI Track - Witte = easy A"
+    },
+    "unlocks": [],
+    "notes": "🤖 AI Track - Witte = easy A"
+  },
+  {
+    "code": "COMP 479",
+    "title": "Information Retrieval & Web Search",
+    "credits": 4,
+    "category": "soen_elective",
+    "prereqs": {
+      "all": ["COMP 352", "ENGR 371"],
+      "any": [],
+      "concurrent": [],
+      "notes": "COMP 352 + ENGR 371"
+    },
+    "unlocks": [],
+    "notes": "Exam-heavy, see AI Track tab"
+  },
+  {
+    "code": "ELEC 275",
+    "title": "Principles of Electrical Engineering",
+    "credits": 3.5,
+    "category": "eng_core",
+    "prereqs": {
+      "all": ["PHYS 205", "ENGR 213"],
+      "any": [],
+      "concurrent": [],
+      "notes": "Needs PHYS 205"
+    },
+    "unlocks": [],
+    "notes": "Needs PHYS 205"
+  },
+  {
+    "code": "ENCS 282",
+    "title": "Technical Writing & Communication",
+    "credits": 3,
+    "category": "eng_core",
+    "prereqs": {
+      "all": [],
+      "any": [],
+      "concurrent": [],
+      "notes": "✅ ADD via swap only if EWT passed before Nov 2026"
+    },
+    "unlocks": ["SOEN 341", "SOEN 384", "ENGR 392"],
+    "notes": "✅ ADD via swap only if EWT passed before Nov 2026"
+  },
+  {
+    "code": "ENGR 201",
+    "title": "Professional Practice & Responsibility",
+    "credits": 1.5,
+    "category": "eng_core",
+    "prereqs": {
+      "all": [],
+      "any": [],
+      "concurrent": [],
+      "notes": "Section EC online"
+    },
+    "unlocks": [],
+    "notes": "Section EC online"
+  },
+  {
+    "code": "ENGR 202",
+    "title": "Sustainable Development & Env Stewardship",
+    "credits": 1.5,
+    "category": "eng_core",
+    "prereqs": {
+      "all": [],
+      "any": [],
+      "concurrent": [],
+      "notes": "Section H"
+    },
+    "unlocks": [],
+    "notes": "Section H"
+  },
+  {
+    "code": "ENGR 213",
+    "title": "Applied Ordinary Differential Equations",
+    "credits": 3,
+    "category": "eng_core",
+    "prereqs": {
+      "all": ["MATH 205", "MATH 204"],
+      "any": [],
+      "concurrent": [],
+      "notes": "Needs MATH 205"
+    },
+    "unlocks": ["ENGR 371", "ELEC 275"],
+    "notes": "Needs MATH 205"
+  },
+  {
+    "code": "ENGR 233",
+    "title": "Applied Advanced Calculus",
+    "credits": 3,
+    "category": "eng_core",
+    "prereqs": {
+      "all": ["MATH 204", "MATH 205"],
+      "any": [],
+      "concurrent": [],
+      "notes": "Needs MATH 204+205"
+    },
+    "unlocks": ["ENGR 371"],
+    "notes": "Needs MATH 204+205"
+  },
+  {
+    "code": "ENGR 245",
+    "title": "Mechanical Analysis",
+    "credits": 3,
+    "category": "eng_nsci_group",
+    "prereqs": {
+      "all": ["PHYS 204"],
+      "any": [],
+      "concurrent": [],
+      "notes": "⭐ Engineering & Nat Sci Group slot - needs PHYS 204"
+    },
+    "unlocks": [],
+    "notes": "⭐ Engineering & Nat Sci Group slot - needs PHYS 204"
+  },
+  {
+    "code": "ENGR 301",
+    "title": "Engineering Management Principles & Economics",
+    "credits": 3,
+    "category": "eng_core",
+    "prereqs": {
+      "all": [],
+      "any": [],
+      "concurrent": [],
+      "notes": "⚠️ Normally Y4 - confirm OK"
+    },
+    "unlocks": [],
+    "notes": "⚠️ Normally Y4 - confirm OK"
+  },
+  {
+    "code": "ENGR 371",
+    "title": "Probability & Stats in Engineering",
+    "credits": 3,
+    "category": "eng_core",
+    "prereqs": {
+      "all": ["ENGR 213", "ENGR 233"],
+      "any": [],
+      "concurrent": [],
+      "notes": "Needs ENGR 213+233"
+    },
+    "unlocks": ["COMP 479"],
+    "notes": "Needs ENGR 213+233"
+  },
+  {
+    "code": "ENGR 392",
+    "title": "Impact of Technology on Society",
+    "credits": 3,
+    "category": "eng_core",
+    "prereqs": {
+      "all": ["ENCS 282"],
+      "any": [],
+      "concurrent": [],
+      "notes": "Needs ENCS 282 done"
+    },
+    "unlocks": [],
+    "notes": "Needs ENCS 282 done"
+  },
+  {
+    "code": "GEOL 206",
+    "title": "Earthquakes, Volcanoes, Plate Tectonics",
+    "credits": 3,
+    "category": "nat_sci_elective",
+    "prereqs": {
+      "all": [],
+      "any": [],
+      "concurrent": [],
+      "notes": "None"
+    },
+    "unlocks": [],
+    "notes": "Popular GPA-friendly option"
+  },
+  {
+    "code": "GEOL 208",
+    "title": "The Earth, Moon and the Planets",
+    "credits": 3,
+    "category": "nat_sci_elective",
+    "prereqs": {
+      "all": [],
+      "any": [],
+      "concurrent": [],
+      "notes": "None"
+    },
+    "unlocks": [],
+    "notes": "Fun alternative to PHYS 284"
+  },
+  {
+    "code": "MATH 203",
+    "title": "Differential & Integral Calculus I",
+    "credits": 3,
+    "category": "deficiency",
+    "prereqs": {
+      "all": [],
+      "any": [],
+      "concurrent": [],
+      "notes": "Cégep Math 103"
+    },
+    "unlocks": [],
+    "notes": null
+  },
+  {
+    "code": "MATH 204",
+    "title": "Vectors and Matrices",
+    "credits": 3,
+    "category": "deficiency",
+    "prereqs": {
+      "all": [],
+      "any": [],
+      "concurrent": [],
+      "notes": "Section B - Mon evening"
+    },
+    "unlocks": ["COMP 232", "ENGR 213"],
+    "notes": "Section B - Mon evening"
+  },
+  {
+    "code": "MATH 205",
+    "title": "Differential & Integral Calculus II",
+    "credits": 3,
+    "category": "deficiency",
+    "prereqs": {
+      "all": [],
+      "any": [],
+      "concurrent": [],
+      "notes": "⭐ ADD - replaces COMP 232 after transfer clears"
+    },
+    "unlocks": ["ENGR 213", "ENGR 233"],
+    "notes": "⭐ ADD - replaces COMP 232 after transfer clears"
+  },
+  {
+    "code": "MIAE 221",
+    "title": "Materials Science",
+    "credits": 3,
+    "category": "nat_sci_elective",
+    "prereqs": {
+      "all": ["CHEM 205"],
+      "any": [],
+      "concurrent": [],
+      "notes": "CHEM 205 done"
+    },
+    "unlocks": [],
+    "notes": "Memorization-heavy, only take if you took CHEM 205 first"
+  },
+  {
+    "code": "PHIL 235",
+    "title": "Biomedical Ethics",
+    "credits": 3,
+    "category": "gen_ed_humanities",
+    "prereqs": {
+      "all": [],
+      "any": [],
+      "concurrent": [],
+      "notes": "Section EC online - Humanities slot"
+    },
+    "unlocks": [],
+    "notes": "Section EC online - Humanities slot"
+  },
+  {
+    "code": "PHYS 204",
+    "title": "Mechanics",
+    "credits": 3,
+    "category": "deficiency",
+    "prereqs": {
+      "all": [],
+      "any": [],
+      "concurrent": [],
+      "notes": "🔒 LOCKED - online (Laszlo Kalman)"
+    },
+    "unlocks": [],
+    "notes": "🔒 LOCKED - online (Laszlo Kalman)"
+  },
+  {
+    "code": "PHYS 205",
+    "title": "Electricity & Magnetism",
+    "credits": 3,
+    "category": "deficiency",
+    "prereqs": {
+      "all": ["PHYS 204"],
+      "any": [],
+      "concurrent": [],
+      "notes": "Needs PHYS 204 done"
+    },
+    "unlocks": ["ELEC 275"],
+    "notes": "Needs PHYS 204 done"
+  },
+  {
+    "code": "PHYS 252",
+    "title": "Optics",
+    "credits": 3,
+    "category": "nat_sci_elective",
+    "prereqs": {
+      "all": [],
+      "any": [],
+      "concurrent": [],
+      "notes": "Basic physics"
+    },
+    "unlocks": [],
+    "notes": "Skip unless physics-inclined"
+  },
+  {
+    "code": "PHYS 260",
+    "title": "Introductory Biophysics",
+    "credits": 3,
+    "category": "nat_sci_elective",
+    "prereqs": {
+      "all": [],
+      "any": [],
+      "concurrent": [],
+      "notes": "Basic physics"
+    },
+    "unlocks": [],
+    "notes": "Bio + physics crossover"
+  },
+  {
+    "code": "PHYS 273",
+    "title": "Energy and Environment",
+    "credits": 3,
+    "category": "nat_sci_elective",
+    "prereqs": {
+      "all": [],
+      "any": [],
+      "concurrent": [],
+      "notes": "None"
+    },
+    "unlocks": [],
+    "notes": "Decent for climate-interested students"
+  },
+  {
+    "code": "PHYS 284",
+    "title": "Introduction to Astronomy",
+    "credits": 3,
+    "category": "nat_sci_elective",
+    "prereqs": {
+      "all": [],
+      "any": [],
+      "concurrent": [],
+      "notes": "🟢 ADD - online no prereq, GPA-friendly, counts toward 120"
+    },
+    "unlocks": [],
+    "notes": "🟢 ADD - online no prereq, GPA-friendly, counts toward 120"
+  },
+  {
+    "code": "SOEN 228",
+    "title": "System Hardware",
+    "credits": 4,
+    "category": "se_core",
+    "prereqs": {
+      "all": [],
+      "any": [],
+      "concurrent": [],
+      "notes": "Heavy 7hr labs - take with light load"
+    },
+    "unlocks": ["COMP 346"],
+    "notes": "Heavy 7hr labs - take with light load"
+  },
+  {
+    "code": "SOEN 321",
+    "title": "Information Systems Security",
+    "credits": 3,
+    "category": "se_core",
+    "prereqs": {
+      "all": ["COMP 346"],
+      "any": [],
+      "concurrent": [],
+      "notes": "Needs COMP 346"
+    },
+    "unlocks": [],
+    "notes": "Needs COMP 346"
+  },
+  {
+    "code": "SOEN 331",
+    "title": "Formal Methods for Software Engineering",
+    "credits": 3,
+    "category": "se_core",
+    "prereqs": {
+      "all": ["COMP 232"],
+      "any": [],
+      "concurrent": [],
+      "notes": "Needs COMP 232+249"
+    },
+    "unlocks": [],
+    "notes": "Needs COMP 232+249"
+  },
+  {
+    "code": "SOEN 341",
+    "title": "Software Process and Practices",
+    "credits": 4,
+    "category": "se_core",
+    "prereqs": {
+      "all": [],
+      "any": [],
+      "concurrent": ["COMP 352", "ENCS 282"],
+      "notes": "Needs COMP 352 + ENCS 282 (concurrent OK)"
+    },
+    "unlocks": ["SOEN 342", "SOEN 343", "SOEN 357", "SOEN 384"],
+    "notes": "Needs COMP 352 + ENCS 282 (concurrent OK)"
+  },
+  {
+    "code": "SOEN 342",
+    "title": "Software Requirements and Deployment",
+    "credits": 3,
+    "category": "se_core",
+    "prereqs": {
+      "all": ["SOEN 341"],
+      "any": [],
+      "concurrent": [],
+      "notes": "Needs SOEN 341"
+    },
+    "unlocks": [],
+    "notes": "Needs SOEN 341"
+  },
+  {
+    "code": "SOEN 343",
+    "title": "Software Architecture and Design",
+    "credits": 4,
+    "category": "se_core",
+    "prereqs": {
+      "all": ["SOEN 341"],
+      "any": [],
+      "concurrent": [],
+      "notes": "Needs SOEN 341+342"
+    },
+    "unlocks": ["SOEN 345"],
+    "notes": "Needs SOEN 341+342"
+  },
+  {
+    "code": "SOEN 345",
+    "title": "Software Testing, Verification & QA",
+    "credits": 4,
+    "category": "se_core",
+    "prereqs": {
+      "all": ["SOEN 343"],
+      "any": [],
+      "concurrent": [],
+      "notes": "Needs SOEN 343"
+    },
+    "unlocks": ["SOEN 390"],
+    "notes": "Needs SOEN 343"
+  },
+  {
+    "code": "SOEN 357",
+    "title": "User Interface Design",
+    "credits": 3,
+    "category": "se_core",
+    "prereqs": {
+      "all": ["SOEN 341"],
+      "any": [],
+      "concurrent": [],
+      "notes": "Needs SOEN 341"
+    },
+    "unlocks": [],
+    "notes": "Needs SOEN 341"
+  },
+  {
+    "code": "SOEN 363",
+    "title": "Data Systems for Software Engineers",
+    "credits": 3,
+    "category": "se_core",
+    "prereqs": {
+      "all": ["COMP 352"],
+      "any": [],
+      "concurrent": [],
+      "notes": "Needs COMP 352"
+    },
+    "unlocks": [],
+    "notes": "Needs COMP 352"
+  },
+  {
+    "code": "SOEN 384",
+    "title": "Management, Measurement & QC",
+    "credits": 3,
+    "category": "se_core",
+    "prereqs": {
+      "all": ["SOEN 341", "ENCS 282"],
+      "any": [],
+      "concurrent": [],
+      "notes": "Needs SOEN 341+ENCS 282"
+    },
+    "unlocks": [],
+    "notes": "Needs SOEN 341+ENCS 282"
+  },
+  {
+    "code": "SOEN 387",
+    "title": "Web-Based Enterprise Application Design",
+    "credits": 4,
+    "category": "soen_elective",
+    "prereqs": {
+      "all": ["SOEN 341"],
+      "any": [],
+      "concurrent": [],
+      "notes": "SOEN 341"
+    },
+    "unlocks": [],
+    "notes": "Enterprise web dev"
+  },
+  {
+    "code": "SOEN 390",
+    "title": "Software Engineering Team Design Project",
+    "credits": 3.5,
+    "category": "se_core",
+    "prereqs": {
+      "all": [],
+      "any": [],
+      "concurrent": ["SOEN 345"],
+      "notes": "Needs SOEN 345+357 (concurrent OK)"
+    },
+    "unlocks": ["SOEN 490"],
+    "notes": "Needs SOEN 345+357 (concurrent OK)"
+  },
+  {
+    "code": "SOEN 422",
+    "title": "Embedded Systems and Software",
+    "credits": 4,
+    "category": "soen_elective",
+    "prereqs": {
+      "all": ["COMP 346", "SOEN 228"],
+      "any": [],
+      "concurrent": [],
+      "notes": "COMP 346+SOEN 228"
+    },
+    "unlocks": [],
+    "notes": "IoT / embedded"
+  },
+  {
+    "code": "SOEN 423",
+    "title": "Distributed Systems",
+    "credits": 4,
+    "category": "soen_elective",
+    "prereqs": {
+      "all": ["COMP 346"],
+      "any": [],
+      "concurrent": [],
+      "notes": "COMP 346"
+    },
+    "unlocks": [],
+    "notes": "Cloud / scaled systems - good w/ AI track"
+  },
+  {
+    "code": "SOEN 448",
+    "title": "Management of Evolving Systems",
+    "credits": 3,
+    "category": "soen_elective",
+    "prereqs": {
+      "all": ["SOEN 343"],
+      "any": [],
+      "concurrent": [],
+      "notes": "SOEN 343"
+    },
+    "unlocks": [],
+    "notes": "Light 3-cr option"
+  },
+  {
+    "code": "SOEN 487",
+    "title": "Web Services & Applications",
+    "credits": 4,
+    "category": "soen_elective",
+    "prereqs": {
+      "all": ["SOEN 387"],
+      "any": [],
+      "concurrent": [],
+      "notes": "SOEN 387"
+    },
+    "unlocks": [],
+    "notes": "Web services / APIs"
+  }
+]
