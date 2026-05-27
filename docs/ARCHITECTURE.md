@@ -335,6 +335,60 @@ This document captures **why** we made each major technical decision. Useful for
 
 ---
 
+### ADR-011: lru-cache for rate limiting (in-memory)
+
+**Status:** Accepted
+**Date:** 2026-05-27
+
+**Context:** Need to enforce per-user and per-IP rate limits on AI endpoints, search, imports, and moderation flags. v1 traffic is small (~100 users).
+
+**Decision:** Use `lru-cache` for in-memory rate limiting on a single Railway replica.
+
+**Rationale:**
+- Zero infrastructure overhead — no Redis to provision, no extra cost.
+- Fits the v1 deployment shape (single Railway replica, single process).
+- `lru-cache` has a sliding-window-friendly API and is widely battle-tested.
+- Trivial to swap for Redis (`@upstash/ratelimit` or similar) when we scale.
+
+**Considered alternatives:**
+- Redis (Upstash free tier): would work, but adds a dependency we don't need for 100 users.
+- Postgres-backed rate limiting: avoids new infra, but every check is a DB round-trip.
+- No rate limiting: rejected — AI endpoints would burn the Groq free tier in hours under abuse.
+
+**Consequences:**
+- Limits reset on process restart (acceptable for v1; users can't game it meaningfully because daily limits persist in `aiUsage` table separately).
+- **Breaks if we scale to multiple Railway replicas.** Tracked as known tech debt — when multi-replica is needed, swap to Redis. Until then, keep deployment to a single replica.
+
+---
+
+### ADR-012: Groq-only AI provider for v1 (Gemini fallback deferred)
+
+**Status:** Accepted
+**Date:** 2026-05-27
+**Supersedes part of:** ADR-004
+
+**Context:** ADR-004 specified a 3-tier routing strategy (Groq fast → Groq smart → Gemini fallback). The Gemini fallback adds an extra SDK, env var, and prompt-divergence testing surface. For v1 with ~100 users, the Groq free tier (28,800 RPD across two models) is significantly more capacity than realistic usage.
+
+**Decision:** Ship Groq-only for v1. On Groq 429, retry with exponential backoff (3 attempts at 1s/2s/4s). If all retries fail, surface 503 to the caller with a friendly UI message.
+
+**Rationale:**
+- The complexity cost of maintaining two providers (different prompt behavior, two rate-limit pools to track, two SDKs to keep updated) is not justified at v1 scale.
+- Groq's free tier is generous enough that 429s should be rare even at peak r/Concordia launch traffic.
+- The 50/day/user cap (PRD §19.2) is enforced *before* the Groq call, so abuse is bounded.
+- `.env.local.example` keeps the `GEMINI_API_KEY` slot as a commented placeholder so re-enabling is a small refactor, not a rewrite.
+
+**Considered alternatives:**
+- Original 3-tier (Groq + Gemini): keeps headroom but doubles maintenance burden for v1.
+- Switch to OpenAI/Anthropic paid tier on 429: violates the $0/month constraint.
+- Cache common AI responses aggressively: planned independently (Reddit summaries cached 7 days per PRD §4.11.5), but not a substitute for rate-limit resilience.
+
+**Consequences:**
+- **Single-provider risk acknowledged:** if Groq has a sustained outage or changes their free tier, the AI features go down. Mitigation is the retry+backoff + 503 UI fallback.
+- Re-enabling Gemini later is a contained refactor (one file: `lib/ai/provider.ts`).
+- Document a SLO target post-launch: "AI features available ≥99% of the time"; if we breach it, that's the trigger to add Gemini.
+
+---
+
 ## 🗂️ Data Flow Diagrams
 
 ### User adds a course to plan

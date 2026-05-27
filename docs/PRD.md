@@ -134,7 +134,7 @@ All decisions LOCKED. Total monthly cost: **$0**.
 |---|---|---|
 | **Fast LLM** | Groq Llama 3.1 8B Instant | 14,400 RPD, 30K TPM, 840 TPS |
 | **Smart LLM** | Groq Llama 3.3 70B Versatile | 14,400 RPD, 6K TPM, 394 TPS |
-| **Fallback LLM** | Google Gemini 2.0 Flash | 1,500 RPD (separate quota) |
+| **Fallback LLM** | _Deferred for v1_ (Gemini 2.0 Flash slot kept in env, not wired) | — |
 | **Embeddings** | sentence-transformers `all-MiniLM-L6-v2` | $0, local, 384 dims, ~80MB |
 | **LLM SDK** | Vercel AI SDK | Free, MIT |
 | **Vector DB** | pgvector in Postgres | $0, no Pinecone needed |
@@ -143,9 +143,9 @@ All decisions LOCKED. Total monthly cost: **$0**.
 **Why this combo:**
 - Groq is the fastest LLM inference in 2026 (LPU hardware)
 - 14,400 RPD × 2 Groq models = 28,800 daily request capacity
-- Gemini fallback adds 1,500 more if Groq has issues
 - Embeddings run locally — no API cost for vector search
 - Total capacity supports ~500 active users on free tiers alone
+- **On Groq 429:** retry with exponential backoff (3 attempts, 1s/2s/4s). If still failing, return 503 to caller. Gemini fallback added later if usage justifies (see ADR-012).
 
 ### 2.4 Infrastructure
 
@@ -827,7 +827,11 @@ Natural-language Q&A with RAG over courses + Reddit + community data.
 
 ## 8. Design System
 
-### 8.1 Colors (OKLCH)
+> ⚠️ **SUPERSEDED.** The design tokens in this section are obsolete. The canonical design system is `docs/design/HANDOFF.md` (Claude Designs handoff bundle, **Graphite Greens** palette). Implementers should paste the `@theme` block from HANDOFF.md §1 directly into `app/globals.css`. The block below is preserved only for historical reference of the original PRD draft.
+
+### 8.1 Colors (OKLCH) — _superseded by HANDOFF.md §1_
+
+<details><summary>Original draft tokens (do not implement)</summary>
 
 ```css
 @theme {
@@ -846,27 +850,19 @@ Natural-language Q&A with RAG over courses + Reddit + community data.
   --color-text: oklch(0.20 0 0);
   --color-text-muted: oklch(0.55 0 0);
 }
-
-@media (prefers-color-scheme: dark) {
-  @theme {
-    --color-bg: oklch(0.13 0 0);
-    --color-bg-subtle: oklch(0.17 0 0);
-    --color-border: oklch(0.25 0 0);
-    --color-text: oklch(0.95 0 0);
-    --color-text-muted: oklch(0.65 0 0);
-  }
-}
 ```
 
-### 8.2 Typography
+</details>
+
+### 8.2 Typography — _see HANDOFF.md §2_
 - Body: Geist Sans, 16px base
-- Code/codes: Geist Mono
+- Code/codes: Geist Mono (with `ss01` + slashed-zero on all course codes)
 - Scale: 12/14/16/18/20/24/30/36
 
-### 8.3 Spacing & Radius
-- Spacing: Tailwind default (4px base)
-- Radius: 4/6/8/12/16
-- Shadows: xs/sm/md/lg (subtle, layered)
+### 8.3 Spacing & Radius — _see HANDOFF.md §1_
+- Spacing: 4px base (`--spacing-1` through `--spacing-16`)
+- Radius: 6/8/12/16 + full (`--radius-sm` through `--radius-full`)
+- Shadows: sm/md/lg from HANDOFF.md (layered, subtle)
 
 ### 8.4 Motion
 
@@ -899,6 +895,8 @@ export const transitions = {
 ---
 
 ## 10. Roadmap
+
+> **Timeline note:** 8-week roadmap is **estimated, not a hard deadline**. Realistic v1 ship for a solo dev with AI assistance is 10–14 weeks. Phase boundaries are fixed; week numbers are directional.
 
 ### Phase 1: Foundation (Week 1-2)
 - Next.js 15 + Biome
@@ -1325,6 +1323,8 @@ If !profile.isPublic, return notFound().
 
 ## 12. Folder Structure
 
+> **Layout note:** All application code lives under `src/`. Path alias `@/*` maps to `./src/*` (configured in `tsconfig.json`). The tree below shows paths relative to repo root — actual `app/`, `components/`, `lib/`, etc. live inside `src/`.
+
 ```
 soen-compass/
 ├── .github/
@@ -1573,15 +1573,9 @@ function selectModel(task: AITask) {
 
 async function generateResponse(messages, task: AITask) {
   const model = selectModel(task);
-  try {
-    return await callGroq(model, messages);
-  } catch (err) {
-    if (err.status === 429) {
-      // Fallback to Gemini
-      return await callGemini(messages);
-    }
-    throw err;
-  }
+  // v1: Groq only. On 429, retry with exponential backoff (1s, 2s, 4s),
+  // then surface 503 to caller. Gemini fallback deferred — see ADR-012.
+  return await callGroqWithBackoff(model, messages, { attempts: 3, baseMs: 1000 });
 }
 ```
 
