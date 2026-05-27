@@ -1,0 +1,142 @@
+# =============================================================================
+# CompassSoenDemo — .gitignore
+# Next.js 15 (App Router) + TypeScript + Drizzle + Better Auth + Docker Postgres
+# =============================================================================
+
+# ----- Dependencies -----
+node_modules/
+.pnp
+.pnp.js
+.pnp.cjs
+.pnp.loader.mjs
+.yarn/install-state.gz
+
+# ----- Next.js build output -----
+.next/
+out/
+build/
+dist/
+
+# ----- Production / runtime artifacts -----
+*.tsbuildinfo
+next-env.d.ts
+
+# ----- Environment / secrets (NEVER commit) -----
+.env
+.env.local
+.env.*.local
+.env.development.local
+.env.test.local
+.env.production.local
+.env.production
+.env.staging
+
+# ----- Logs -----
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+logs/
+*.log
+
+# ----- Coverage & test output -----
+coverage/
+*.lcov
+.nyc_output/
+.vitest-cache/
+playwright-report/
+playwright/.cache/
+test-results/
+blob-report/
+
+# ----- IDE / editor -----
+.vscode/*
+!.vscode/settings.json
+!.vscode/extensions.json
+!.vscode/launch.json
+.idea/
+*.swp
+*.swo
+*.iml
+.fleet/
+
+# ----- OS junk -----
+.DS_Store
+.DS_Store?
+._*
+Thumbs.db
+Desktop.ini
+.AppleDouble
+.LSOverride
+
+# ----- TypeScript / build caches -----
+.cache/
+.parcel-cache/
+.turbo/
+.swc/
+.eslintcache
+.stylelintcache
+
+# ----- Drizzle ORM -----
+# Keep migrations checked in (drizzle/), ignore the generated metadata cache
+drizzle/meta/_journal.json.bak
+drizzle.snapshot.tmp.json
+
+# ----- Better Auth -----
+# Better Auth doesn't write local files by default, but be defensive
+.better-auth/
+
+# ----- Docker / local DB -----
+.docker/
+docker-data/
+postgres-data/
+pgdata/
+*.dump
+*.sql.bak
+
+# ----- AI model cache (sentence-transformers via @xenova/transformers) -----
+.cache/transformers/
+models/
+.transformers-cache/
+
+# ----- Vercel / deployment platforms -----
+.vercel/
+.netlify/
+.railway/
+
+# ----- Sentry -----
+.sentryclirc
+
+# ----- PostHog -----
+# (no local files by default)
+
+# ----- Bundle analyzer output -----
+.next/analyze/
+analyze/
+
+# ----- Misc temp / scratch -----
+tmp/
+temp/
+*.tmp
+.scratch/
+scratch.*
+TODO.local.md
+NOTES.local.md
+
+# ----- Lock files: KEEP package-lock.json (npm), ignore others if mixed -----
+yarn.lock
+pnpm-lock.yaml
+bun.lockb
+
+# ----- Generated docs / API specs -----
+.docusaurus/
+storybook-static/
+
+# ----- macOS-specific -----
+*.icloud
+
+# ----- Project-specific scratch -----
+# Place to drop one-off test data without polluting git
+sandbox/
+scratch/
