@@ -149,7 +149,7 @@ Contributions welcome! See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
 
 ## 📜 License
 
-[MIT](LICENSE) © 2026 Amirhossein Ghadimi
+[MIT](LICENSE) © 2026 Amir Ghadimi
 
 You can use this code freely. If you build something with it, a star ⭐ is appreciated but not required.
 
