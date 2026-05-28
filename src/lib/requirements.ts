@@ -24,14 +24,14 @@ export const CATEGORIES: CategorySpec[] = [
   {
     key: "eng_core",
     label: "Engineering Core",
-    requiredCredits: 26.5,
+    requiredCredits: 27.5,
     description: "ENGR + ELEC + ENCS required for all engineering students.",
   },
   {
     key: "se_core",
     label: "Software Engineering Core",
-    requiredCredits: 64,
-    description: "COMP + SOEN courses that make up the SOEN backbone.",
+    requiredCredits: 73.5,
+    description: "COMP + SOEN courses (SE Core 46.5 + CS Group 27 cr per Concordia §71.70.9).",
   },
   {
     key: "eng_nsci_group",

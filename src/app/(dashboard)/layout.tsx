@@ -1,3 +1,4 @@
+import { CommandPalette } from "@/components/command-palette";
 import { Sidebar } from "@/components/nav/sidebar";
 import { Topbar } from "@/components/nav/topbar";
 import { db } from "@/lib/db";
@@ -32,6 +33,7 @@ export default async function DashboardLayout({
         <Topbar userName={session.user.name ?? null} userEmail={session.user.email} />
         <main className="flex-1 overflow-y-auto">{children}</main>
       </div>
+      <CommandPalette />
     </div>
   );
 }

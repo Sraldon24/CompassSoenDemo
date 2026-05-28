@@ -1,0 +1,74 @@
+[
+  {
+    "id": "request-transfer-verification",
+    "category": "Transfer Credit",
+    "title": "Request transfer credit verification",
+    "to": "advisor",
+    "subject": "Transfer credit verification — [Student ID]",
+    "body": "Hello [Advisor name],\n\nI'm writing to confirm the status of my transfer credits from [previous institution]. I expected the following to appear on my Advisement Report:\n\n- [Course code 1] → Concordia [Course code 1 equivalent]\n- [Course code 2] → Concordia [Course code 2 equivalent]\n\nCould you please confirm when these will be processed, or let me know if anything additional is needed from my side?\n\nThank you,\n[Your name]\n[Student ID] · [Program]"
+  },
+  {
+    "id": "request-prereq-waiver",
+    "category": "Registration",
+    "title": "Request prerequisite waiver",
+    "to": "professor",
+    "subject": "Prerequisite waiver request — [Course code]",
+    "body": "Dear Professor [Name],\n\nI'd like to request a prerequisite waiver to register in [Course code] for [Term].\n\nThe official prerequisite is [Prereq code], which I have not yet completed. However, I have completed [equivalent/related course] which covers similar material. I am also currently in [related course] and would be taking [Course code] concurrently.\n\nWould you be willing to sign a prerequisite override? I can provide my transcript or course outlines on request.\n\nThank you,\n[Your name]\n[Student ID] · [Program]"
+  },
+  {
+    "id": "request-course-permission",
+    "category": "Registration",
+    "title": "Request permission to register (course full)",
+    "to": "department",
+    "subject": "Registration permission — [Course code] [Section]",
+    "body": "Hello,\n\nI'm trying to register for [Course code] [Section] in [Term], but the section is full. This course is on the critical path for my graduation in [Expected grad term] and I would like to be added.\n\nI have completed all listed prerequisites:\n- [Prereq 1] ✓\n- [Prereq 2] ✓\n\nIs there a waitlist I can join, or could I be added to the section? I'm available to come to the department office in person if needed.\n\nThank you,\n[Your name]\n[Student ID]"
+  },
+  {
+    "id": "ewt-clarification",
+    "category": "Engineering Writing Test",
+    "title": "EWT scheduling / status clarification",
+    "to": "advisor",
+    "subject": "EWT scheduling for [Term] — [Student ID]",
+    "body": "Hello,\n\nCould you confirm the next available sitting of the Engineering Writing Test (EWT)?\n\nMy plan is to take ENCS 282 in [Target term] if I pass the EWT, or otherwise register for ENCS 272 first. I'd like to align my registration before the add/drop deadline of [Date].\n\nThank you,\n[Your name]\n[Student ID]"
+  },
+  {
+    "id": "late-disc-request",
+    "category": "Withdrawal",
+    "title": "Request late DISC (withdrawal without academic penalty)",
+    "to": "advisor",
+    "subject": "Late DISC request — [Course code] [Term]",
+    "body": "Hello,\n\nI'd like to request a late DISC for [Course code] this term. The standard drop deadline has passed, but my current circumstances ([brief reason — health, family, etc.]) have made continuing unmanageable.\n\nI understand DISC appears on the transcript but does not affect GPA. I've reviewed the implications with [Counsellor / professor] and would like to proceed.\n\nWhat documentation do you need from me?\n\nThank you,\n[Your name]\n[Student ID]"
+  },
+  {
+    "id": "coop-application",
+    "category": "Co-op",
+    "title": "Co-op application status",
+    "to": "coop-office",
+    "subject": "Co-op application status — [Student ID]",
+    "body": "Hello,\n\nI applied to the SOEN Co-op program on [Date]. Could you confirm:\n\n1. Whether my application has been reviewed\n2. The expected timeline for the decision\n3. Any additional documents you need from me\n\nThank you,\n[Your name]\n[Student ID] · [Program]"
+  },
+  {
+    "id": "graduation-application",
+    "category": "Graduation",
+    "title": "Graduation application + audit",
+    "to": "advisor",
+    "subject": "Graduation application audit — Spring [Year]",
+    "body": "Hello,\n\nI'm applying for [Spring/Fall] [Year] convocation and would like to confirm I'm on track.\n\nMy Advisement Report shows:\n- Total credits: [X] / 120\n- Outstanding: [list any remaining courses]\n- Deficiencies cleared: [Yes/No]\n\nCould you confirm that everything is in order, or flag anything missing?\n\nThank you,\n[Your name]\n[Student ID] · [Program]"
+  },
+  {
+    "id": "schedule-conflict",
+    "category": "Registration",
+    "title": "Two-course schedule conflict resolution",
+    "to": "department",
+    "subject": "Schedule conflict — [Course A] and [Course B]",
+    "body": "Hello,\n\nI have a schedule conflict between [Course A] [Section] and [Course B] [Section] in [Term]. Both are required for my plan.\n\nOptions I've considered:\n1. Different section of [Course A] (if available)\n2. Different section of [Course B] (if available)\n3. Switching one of them to [alternative term]\n\nDo you know which option is most realistic, or is there a section override path?\n\nThank you,\n[Your name]\n[Student ID]"
+  },
+  {
+    "id": "reference-letter",
+    "category": "Career",
+    "title": "Reference letter request",
+    "to": "professor",
+    "subject": "Reference letter request — [Application / Job]",
+    "body": "Dear Professor [Name],\n\nI'm applying for [position / program] with a deadline of [Date]. I took your [Course code] in [Term] and earned [Grade] — I learned a lot from [specific topic / project].\n\nWould you be willing to write a reference letter on my behalf? I can send you my CV, the application details, and a short summary of what I'm hoping to highlight. I'd need the letter submitted to [Submission portal / email] by [Date].\n\nThank you for considering,\n[Your name]\n[Student ID]"
+  }
+]

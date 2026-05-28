@@ -389,6 +389,79 @@ This document captures **why** we made each major technical decision. Useful for
 
 ---
 
+### ADR-013: `inArray()` over raw `sql\`... ANY(${array})\`` for parametrized lists
+
+**Status:** Accepted
+**Date:** 2026-05-28
+**Context:** During live AI integration testing in Phase 3, two endpoints (`/api/ai/chat` and the planner snapshot query) crashed with Postgres error `op ANY/ALL (array) requires array on right side`. Root cause: Drizzle's `sql\` tag splits each element of a JS array into its own placeholder when used inside `ANY()` / `IN()`. The query that looks like `code = ANY(${codes})` compiles to `code = ANY(($1, $2, $3))` — invalid SQL.
+
+**Decision:** Always use Drizzle's typed `inArray(column, jsArray)` helper for list-membership queries. Reserve raw `sql\` tags for things Drizzle's API can't express (HNSW vector search, JSON path queries, raw aggregates).
+
+**Rationale:**
+- Drizzle's `inArray()` correctly binds the array as a single `text[]` parameter.
+- Type-safe — the column type must match the array element type at compile time.
+- This bug class is invisible to TypeScript (the raw `sql\` tag returns `SQL<unknown>`), so we need a runtime + lint-level guard, not just a type check.
+
+**Implementation:**
+- Pre-commit guard at `scripts/check-sql-patterns.sh` greps for `sql\`...ANY\(\${...}` and `sql\`...IN \(\${...}` patterns. Wired into `npm run lint`.
+- Integration tests in `tests/integration/db-queries.test.ts` include a regression case that exercises `inArray` with a 3-element array to prove the pattern stays correct.
+
+**Consequences:**
+- One more script to maintain (~30 LOC, shell).
+- Future contributors who reach for `sql\`... ANY(${...})\`` get a clear error before committing.
+
+---
+
+### ADR-014: RAG context force-includes explicitly-mentioned courses
+
+**Status:** Accepted
+**Date:** 2026-05-28
+**Context:** Early Phase 3 live-testing showed that when a user asked "When can I take COMP 472?", the RAG pipeline's pure semantic search did not always surface COMP 472's catalog entry in the top-K context. Cosine similarity matched broader concepts (e.g. AI / ML courses) but missed the specific entry. The LLM, correctly refusing to invent prereqs, answered "I don't have that information."
+
+**Decision:** Before semantic search, regex-extract any course codes from the query (`/\b([A-Z]{3,4})\s*(\d{3})\b/g`) and force-include their full catalog row in the RAG context as a separate "Courses you explicitly mentioned" block, with `[E1]/[E2]/...` citation labels. Semantic search runs over the catalog *minus* those explicit codes to maximize unique signal.
+
+**Rationale:**
+- The user naming a code is the strongest possible signal of relevance. Pure embedding similarity buries it under thematically-related courses.
+- This is a small, deterministic pre-step — adds <10ms.
+- The LLM gets prereqs, credits, category, and the user's plan status for the named course in the system prompt. Quality of answer jumps from "I don't have that info" to a correct, cited response.
+
+**Considered alternatives:**
+- Higher top-K cutoff: increases context length without solving the core ranking issue.
+- Re-rank embeddings with a small LLM pass: more latency, marginal gain.
+- Train a domain-specific embedder: massive overkill for the use case.
+
+**Consequences:**
+- Two label namespaces in citations (`[E1]` explicit, `[1]/[2]` semantic). UI renders them as distinct chips.
+- A query like "tell me about COMP 999" will force-include the non-existent code — the catalog lookup returns empty, so no harm done.
+
+---
+
+### ADR-015: Course catalog seeded from Concordia §71.70.10 (not the scraper)
+
+**Status:** Accepted
+**Date:** 2026-05-28
+**Supersedes part of:** ADR-008 (scope, not the tool choice)
+**Context:** ADR-008 specified Crawlee as the catalog source for Phase 4 onwards. v1 needed catalog data **immediately** to power the planner, recommendations, and prereq map. Writing the scraper-with-admin-review-queue first would have blocked Phases 2+3.
+
+**Decision:** For v1, seed the catalog from two sources:
+1. The user's hand-curated Excel (`data/seed/courses.json` — 61 courses he has personally verified)
+2. A supplementary JSON (`data/seed/courses-supplementary.json` — 113 courses extracted from Concordia 2025-26 calendar §71.70.9 + §71.70.10 via WebFetch)
+
+Total: **124 courses** with prereqs, credits, categories. Seeded into Postgres via `npm run seed:catalog`, then embedded via `npm run db:embed`.
+
+**Rationale:**
+- Authoritative source (the official calendar) without the engineering cost of a scraper.
+- Hand-curated user plan gives us better prereq accuracy than auto-parsing the calendar's prose.
+- Idempotent — re-running the seed updates rows on conflict but never duplicates.
+- The Phase 4 scraper still ships per ADR-008, but as an *update* mechanism, not the initial bootstrap.
+
+**Consequences:**
+- Catalog drifts if Concordia updates §71.70.10 between v1 and Phase 4. Mitigation: PRD §15 admin-review queue.
+- Manual review of `courses-supplementary.json` before commit caught at least one ambiguity (ENGR 245 / MIAE 221 as Eng & Nat Sci Group alternatives — both are valid).
+- Removing 17 stale courses or fixing a wrong credit value requires editing the JSON, not the DB directly.
+
+---
+
 ## 🗂️ Data Flow Diagrams
 
 ### User adds a course to plan

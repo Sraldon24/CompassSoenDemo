@@ -193,7 +193,7 @@ I'll stop and ask only if (a) something fails in a way I can't recover from, (b)
 ## Things I'm tracking for you (so you don't have to)
 
 - **Node 22 vs 25:** You have Node 25 installed (current, not LTS). PRD locks Node 22 LTS for native dep compatibility (esp. `@xenova/transformers`). I'll set Node 22 as the default via nvm — your other projects on Node 25 won't break (nvm is per-shell).
-- **GitHub handle:** Your actual username is `Sraldon24` (not `sraldon`). PRD/README mentions of "Amirhossein Ghadimi" will be updated to match Amir Ghadimi (user-facing) / Amirhossein Ghadimi (legal) per earlier decision.
+- **GitHub handle:** Your actual username is `Sraldon24` (not `sraldon`). User name is **Amir Ghadimi** everywhere (user-facing + legal + LICENSE).
 - Design bundle at `docs/design/` — Graphite Greens palette supersedes PRD §8 (flagged in `docs/CLAUDE.md`)
 - D3 prereq map → `d3-hierarchy` tree layout (deterministic), not `d3-force`
 - `lru-cache` rate limiting is fine for v1; Redis when multi-replica (post-launch)

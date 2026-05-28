@@ -1,0 +1,1154 @@
+[
+  {
+    "code": "COMP 108",
+    "title": "Computer Science C.Edge Option Reflective Learning I",
+    "credits": 3,
+    "category": "soen_elective",
+    "prereqs": { "all": [], "any": [], "concurrent": [], "notes": "Permission of GCS required" },
+    "unlocks": ["COMP 208"],
+    "notes": null
+  },
+  {
+    "code": "COMP 208",
+    "title": "Computer Science C.Edge Option Reflective Learning II",
+    "credits": 3,
+    "category": "soen_elective",
+    "prereqs": { "all": ["COMP 108"], "any": [], "concurrent": [], "notes": null },
+    "unlocks": [],
+    "notes": null
+  },
+  {
+    "code": "COMP 218",
+    "title": "Fundamentals of Programming",
+    "credits": 3,
+    "category": "deficiency",
+    "prereqs": { "all": [], "any": [], "concurrent": [], "notes": "MATH 201 or equivalent" },
+    "unlocks": ["COMP 248"],
+    "notes": null
+  },
+  {
+    "code": "COMP 228",
+    "title": "System Hardware",
+    "credits": 3,
+    "category": "se_core",
+    "prereqs": {
+      "all": ["COMP 248"],
+      "any": ["MATH 203", "MATH 204"],
+      "concurrent": [],
+      "notes": "COMP 248; MATH 203/204"
+    },
+    "unlocks": ["COMP 346", "COMP 442"],
+    "notes": null
+  },
+  {
+    "code": "COMP 232",
+    "title": "Mathematics for Computer Science",
+    "credits": 3,
+    "category": "se_core",
+    "prereqs": {
+      "all": ["MATH 203", "MATH 204"],
+      "any": [],
+      "concurrent": [],
+      "notes": "MATH 203, MATH 204"
+    },
+    "unlocks": ["COMP 335", "COMP 339", "COMP 352", "COMP 442", "COMP 465", "COMP 471", "SOEN 331"],
+    "notes": null
+  },
+  {
+    "code": "COMP 233",
+    "title": "Probability and Statistics for Computer Science",
+    "credits": 3,
+    "category": "soen_elective",
+    "prereqs": {
+      "all": ["MATH 205"],
+      "any": [],
+      "concurrent": [],
+      "notes": "MATH 205 or equivalent"
+    },
+    "unlocks": ["COMP 333", "COMP 479"],
+    "notes": null
+  },
+  {
+    "code": "COMP 248",
+    "title": "Object-Oriented Programming I",
+    "credits": 3.5,
+    "category": "se_core",
+    "prereqs": {
+      "all": ["MATH 204"],
+      "any": [],
+      "concurrent": [],
+      "notes": "MATH 204 or equivalent"
+    },
+    "unlocks": ["COMP 228", "COMP 249", "SOEN 287"],
+    "notes": null
+  },
+  {
+    "code": "COMP 249",
+    "title": "Object-Oriented Programming II",
+    "credits": 3.5,
+    "category": "se_core",
+    "prereqs": {
+      "all": ["COMP 248", "MATH 203", "MATH 205"],
+      "any": [],
+      "concurrent": [],
+      "notes": null
+    },
+    "unlocks": ["COMP 335", "COMP 348", "COMP 352", "SOEN 331"],
+    "notes": null
+  },
+  {
+    "code": "COMP 326",
+    "title": "Computer Architecture",
+    "credits": 3,
+    "category": "soen_elective",
+    "prereqs": { "all": ["COMP 346"], "any": [], "concurrent": [], "notes": null },
+    "unlocks": [],
+    "notes": null
+  },
+  {
+    "code": "COMP 333",
+    "title": "Data Analytics",
+    "credits": 4,
+    "category": "soen_elective",
+    "prereqs": {
+      "all": ["COMP 352", "ENCS 282"],
+      "any": ["COMP 233", "ENGR 371"],
+      "concurrent": [],
+      "notes": null
+    },
+    "unlocks": [],
+    "notes": "Data Engineering specialization"
+  },
+  {
+    "code": "COMP 335",
+    "title": "Introduction to Theoretical Computer Science",
+    "credits": 3,
+    "category": "se_core",
+    "prereqs": { "all": ["COMP 232", "COMP 249"], "any": [], "concurrent": [], "notes": null },
+    "unlocks": ["COMP 442"],
+    "notes": null
+  },
+  {
+    "code": "COMP 339",
+    "title": "Combinatorics",
+    "credits": 3,
+    "category": "soen_elective",
+    "prereqs": {
+      "all": ["COMP 232"],
+      "any": [],
+      "concurrent": [],
+      "notes": "COMP 232 or 18+ credits post-Cégep math"
+    },
+    "unlocks": ["COMP 465"],
+    "notes": null
+  },
+  {
+    "code": "COMP 345",
+    "title": "Advanced Program Design with C++",
+    "credits": 4,
+    "category": "soen_elective",
+    "prereqs": {
+      "all": [],
+      "any": [],
+      "concurrent": ["COMP 352"],
+      "notes": "COMP 352 (concurrent ok)"
+    },
+    "unlocks": [],
+    "notes": "Games/Real-Time specialization"
+  },
+  {
+    "code": "COMP 346",
+    "title": "Operating Systems",
+    "credits": 4,
+    "category": "se_core",
+    "prereqs": {
+      "all": ["COMP 352"],
+      "any": ["COMP 228", "SOEN 228"],
+      "concurrent": [],
+      "notes": null
+    },
+    "unlocks": [
+      "COMP 326",
+      "COMP 426",
+      "COMP 428",
+      "COMP 444",
+      "COMP 445",
+      "SOEN 321",
+      "SOEN 422",
+      "SOEN 423"
+    ],
+    "notes": null
+  },
+  {
+    "code": "COMP 348",
+    "title": "Principles of Programming Languages",
+    "credits": 3,
+    "category": "se_core",
+    "prereqs": { "all": ["COMP 249"], "any": [], "concurrent": [], "notes": null },
+    "unlocks": ["COMP 442"],
+    "notes": null
+  },
+  {
+    "code": "COMP 352",
+    "title": "Data Structures and Algorithms",
+    "credits": 3,
+    "category": "se_core",
+    "prereqs": {
+      "all": ["COMP 249"],
+      "any": [],
+      "concurrent": ["COMP 232"],
+      "notes": "COMP 232 concurrent ok; COMP 249"
+    },
+    "unlocks": [
+      "COMP 333",
+      "COMP 345",
+      "COMP 346",
+      "COMP 353",
+      "COMP 354",
+      "COMP 371",
+      "COMP 432",
+      "COMP 433",
+      "COMP 438",
+      "COMP 442",
+      "COMP 465",
+      "COMP 471",
+      "COMP 472",
+      "COMP 473",
+      "COMP 474",
+      "COMP 478",
+      "COMP 479",
+      "SOEN 341",
+      "SOEN 363",
+      "SOEN 471"
+    ],
+    "notes": "🔴 Most important course in the degree — unlocks 20+ downstream"
+  },
+  {
+    "code": "COMP 353",
+    "title": "Databases",
+    "credits": 4,
+    "category": "soen_elective",
+    "prereqs": {
+      "all": ["COMP 352"],
+      "any": ["COMP 232", "COEN 231"],
+      "concurrent": [],
+      "notes": null
+    },
+    "unlocks": ["COMP 451", "SOEN 387"],
+    "notes": null
+  },
+  {
+    "code": "COMP 354",
+    "title": "Introduction to Software Engineering",
+    "credits": 4,
+    "category": "soen_elective",
+    "prereqs": { "all": ["COMP 352", "ENCS 282"], "any": [], "concurrent": [], "notes": null },
+    "unlocks": ["SOEN 387"],
+    "notes": null
+  },
+  {
+    "code": "COMP 361",
+    "title": "Elementary Numerical Methods",
+    "credits": 3,
+    "category": "soen_elective",
+    "prereqs": { "all": ["COMP 232", "COMP 249"], "any": [], "concurrent": [], "notes": null },
+    "unlocks": ["COMP 476", "COMP 477"],
+    "notes": null
+  },
+  {
+    "code": "COMP 367",
+    "title": "Techniques in Symbolic Computation",
+    "credits": 3,
+    "category": "soen_elective",
+    "prereqs": {
+      "all": ["COMP 248"],
+      "any": ["MATH 222", "COMP 232"],
+      "concurrent": [],
+      "notes": null
+    },
+    "unlocks": [],
+    "notes": null
+  },
+  {
+    "code": "COMP 371",
+    "title": "Computer Graphics",
+    "credits": 4,
+    "category": "soen_elective",
+    "prereqs": { "all": ["COMP 232", "COMP 352"], "any": [], "concurrent": [], "notes": null },
+    "unlocks": ["COMP 376", "COMP 475", "COMP 477"],
+    "notes": "Games specialization"
+  },
+  {
+    "code": "COMP 376",
+    "title": "Introduction to Game Development",
+    "credits": 4,
+    "category": "soen_elective",
+    "prereqs": { "all": ["COMP 371"], "any": [], "concurrent": [], "notes": null },
+    "unlocks": ["COMP 476"],
+    "notes": "Games specialization"
+  },
+  {
+    "code": "COMP 425",
+    "title": "Computer Vision",
+    "credits": 4,
+    "category": "soen_elective",
+    "prereqs": { "all": [], "any": [], "concurrent": [], "notes": "Refer to current calendar" },
+    "unlocks": [],
+    "notes": "AI specialization"
+  },
+  {
+    "code": "COMP 426",
+    "title": "Multicore Programming",
+    "credits": 4,
+    "category": "soen_elective",
+    "prereqs": { "all": ["COMP 346"], "any": [], "concurrent": [], "notes": null },
+    "unlocks": [],
+    "notes": null
+  },
+  {
+    "code": "COMP 428",
+    "title": "Parallel Programming",
+    "credits": 4,
+    "category": "soen_elective",
+    "prereqs": { "all": ["COMP 346"], "any": [], "concurrent": [], "notes": null },
+    "unlocks": [],
+    "notes": null
+  },
+  {
+    "code": "COMP 432",
+    "title": "Machine Learning",
+    "credits": 4,
+    "category": "se_core",
+    "prereqs": { "all": ["COMP 352"], "any": [], "concurrent": [], "notes": null },
+    "unlocks": ["COMP 433", "SOEN 471"],
+    "notes": "Required core (AI foundation) — replaces ENGR 391"
+  },
+  {
+    "code": "COMP 433",
+    "title": "Introduction to Deep Learning",
+    "credits": 4,
+    "category": "soen_elective",
+    "prereqs": { "all": ["COMP 352"], "any": [], "concurrent": [], "notes": null },
+    "unlocks": [],
+    "notes": "AI specialization"
+  },
+  {
+    "code": "COMP 438",
+    "title": "Geometric Modelling and Processing",
+    "credits": 4,
+    "category": "soen_elective",
+    "prereqs": { "all": ["COMP 352"], "any": [], "concurrent": [], "notes": null },
+    "unlocks": [],
+    "notes": "Games specialization"
+  },
+  {
+    "code": "COMP 442",
+    "title": "Compiler Design",
+    "credits": 4,
+    "category": "soen_elective",
+    "prereqs": {
+      "all": ["COMP 335", "COMP 352"],
+      "any": ["COMP 228", "SOEN 228", "COEN 311"],
+      "concurrent": [],
+      "notes": null
+    },
+    "unlocks": [],
+    "notes": null
+  },
+  {
+    "code": "COMP 444",
+    "title": "System Software Design",
+    "credits": 4,
+    "category": "soen_elective",
+    "prereqs": { "all": ["COMP 346"], "any": [], "concurrent": [], "notes": null },
+    "unlocks": [],
+    "notes": "Real-Time/Embedded specialization"
+  },
+  {
+    "code": "COMP 445",
+    "title": "Data Communication and Computer Networks",
+    "credits": 4,
+    "category": "soen_elective",
+    "prereqs": { "all": ["COMP 346"], "any": [], "concurrent": [], "notes": null },
+    "unlocks": [],
+    "notes": "Web Services specialization"
+  },
+  {
+    "code": "COMP 451",
+    "title": "Database Design",
+    "credits": 4,
+    "category": "soen_elective",
+    "prereqs": { "all": ["COMP 353"], "any": [], "concurrent": [], "notes": null },
+    "unlocks": [],
+    "notes": null
+  },
+  {
+    "code": "COMP 465",
+    "title": "Design and Analysis of Algorithms",
+    "credits": 3,
+    "category": "soen_elective",
+    "prereqs": {
+      "all": ["COMP 339", "COMP 352"],
+      "any": ["COMP 232", "COEN 231"],
+      "concurrent": [],
+      "notes": null
+    },
+    "unlocks": [],
+    "notes": null
+  },
+  {
+    "code": "COMP 471",
+    "title": "Quantum Computing",
+    "credits": 3,
+    "category": "soen_elective",
+    "prereqs": { "all": ["COMP 352"], "any": [], "concurrent": [], "notes": null },
+    "unlocks": [],
+    "notes": null
+  },
+  {
+    "code": "COMP 472",
+    "title": "Artificial Intelligence",
+    "credits": 4,
+    "category": "soen_elective",
+    "prereqs": { "all": ["COMP 352"], "any": [], "concurrent": [], "notes": null },
+    "unlocks": [],
+    "notes": "AI specialization — take with Kosseim per community feedback"
+  },
+  {
+    "code": "COMP 473",
+    "title": "Pattern Recognition",
+    "credits": 4,
+    "category": "soen_elective",
+    "prereqs": { "all": ["COMP 352"], "any": [], "concurrent": [], "notes": null },
+    "unlocks": [],
+    "notes": "AI specialization — overlaps with COMP 432 ML"
+  },
+  {
+    "code": "COMP 474",
+    "title": "Intelligent Systems",
+    "credits": 4,
+    "category": "soen_elective",
+    "prereqs": { "all": ["COMP 352"], "any": [], "concurrent": [], "notes": null },
+    "unlocks": [],
+    "notes": "AI specialization — take with Witte per community feedback"
+  },
+  {
+    "code": "COMP 475",
+    "title": "Immersive Technologies",
+    "credits": 4,
+    "category": "soen_elective",
+    "prereqs": { "all": ["COMP 371"], "any": [], "concurrent": [], "notes": null },
+    "unlocks": [],
+    "notes": "Games specialization"
+  },
+  {
+    "code": "COMP 476",
+    "title": "Advanced Game Development",
+    "credits": 4,
+    "category": "soen_elective",
+    "prereqs": {
+      "all": ["COMP 376"],
+      "any": ["COMP 361", "ENGR 391"],
+      "concurrent": [],
+      "notes": null
+    },
+    "unlocks": [],
+    "notes": "Games specialization"
+  },
+  {
+    "code": "COMP 477",
+    "title": "Animation for Computer Games",
+    "credits": 4,
+    "category": "soen_elective",
+    "prereqs": {
+      "all": ["COMP 371"],
+      "any": ["COMP 361", "ENGR 391"],
+      "concurrent": [],
+      "notes": null
+    },
+    "unlocks": [],
+    "notes": "Games specialization"
+  },
+  {
+    "code": "COMP 478",
+    "title": "Image Processing",
+    "credits": 4,
+    "category": "soen_elective",
+    "prereqs": { "all": ["COMP 352"], "any": [], "concurrent": [], "notes": null },
+    "unlocks": [],
+    "notes": null
+  },
+  {
+    "code": "COMP 479",
+    "title": "Information Retrieval and Web Search",
+    "credits": 4,
+    "category": "soen_elective",
+    "prereqs": {
+      "all": ["COMP 352"],
+      "any": ["COMP 233", "ENGR 371"],
+      "concurrent": [],
+      "notes": null
+    },
+    "unlocks": [],
+    "notes": "Skip per AI track guidance — exam-heavy, overlaps with COMP 432"
+  },
+  {
+    "code": "COMP 490",
+    "title": "Computer Science Project I",
+    "credits": 3,
+    "category": "soen_elective",
+    "prereqs": { "all": ["ENCS 282"], "any": [], "concurrent": [], "notes": "60 credits minimum" },
+    "unlocks": ["COMP 492"],
+    "notes": null
+  },
+  {
+    "code": "COMP 492",
+    "title": "Computer Science Project II",
+    "credits": 3,
+    "category": "soen_elective",
+    "prereqs": { "all": [], "any": [], "concurrent": ["COMP 490"], "notes": null },
+    "unlocks": [],
+    "notes": null
+  },
+  {
+    "code": "COMP 498",
+    "title": "Topics in Computer Science",
+    "credits": 3,
+    "category": "soen_elective",
+    "prereqs": { "all": [], "any": [], "concurrent": [], "notes": "Department permission" },
+    "unlocks": [],
+    "notes": null
+  },
+  {
+    "code": "COMP 499",
+    "title": "Topics in Computer Science with Lab",
+    "credits": 4,
+    "category": "soen_elective",
+    "prereqs": { "all": [], "any": [], "concurrent": [], "notes": "Department permission" },
+    "unlocks": [],
+    "notes": null
+  },
+  {
+    "code": "SOEN 228",
+    "title": "System Hardware",
+    "credits": 4,
+    "category": "se_core",
+    "prereqs": { "all": ["MATH 203", "MATH 204"], "any": [], "concurrent": [], "notes": null },
+    "unlocks": ["COMP 346", "SOEN 422"],
+    "notes": "Heavy 7hr labs — pair with lighter term"
+  },
+  {
+    "code": "SOEN 287",
+    "title": "Web Programming",
+    "credits": 3,
+    "category": "se_core",
+    "prereqs": { "all": ["COMP 248"], "any": [], "concurrent": [], "notes": null },
+    "unlocks": ["SOEN 387"],
+    "notes": null
+  },
+  {
+    "code": "SOEN 298",
+    "title": "System Hardware Lab",
+    "credits": 1,
+    "category": "soen_elective",
+    "prereqs": { "all": [], "any": [], "concurrent": [], "notes": "Program director permission" },
+    "unlocks": [],
+    "notes": null
+  },
+  {
+    "code": "SOEN 321",
+    "title": "Information Systems Security",
+    "credits": 3,
+    "category": "se_core",
+    "prereqs": { "all": ["COMP 346"], "any": [], "concurrent": [], "notes": null },
+    "unlocks": [],
+    "notes": null
+  },
+  {
+    "code": "SOEN 331",
+    "title": "Formal Methods for Software Engineering",
+    "credits": 3,
+    "category": "se_core",
+    "prereqs": { "all": ["COMP 232", "COMP 249"], "any": [], "concurrent": [], "notes": null },
+    "unlocks": [],
+    "notes": null
+  },
+  {
+    "code": "SOEN 341",
+    "title": "Software Process and Practices",
+    "credits": 4,
+    "category": "se_core",
+    "prereqs": {
+      "all": ["ENCS 282"],
+      "any": [],
+      "concurrent": ["COMP 352"],
+      "notes": "COMP 352 concurrent ok; ENCS 282 done"
+    },
+    "unlocks": ["SOEN 342", "SOEN 343", "SOEN 357", "SOEN 384", "SOEN 387", "COMP 354"],
+    "notes": null
+  },
+  {
+    "code": "SOEN 342",
+    "title": "Software Requirements and Deployment",
+    "credits": 3,
+    "category": "se_core",
+    "prereqs": { "all": ["SOEN 341"], "any": [], "concurrent": [], "notes": null },
+    "unlocks": ["SOEN 343"],
+    "notes": null
+  },
+  {
+    "code": "SOEN 343",
+    "title": "Software Architecture and Design",
+    "credits": 4,
+    "category": "se_core",
+    "prereqs": {
+      "all": [],
+      "any": [],
+      "concurrent": ["SOEN 341", "SOEN 342"],
+      "notes": "SOEN 341 + 342 concurrent ok"
+    },
+    "unlocks": ["SOEN 344", "SOEN 345", "SOEN 424"],
+    "notes": null
+  },
+  {
+    "code": "SOEN 344",
+    "title": "Advanced Software Architecture and Design",
+    "credits": 3,
+    "category": "soen_elective",
+    "prereqs": { "all": ["SOEN 343"], "any": [], "concurrent": [], "notes": null },
+    "unlocks": [],
+    "notes": null
+  },
+  {
+    "code": "SOEN 345",
+    "title": "Software Testing, Verification and Quality Assurance",
+    "credits": 4,
+    "category": "se_core",
+    "prereqs": { "all": [], "any": [], "concurrent": ["SOEN 343"], "notes": null },
+    "unlocks": ["SOEN 390"],
+    "notes": null
+  },
+  {
+    "code": "SOEN 357",
+    "title": "User Interface Design",
+    "credits": 3,
+    "category": "se_core",
+    "prereqs": { "all": [], "any": ["SOEN 341", "COMP 354"], "concurrent": [], "notes": null },
+    "unlocks": ["SOEN 390"],
+    "notes": null
+  },
+  {
+    "code": "SOEN 363",
+    "title": "Data Systems for Software Engineers",
+    "credits": 3,
+    "category": "se_core",
+    "prereqs": { "all": ["COMP 352"], "any": [], "concurrent": [], "notes": null },
+    "unlocks": ["SOEN 387"],
+    "notes": null
+  },
+  {
+    "code": "SOEN 384",
+    "title": "Management, Measurement and Quality Control",
+    "credits": 3,
+    "category": "se_core",
+    "prereqs": { "all": ["ENCS 282", "SOEN 341"], "any": [], "concurrent": [], "notes": null },
+    "unlocks": [],
+    "notes": null
+  },
+  {
+    "code": "SOEN 385",
+    "title": "Control Systems and Applications",
+    "credits": 3,
+    "category": "soen_elective",
+    "prereqs": { "all": ["ENGR 213", "ENGR 233"], "any": [], "concurrent": [], "notes": null },
+    "unlocks": [],
+    "notes": null
+  },
+  {
+    "code": "SOEN 387",
+    "title": "Web-Based Enterprise Application Design",
+    "credits": 3,
+    "category": "soen_elective",
+    "prereqs": {
+      "all": ["SOEN 287"],
+      "any": ["COMP 354", "SOEN 341"],
+      "concurrent": ["COMP 353", "SOEN 363"],
+      "notes": null
+    },
+    "unlocks": ["SOEN 487"],
+    "notes": "Web Services specialization"
+  },
+  {
+    "code": "SOEN 390",
+    "title": "Software Engineering Team Design Project",
+    "credits": 3.5,
+    "category": "se_core",
+    "prereqs": { "all": ["SOEN 345"], "any": [], "concurrent": ["SOEN 357"], "notes": null },
+    "unlocks": ["SOEN 490"],
+    "notes": null
+  },
+  {
+    "code": "SOEN 422",
+    "title": "Embedded Systems and Software",
+    "credits": 4,
+    "category": "soen_elective",
+    "prereqs": { "all": ["COMP 346"], "any": [], "concurrent": [], "notes": null },
+    "unlocks": [],
+    "notes": "Embedded/Real-Time specialization"
+  },
+  {
+    "code": "SOEN 423",
+    "title": "Distributed Systems",
+    "credits": 4,
+    "category": "soen_elective",
+    "prereqs": { "all": ["COMP 346"], "any": [], "concurrent": [], "notes": null },
+    "unlocks": [],
+    "notes": "Real-Time/Embedded specialization — pairs well with AI track"
+  },
+  {
+    "code": "SOEN 424",
+    "title": "Enterprise Software Design",
+    "credits": 4,
+    "category": "soen_elective",
+    "prereqs": { "all": ["SOEN 343"], "any": [], "concurrent": [], "notes": null },
+    "unlocks": [],
+    "notes": null
+  },
+  {
+    "code": "SOEN 471",
+    "title": "Big Data Analytics",
+    "credits": 4,
+    "category": "soen_elective",
+    "prereqs": { "all": ["COMP 352", "COMP 432"], "any": [], "concurrent": [], "notes": null },
+    "unlocks": [],
+    "notes": "Data Engineering specialization"
+  },
+  {
+    "code": "SOEN 487",
+    "title": "Web Services and Applications",
+    "credits": 4,
+    "category": "soen_elective",
+    "prereqs": { "all": ["SOEN 387"], "any": [], "concurrent": [], "notes": null },
+    "unlocks": [],
+    "notes": "Web Services specialization"
+  },
+  {
+    "code": "SOEN 490",
+    "title": "Capstone Software Engineering Design Project",
+    "credits": 6,
+    "category": "se_core",
+    "prereqs": { "all": ["SOEN 390"], "any": [], "concurrent": [], "notes": "75 credits minimum" },
+    "unlocks": ["SOEN 491"],
+    "notes": "Year 4 capstone — 2-term project"
+  },
+  {
+    "code": "SOEN 491",
+    "title": "Software Engineering Project",
+    "credits": 1,
+    "category": "soen_elective",
+    "prereqs": { "all": [], "any": [], "concurrent": ["SOEN 490"], "notes": null },
+    "unlocks": [],
+    "notes": null
+  },
+  {
+    "code": "SOEN 498",
+    "title": "Topics in Software Engineering",
+    "credits": 3,
+    "category": "soen_elective",
+    "prereqs": { "all": [], "any": [], "concurrent": [], "notes": "Program director permission" },
+    "unlocks": [],
+    "notes": null
+  },
+  {
+    "code": "SOEN 499",
+    "title": "Topics in Software Engineering with Lab",
+    "credits": 4,
+    "category": "soen_elective",
+    "prereqs": { "all": [], "any": [], "concurrent": [], "notes": "Department permission" },
+    "unlocks": [],
+    "notes": null
+  },
+  {
+    "code": "MATH 203",
+    "title": "Differential and Integral Calculus I",
+    "credits": 3,
+    "category": "deficiency",
+    "prereqs": { "all": [], "any": [], "concurrent": [], "notes": "Cégep Calc I exempts this" },
+    "unlocks": ["MATH 205", "PHYS 204"],
+    "notes": "Most cégep math students get exempted"
+  },
+  {
+    "code": "MATH 204",
+    "title": "Vectors and Matrices",
+    "credits": 3,
+    "category": "deficiency",
+    "prereqs": { "all": [], "any": [], "concurrent": [], "notes": "None" },
+    "unlocks": ["COMP 232", "COMP 248", "ENGR 213", "ENGR 233"],
+    "notes": "Linear algebra. Required if you didn't take linear in cégep."
+  },
+  {
+    "code": "MATH 205",
+    "title": "Differential and Integral Calculus II",
+    "credits": 3,
+    "category": "deficiency",
+    "prereqs": { "all": ["MATH 203"], "any": [], "concurrent": [], "notes": null },
+    "unlocks": ["ENGR 213", "ENGR 233"],
+    "notes": "Required if you didn't take Calc 2 in cégep."
+  },
+  {
+    "code": "PHYS 204",
+    "title": "Mechanics",
+    "credits": 3,
+    "category": "deficiency",
+    "prereqs": { "all": [], "any": [], "concurrent": ["MATH 203"], "notes": "MATH 203 co-req ok" },
+    "unlocks": ["PHYS 205", "ENGR 245"],
+    "notes": "Required if you didn't take Mechanics physics in cégep."
+  },
+  {
+    "code": "PHYS 205",
+    "title": "Electricity and Magnetism",
+    "credits": 3,
+    "category": "deficiency",
+    "prereqs": { "all": ["MATH 203", "PHYS 204"], "any": [], "concurrent": [], "notes": null },
+    "unlocks": ["ELEC 275"],
+    "notes": "Required if you didn't take E&M physics in cégep."
+  },
+  {
+    "code": "CHEM 205",
+    "title": "General Chemistry",
+    "credits": 3,
+    "category": "deficiency",
+    "prereqs": { "all": [], "any": [], "concurrent": [], "notes": "None" },
+    "unlocks": [],
+    "notes": "Required if you didn't take chemistry in cégep."
+  },
+  {
+    "code": "ENGR 201",
+    "title": "Professional Practice and Responsibility",
+    "credits": 1.5,
+    "category": "eng_core",
+    "prereqs": { "all": [], "any": [], "concurrent": [], "notes": "None" },
+    "unlocks": [],
+    "notes": null
+  },
+  {
+    "code": "ENGR 202",
+    "title": "Sustainable Development and Environmental Stewardship",
+    "credits": 1.5,
+    "category": "eng_core",
+    "prereqs": { "all": [], "any": [], "concurrent": [], "notes": "None" },
+    "unlocks": [],
+    "notes": null
+  },
+  {
+    "code": "ENGR 213",
+    "title": "Applied Ordinary Differential Equations",
+    "credits": 3,
+    "category": "eng_core",
+    "prereqs": { "all": ["MATH 204", "MATH 205"], "any": [], "concurrent": [], "notes": null },
+    "unlocks": ["ENGR 233", "ENGR 251", "ENGR 311", "ENGR 371", "ENGR 391", "ELEC 275", "SOEN 385"],
+    "notes": null
+  },
+  {
+    "code": "ENGR 233",
+    "title": "Applied Advanced Calculus",
+    "credits": 3,
+    "category": "eng_core",
+    "prereqs": { "all": ["MATH 204", "MATH 205"], "any": [], "concurrent": [], "notes": null },
+    "unlocks": ["ENGR 311", "ENGR 371", "ENGR 391", "SOEN 385"],
+    "notes": null
+  },
+  {
+    "code": "ENGR 251",
+    "title": "Thermodynamics I",
+    "credits": 3.5,
+    "category": "eng_core",
+    "prereqs": { "all": ["PHYS 204"], "any": [], "concurrent": [], "notes": null },
+    "unlocks": [],
+    "notes": null
+  },
+  {
+    "code": "ENGR 301",
+    "title": "Engineering Management Principles and Economics",
+    "credits": 3,
+    "category": "eng_core",
+    "prereqs": { "all": [], "any": [], "concurrent": [], "notes": "None" },
+    "unlocks": [],
+    "notes": "Normally Y4 — verify with advisor if taking earlier"
+  },
+  {
+    "code": "ENGR 311",
+    "title": "Transform Calculus and Partial Differential Equations",
+    "credits": 3,
+    "category": "eng_core",
+    "prereqs": { "all": ["ENGR 213", "ENGR 233"], "any": [], "concurrent": [], "notes": null },
+    "unlocks": [],
+    "notes": null
+  },
+  {
+    "code": "ENGR 371",
+    "title": "Probability and Statistics in Engineering",
+    "credits": 3,
+    "category": "eng_core",
+    "prereqs": { "all": ["ENGR 213", "ENGR 233"], "any": [], "concurrent": [], "notes": null },
+    "unlocks": ["COMP 333", "COMP 479"],
+    "notes": null
+  },
+  {
+    "code": "ENGR 391",
+    "title": "Numerical Methods in Engineering",
+    "credits": 3,
+    "category": "soen_elective",
+    "prereqs": {
+      "all": ["COMP 248", "ENGR 213", "ENGR 233"],
+      "any": [],
+      "concurrent": [],
+      "notes": null
+    },
+    "unlocks": ["COMP 476", "COMP 477"],
+    "notes": null
+  },
+  {
+    "code": "ENGR 392",
+    "title": "Impact of Technology on Society",
+    "credits": 3,
+    "category": "eng_core",
+    "prereqs": { "all": ["ENCS 282"], "any": [], "concurrent": [], "notes": null },
+    "unlocks": [],
+    "notes": null
+  },
+  {
+    "code": "ENGR 411",
+    "title": "Capstone Elective",
+    "credits": 1,
+    "category": "soen_elective",
+    "prereqs": { "all": [], "any": [], "concurrent": [], "notes": null },
+    "unlocks": [],
+    "notes": null
+  },
+  {
+    "code": "ENGR 245",
+    "title": "Mechanical Analysis",
+    "credits": 3,
+    "category": "eng_nsci_group",
+    "prereqs": { "all": ["PHYS 204"], "any": [], "concurrent": [], "notes": null },
+    "unlocks": [],
+    "notes": "Recommended Eng & Nat Sci Group option"
+  },
+  {
+    "code": "MIAE 221",
+    "title": "Materials Science",
+    "credits": 3,
+    "category": "eng_nsci_group",
+    "prereqs": { "all": ["CHEM 205"], "any": [], "concurrent": [], "notes": null },
+    "unlocks": [],
+    "notes": "Eng & Nat Sci Group alternative (memorization-heavy)"
+  },
+  {
+    "code": "ELEC 275",
+    "title": "Principles of Electrical Engineering",
+    "credits": 3.5,
+    "category": "eng_core",
+    "prereqs": { "all": ["PHYS 205"], "any": [], "concurrent": [], "notes": null },
+    "unlocks": [],
+    "notes": null
+  },
+  {
+    "code": "ENCS 282",
+    "title": "Technical Writing and Communication",
+    "credits": 3,
+    "category": "eng_core",
+    "prereqs": { "all": [], "any": [], "concurrent": [], "notes": "EWT or ENCS 272" },
+    "unlocks": ["SOEN 341", "SOEN 384", "ENGR 392", "COMP 354", "COMP 490"],
+    "notes": "EWT (Eng Writing Test) is the way most students fulfill this"
+  },
+  {
+    "code": "AERO 480",
+    "title": "Aerospace Avionics Systems",
+    "credits": 3.5,
+    "category": "soen_elective",
+    "prereqs": { "all": [], "any": [], "concurrent": [], "notes": "Refer to current calendar" },
+    "unlocks": [],
+    "notes": "Avionics/Real-Time specialization"
+  },
+  {
+    "code": "AERO 482",
+    "title": "Avionics and Air Navigation",
+    "credits": 3,
+    "category": "soen_elective",
+    "prereqs": { "all": [], "any": [], "concurrent": [], "notes": "Refer to current calendar" },
+    "unlocks": [],
+    "notes": "Avionics/Real-Time specialization"
+  },
+  {
+    "code": "COEN 320",
+    "title": "Introduction to Real-Time Systems",
+    "credits": 3.5,
+    "category": "soen_elective",
+    "prereqs": { "all": [], "any": [], "concurrent": [], "notes": "Refer to current calendar" },
+    "unlocks": [],
+    "notes": "Real-Time/Embedded specialization"
+  },
+  {
+    "code": "BIOL 201",
+    "title": "General Biology I",
+    "credits": 3,
+    "category": "nat_sci_elective",
+    "prereqs": { "all": [], "any": [], "concurrent": [], "notes": "None" },
+    "unlocks": ["BIOL 226", "BIOL 261"],
+    "notes": null
+  },
+  {
+    "code": "GEOL 206",
+    "title": "Earthquakes, Volcanoes, Plate Tectonics",
+    "credits": 3,
+    "category": "nat_sci_elective",
+    "prereqs": { "all": [], "any": [], "concurrent": [], "notes": "None" },
+    "unlocks": [],
+    "notes": "Popular light Nat Sci elective"
+  },
+  {
+    "code": "GEOL 208",
+    "title": "The Earth, Moon and the Planets",
+    "credits": 3,
+    "category": "nat_sci_elective",
+    "prereqs": { "all": [], "any": [], "concurrent": [], "notes": "None" },
+    "unlocks": [],
+    "notes": "Light Nat Sci elective"
+  },
+  {
+    "code": "PHYS 252",
+    "title": "Optics",
+    "credits": 3,
+    "category": "nat_sci_elective",
+    "prereqs": { "all": [], "any": [], "concurrent": [], "notes": "Basic physics" },
+    "unlocks": [],
+    "notes": "Hard — skip unless physics-inclined"
+  },
+  {
+    "code": "PHYS 260",
+    "title": "Introductory Biophysics",
+    "credits": 3,
+    "category": "nat_sci_elective",
+    "prereqs": { "all": [], "any": [], "concurrent": [], "notes": "Basic physics" },
+    "unlocks": [],
+    "notes": null
+  },
+  {
+    "code": "PHYS 273",
+    "title": "Energy and Environment",
+    "credits": 3,
+    "category": "nat_sci_elective",
+    "prereqs": { "all": [], "any": [], "concurrent": [], "notes": "None" },
+    "unlocks": [],
+    "notes": null
+  },
+  {
+    "code": "PHYS 284",
+    "title": "Introduction to Astronomy",
+    "credits": 3,
+    "category": "nat_sci_elective",
+    "prereqs": { "all": [], "any": [], "concurrent": [], "notes": "None" },
+    "unlocks": [],
+    "notes": "TOP PICK — online, GPA-friendly, no textbook"
+  },
+  {
+    "code": "BIOL 261",
+    "title": "Molecular and General Genetics",
+    "credits": 3,
+    "category": "nat_sci_elective",
+    "prereqs": { "all": [], "any": ["BIOL 201", "BIOL 202"], "concurrent": [], "notes": null },
+    "unlocks": [],
+    "notes": null
+  },
+  {
+    "code": "CHEM 206",
+    "title": "Chemistry of Solutions",
+    "credits": 3,
+    "category": "nat_sci_elective",
+    "prereqs": { "all": [], "any": [], "concurrent": [], "notes": "None" },
+    "unlocks": [],
+    "notes": null
+  },
+  {
+    "code": "PHIL 210",
+    "title": "Critical Thinking",
+    "credits": 3,
+    "category": "gen_ed_humanities",
+    "prereqs": { "all": [], "any": [], "concurrent": [], "notes": "None" },
+    "unlocks": [],
+    "notes": null
+  },
+  {
+    "code": "PHIL 232",
+    "title": "Ethics of Science",
+    "credits": 3,
+    "category": "gen_ed_humanities",
+    "prereqs": { "all": [], "any": [], "concurrent": [], "notes": "None" },
+    "unlocks": [],
+    "notes": null
+  },
+  {
+    "code": "PHIL 235",
+    "title": "Biomedical Ethics",
+    "credits": 3,
+    "category": "gen_ed_humanities",
+    "prereqs": { "all": [], "any": [], "concurrent": [], "notes": "None" },
+    "unlocks": [],
+    "notes": null
+  },
+  {
+    "code": "PHIL 237",
+    "title": "Ethical Issues in Engineering and Computer Science",
+    "credits": 3,
+    "category": "gen_ed_humanities",
+    "prereqs": { "all": [], "any": [], "concurrent": [], "notes": "None" },
+    "unlocks": [],
+    "notes": null
+  },
+  {
+    "code": "HIST 280",
+    "title": "Introduction to the History of Science and Technology",
+    "credits": 3,
+    "category": "gen_ed_humanities",
+    "prereqs": { "all": [], "any": [], "concurrent": [], "notes": "None" },
+    "unlocks": [],
+    "notes": null
+  },
+  {
+    "code": "POLI 271",
+    "title": "Globalization and Politics",
+    "credits": 3,
+    "category": "gen_ed_humanities",
+    "prereqs": { "all": [], "any": [], "concurrent": [], "notes": "None" },
+    "unlocks": [],
+    "notes": null
+  },
+  {
+    "code": "SOCI 212",
+    "title": "Society and Technology",
+    "credits": 3,
+    "category": "gen_ed_humanities",
+    "prereqs": { "all": [], "any": [], "concurrent": [], "notes": "None" },
+    "unlocks": [],
+    "notes": null
+  },
+  {
+    "code": "ECON 201",
+    "title": "Introduction to Microeconomics",
+    "credits": 3,
+    "category": "gen_ed_humanities",
+    "prereqs": { "all": [], "any": [], "concurrent": [], "notes": "None" },
+    "unlocks": [],
+    "notes": null
+  },
+  {
+    "code": "PSYC 200",
+    "title": "Introduction to Psychology",
+    "credits": 3,
+    "category": "gen_ed_humanities",
+    "prereqs": { "all": [], "any": [], "concurrent": [], "notes": "None" },
+    "unlocks": [],
+    "notes": null
+  }
+]

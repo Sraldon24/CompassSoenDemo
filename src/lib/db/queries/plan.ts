@@ -8,7 +8,7 @@
 import { db } from "@/lib/db";
 import { courses, userCourses } from "@/lib/db/schema";
 import type { CourseCatalogEntry, PlannedCourse } from "@/lib/validation/plan";
-import { asc, eq, sql } from "drizzle-orm";
+import { asc, eq, inArray } from "drizzle-orm";
 
 export interface UserPlanSnapshot {
   userPlan: PlannedCourse[];
@@ -68,7 +68,7 @@ export async function getUserPlanSnapshot(userId: string): Promise<UserPlanSnaps
           avgHoursPerWeek: courses.avgHoursPerWeek,
         })
         .from(courses)
-        .where(sql`${courses.code} = ANY(${codes})`)
+        .where(inArray(courses.code, codes))
     : [];
 
   const catalog = new Map<string, CourseCatalogEntry>();

@@ -1,11 +1,14 @@
+import { AIInsightWidget } from "@/components/dashboard/ai-insight";
+import { RecommendationsWidget } from "@/components/dashboard/recommendations";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { getUserPlanSnapshot } from "@/lib/db/queries/plan";
 import { getSession } from "@/lib/get-session";
 import { computeCategoryProgress, totalDegreeProgress } from "@/lib/requirements";
-import { Calendar, Clock, GraduationCap, Sparkles, TrendingUp } from "lucide-react";
+import { Calendar, Clock, Sparkles, TrendingUp } from "lucide-react";
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import { Suspense } from "react";
 
 export default async function DashboardPage(): Promise<React.ReactElement> {
   const session = await getSession();
@@ -87,24 +90,27 @@ export default async function DashboardPage(): Promise<React.ReactElement> {
         ))}
       </section>
 
-      {/* AI insight widget — skeleton */}
+      {/* AI insight widget — streams in via Suspense */}
       <section>
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-base">
-              <Sparkles className="h-4 w-4" style={{ color: "var(--color-accent)" }} />
-              AI Insight of the Day
-            </CardTitle>
-            <CardDescription>
-              Compass will analyze your plan and surface a suggestion here once your courses are
-              seeded.
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <Skeleton className="h-4 w-3/4 mb-2" />
-            <Skeleton className="h-4 w-1/2" />
-          </CardContent>
-        </Card>
+        <Suspense
+          fallback={
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2 text-base">
+                  <Sparkles className="h-4 w-4" style={{ color: "var(--color-accent)" }} />
+                  AI Insight of the Day
+                </CardTitle>
+                <CardDescription>Generating today&apos;s insight…</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <Skeleton className="h-4 w-3/4 mb-2" />
+                <Skeleton className="h-4 w-1/2" />
+              </CardContent>
+            </Card>
+          }
+        >
+          <AIInsightWidget userId={session.user.id} />
+        </Suspense>
       </section>
 
       {/* Deadlines + Action items */}
@@ -139,17 +145,16 @@ export default async function DashboardPage(): Promise<React.ReactElement> {
         </Card>
       </section>
 
-      {/* Recommended next courses */}
+      {/* Recommended next courses — client-side fetch with refresh button */}
       <section>
+        <RecommendationsWidget />
+      </section>
+
+      {/* Hidden helper section (was placeholder skeleton) */}
+      <section hidden>
         <Card>
           <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-base">
-              <GraduationCap className="h-4 w-4" style={{ color: "var(--color-accent)" }} />
-              Recommended Next Courses
-            </CardTitle>
-            <CardDescription>
-              Based on your interests and current plan. Powered by AI in Phase 3.
-            </CardDescription>
+            <CardTitle className="text-base">Legacy placeholder</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">

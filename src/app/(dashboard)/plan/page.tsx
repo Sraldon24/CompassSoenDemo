@@ -24,9 +24,34 @@ export default async function PlanPage(): Promise<React.ReactElement> {
           <h1 className="text-3xl font-semibold tracking-tight">My Plan</h1>
           <p className="text-sm" style={{ color: "var(--color-text-muted)" }}>
             {userPlan.length === 0
-              ? "Your plan is empty. Phase 2.10 will add an onboarding wizard so you can import or build one."
+              ? "Your plan is empty. Use the Add course buttons below or import your existing plan."
               : `${userPlan.length} courses planned. Drag a card to a different term to reschedule.`}
           </p>
+        </div>
+        <div className="flex gap-2">
+          <a
+            href="/api/export/pdf"
+            download
+            className="inline-flex items-center gap-1.5 rounded-md border px-3 py-1.5 text-xs font-medium transition-colors hover:bg-accent/10"
+            style={{ borderColor: "var(--color-border)", color: "var(--color-text)" }}
+          >
+            Download PDF
+          </a>
+          <a
+            href="/api/export/ics"
+            download
+            className="inline-flex items-center gap-1.5 rounded-md border px-3 py-1.5 text-xs font-medium transition-colors hover:bg-accent/10"
+            style={{ borderColor: "var(--color-border)", color: "var(--color-text)" }}
+          >
+            Calendar (.ics)
+          </a>
+          <a
+            href="/settings/import"
+            className="inline-flex items-center gap-1.5 rounded-md border px-3 py-1.5 text-xs font-medium transition-colors hover:bg-accent/10"
+            style={{ borderColor: "var(--color-border)", color: "var(--color-text)" }}
+          >
+            Import Excel
+          </a>
         </div>
       </header>
 

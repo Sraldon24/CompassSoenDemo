@@ -5,7 +5,7 @@
 **Version:** 2.0
 **Status:** Ready for development
 **Date:** May 27, 2026
-**Author:** Amirhossein Ghadimi
+**Author:** Amir Ghadimi
 **Repository:** github.com/amirghadimi/soen-compass (TBD)
 **Target users:** Concordia SOEN students
 **Tagline:** "Plan your Software Engineering degree the smart way."
