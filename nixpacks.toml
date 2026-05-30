@@ -1,0 +1,10 @@
+# Railway / Nixpacks build config.
+#
+# We override the default `npm ci` with `npm install --include=dev`:
+#  - `npm ci` strict-mode was rejecting the lockfile over esbuild optional-dep
+#    version reconciliation (Missing: @esbuild/*@0.28.0). `npm install` resolves
+#    it instead of failing the build.
+#  - `--include=dev` keeps drizzle-kit + tsx available for the migrate/start step
+#    (the start command runs db:migrate via drizzle-kit).
+[phases.install]
+cmds = ["npm install --include=dev --no-audit --no-fund"]
