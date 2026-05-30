@@ -8,6 +8,13 @@
       "when": 1779908068050,
       "tag": "0000_silly_blizzard",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1779983206553,
+      "tag": "0001_abnormal_wither",
+      "breakpoints": true
     }
   ]
 }

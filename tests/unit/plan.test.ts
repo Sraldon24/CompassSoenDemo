@@ -1,9 +1,9 @@
+import { termOrdinal } from "@/lib/term";
 import {
   type CourseCatalogEntry,
   type PlannedCourse,
   buildPlan,
   parseTermLabel,
-  termOrdinal,
   validatePlan,
 } from "@/lib/validation/plan";
 import { describe, expect, it } from "vitest";

@@ -1,7 +1,12 @@
 "use client";
 
-import { moveCourseToTerm } from "@/app/(dashboard)/plan/actions";
+import {
+  addCourseToPlan,
+  moveCourseToTerm,
+  removeCourseFromPlan,
+} from "@/app/(dashboard)/plan/actions";
 import { CourseCard } from "@/components/planner/course-card";
+import { CoursePicker } from "@/components/planner/course-picker";
 import { WorkloadBadge } from "@/components/planner/workload-badge";
 import type { CourseCatalogEntry, PlannedCourse, ValidationIssue } from "@/lib/validation/plan";
 import { buildPlan, validatePlan } from "@/lib/validation/plan";
@@ -19,8 +24,8 @@ import {
   useSensor,
   useSensors,
 } from "@dnd-kit/core";
-import { Plus } from "lucide-react";
-import { useMemo, useOptimistic, useState, useTransition } from "react";
+import { Plus, X } from "lucide-react";
+import { useEffect, useMemo, useState, useTransition } from "react";
 import { toast } from "sonner";
 
 /** UserCourse row with id (DB primary key) for DnD identity. */
@@ -47,10 +52,16 @@ export function PlannerBoard({
 
   const [isPending, startTransition] = useTransition();
   const [activeId, setActiveId] = useState<string | null>(null);
-  const [courses, applyOptimistic] = useOptimistic<PlannerCourse[], { id: string; toTerm: string }>(
-    initialCourses,
-    (state, action) => state.map((c) => (c.id === action.id ? { ...c, term: action.toTerm } : c)),
-  );
+  // Single source of truth for rendering. Seeded from the server snapshot;
+  // mutated optimistically on add/move/remove, then reconciled by the server
+  // action's revalidatePath (which re-renders this client with fresh props).
+  const [courses, setCourses] = useState<PlannerCourse[]>(initialCourses);
+  const [pickerTerm, setPickerTerm] = useState<string | null>(null);
+
+  // Keep local state in sync when the server snapshot changes (after revalidate).
+  useEffect(() => {
+    setCourses(initialCourses);
+  }, [initialCourses]);
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 4 } }),
@@ -97,10 +108,12 @@ export function PlannerBoard({
     const current = courses.find((c) => c.id === movedId);
     if (!current || current.term === toTerm) return;
 
+    const prev = courses;
+    setCourses((cs) => cs.map((c) => (c.id === movedId ? { ...c, term: toTerm } : c)));
     startTransition(async () => {
-      applyOptimistic({ id: movedId, toTerm });
       const result = await moveCourseToTerm({ userCourseId: movedId, toTerm });
       if (!result.success) {
+        setCourses(prev); // roll back
         toast.error(`Couldn't move: ${result.error}`);
       } else {
         toast.success(`Moved to ${toTerm}`);
@@ -108,6 +121,43 @@ export function PlannerBoard({
     });
   };
 
+  const handleAddCourse = (term: string, courseCode: string) => {
+    setPickerTerm(null);
+    const entry = catalog.get(courseCode);
+    // Optimistic temp row (real id arrives via revalidate).
+    const tempId = `temp-${courseCode}-${term}`;
+    setCourses((cs) => [
+      ...cs,
+      { id: tempId, courseCode, term, status: "planned", isDeficiency: entry?.isDeficiency },
+    ]);
+    startTransition(async () => {
+      const result = await addCourseToPlan({ courseCode, term });
+      if (!result.success) {
+        setCourses((cs) => cs.filter((c) => c.id !== tempId)); // roll back
+        toast.error(result.error);
+      } else {
+        // Swap the temp id for the real DB id.
+        setCourses((cs) => cs.map((c) => (c.id === tempId ? { ...c, id: result.data.id } : c)));
+        toast.success(`Added ${courseCode} to ${term}`);
+      }
+    });
+  };
+
+  const handleRemoveCourse = (userCourseId: string) => {
+    const prev = courses;
+    setCourses((cs) => cs.filter((c) => c.id !== userCourseId));
+    startTransition(async () => {
+      const result = await removeCourseFromPlan({ userCourseId });
+      if (!result.success) {
+        setCourses(prev); // roll back
+        toast.error(result.error);
+      } else {
+        toast.success("Removed from plan");
+      }
+    });
+  };
+
+  const plannedCodes = useMemo(() => new Set(courses.map((c) => c.courseCode)), [courses]);
   const activeCourse = activeId ? courses.find((c) => c.id === activeId) : undefined;
 
   return (
@@ -125,9 +175,21 @@ export function PlannerBoard({
             courses={byTerm.get(term) ?? []}
             catalog={catalog}
             violationsByCourse={violationCodes}
+            onAddClick={() => setPickerTerm(term)}
+            onRemove={handleRemoveCourse}
           />
         ))}
       </div>
+
+      {pickerTerm && (
+        <CoursePicker
+          term={pickerTerm}
+          catalog={catalogList}
+          excludeCodes={plannedCodes}
+          onPick={(code) => handleAddCourse(pickerTerm, code)}
+          onClose={() => setPickerTerm(null)}
+        />
+      )}
 
       <DragOverlay>
         {activeCourse && (
@@ -154,6 +216,8 @@ interface DroppableTermProps {
   courses: PlannerCourse[];
   catalog: Map<string, CourseCatalogEntry>;
   violationsByCourse: Set<string>;
+  onAddClick: () => void;
+  onRemove: (userCourseId: string) => void;
 }
 
 function DroppableTerm({
@@ -161,6 +225,8 @@ function DroppableTerm({
   courses,
   catalog,
   violationsByCourse,
+  onAddClick,
+  onRemove,
 }: DroppableTermProps): React.ReactElement {
   const { setNodeRef, isOver } = useDroppable({ id: term });
   const workload = calculateTermWorkload(courses, catalog);
@@ -218,12 +284,14 @@ function DroppableTerm({
               course={c}
               catalogEntry={catalog.get(c.courseCode)}
               hasViolation={violationsByCourse.has(c.courseCode)}
+              onRemove={onRemove}
             />
           ))
         )}
 
         <button
           type="button"
+          onClick={onAddClick}
           aria-label={`Add a course to ${term}`}
           className="flex items-center justify-center gap-1.5 rounded-md border border-dashed py-2 text-xs transition-colors hover:bg-accent/10 focus-visible:outline-none"
           style={{
@@ -243,27 +311,42 @@ interface DraggableCourseProps {
   course: PlannerCourse;
   catalogEntry: CourseCatalogEntry | undefined;
   hasViolation: boolean;
+  onRemove: (userCourseId: string) => void;
 }
 
 function DraggableCourse({
   course,
   catalogEntry,
   hasViolation,
+  onRemove,
 }: DraggableCourseProps): React.ReactElement {
   const { attributes, listeners, setNodeRef, isDragging } = useDraggable({ id: course.id });
   return (
-    <div
-      ref={setNodeRef}
-      {...attributes}
-      {...listeners}
-      data-testid={`course-${course.courseCode}`}
-    >
-      <CourseCard
-        planned={course}
-        course={catalogEntry}
-        hasViolation={hasViolation}
-        dragging={isDragging}
-      />
+    <div ref={setNodeRef} className="group relative" data-testid={`course-${course.courseCode}`}>
+      {/* Drag handle wraps the card; the remove button sits outside the listeners
+          so a click removes rather than starting a drag. */}
+      <div {...attributes} {...listeners}>
+        <CourseCard
+          planned={course}
+          course={catalogEntry}
+          hasViolation={hasViolation}
+          dragging={isDragging}
+        />
+      </div>
+      <button
+        type="button"
+        aria-label={`Remove ${course.courseCode} from plan`}
+        title="Remove course"
+        onClick={(e) => {
+          e.stopPropagation();
+          onRemove(course.id);
+        }}
+        onPointerDown={(e) => e.stopPropagation()}
+        className="absolute right-1.5 top-1.5 hidden h-5 w-5 items-center justify-center rounded text-xs transition-colors group-hover:flex hover:bg-danger/15 focus-visible:flex focus-visible:outline-none"
+        style={{ color: "var(--color-text-muted)" }}
+      >
+        <X className="h-3.5 w-3.5" />
+      </button>
     </div>
   );
 }

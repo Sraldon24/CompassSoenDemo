@@ -3,6 +3,7 @@
 import { db } from "@/lib/db";
 import { profiles } from "@/lib/db/schema";
 import { getSession } from "@/lib/get-session";
+import { TERM_REGEX } from "@/lib/term";
 import { eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
@@ -10,7 +11,7 @@ import { z } from "zod";
 
 const profileSchema = z.object({
   program: z.enum(["SOEN-General", "SOEN-AvionicsEmbedded", "SOEN-Web", "SOEN-RealTime"]),
-  entryTerm: z.string().regex(/^(Fall|Winter|Summer)\s+\d{4}$/, "Format: 'Fall 2026'"),
+  entryTerm: z.string().regex(TERM_REGEX, "Format: 'Fall 2026'"),
   studentId: z
     .string()
     .trim()

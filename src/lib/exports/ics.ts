@@ -58,20 +58,6 @@ export function buildICS(calendarName: string, events: ICSEvent[]): string {
   return lines.join("\r\n");
 }
 
-const TERM_START_DATES: Record<string, string> = {
-  Fall: "09-04",
-  Winter: "01-08",
-  Summer: "05-06",
-};
-
-/**
- * Best-effort start date for a labeled term like "Fall 2026" → 2026-09-04.
- * Real Concordia dates vary slightly year-to-year — close enough for a calendar
- * placeholder, the user adjusts in their calendar app.
- */
-export function termToStartDate(termLabel: string): string | null {
-  const m = termLabel.match(/^(Fall|Winter|Summer)\s+(\d{4})$/);
-  if (!m || !m[1] || !m[2]) return null;
-  const season = m[1] as keyof typeof TERM_START_DATES;
-  return `${m[2]}-${TERM_START_DATES[season]}`;
-}
+// `termToStartDate` now lives in `@/lib/term` (single source of truth).
+// Re-exported so the existing `@/lib/exports/ics` import path stays stable.
+export { termToStartDate } from "@/lib/term";

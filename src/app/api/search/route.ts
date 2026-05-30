@@ -2,7 +2,7 @@ import { embed } from "@/lib/ai/embeddings";
 import { db } from "@/lib/db";
 import { courses } from "@/lib/db/schema";
 import { getSession } from "@/lib/get-session";
-import { LIMITS, rateLimitByIp } from "@/lib/rate-limit";
+import { denyResponse, guardAiCall } from "@/lib/limits";
 import { ilike, or, sql } from "drizzle-orm";
 import { NextResponse } from "next/server";
 
@@ -30,21 +30,14 @@ export async function GET(req: Request): Promise<Response> {
     return NextResponse.json({ results: [] });
   }
 
-  // Rate limit by IP (cheap protection — anonymous users can still search).
+  // Rate limit by user when authed, else by IP (anonymous users can still search).
   const session = await getSession();
   const ip = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? "anonymous";
-  const limit = rateLimitByIp(
-    session?.user.id ?? ip,
-    "search",
-    LIMITS.search.limit,
-    LIMITS.search.windowMs,
-  );
-  if (!limit.allowed) {
-    return NextResponse.json(
-      { error: "Search rate limit reached." },
-      { status: 429, headers: { "Retry-After": String(Math.ceil(limit.retryAfterMs / 1000)) } },
-    );
-  }
+  const decision = guardAiCall({
+    feature: "search",
+    identity: session ? { kind: "user", id: session.user.id } : { kind: "ip", id: ip },
+  });
+  if (!decision.allowed) return denyResponse(decision);
 
   let results: SearchHit[] = [];
 

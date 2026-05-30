@@ -1,3 +1,5 @@
+import { ANALYTICS_EVENTS } from "@/lib/analytics/events";
+import { trackServer } from "@/lib/analytics/server";
 import { getUserPlanSnapshot } from "@/lib/db/queries/plan";
 import { generatePlanPDF } from "@/lib/exports/pdf";
 import { getSession } from "@/lib/get-session";
@@ -23,6 +25,8 @@ export async function GET(): Promise<Response> {
     progress,
     totals,
   });
+
+  void trackServer(session.user.id, ANALYTICS_EVENTS.export_pdf);
 
   return new Response(new Uint8Array(buffer), {
     headers: {

@@ -1,3 +1,5 @@
+import { ANALYTICS_EVENTS } from "@/lib/analytics/events";
+import { trackServer } from "@/lib/analytics/server";
 import { getUserPlanSnapshot } from "@/lib/db/queries/plan";
 import { type ICSEvent, buildICS, termToStartDate } from "@/lib/exports/ics";
 import { getSession } from "@/lib/get-session";
@@ -27,6 +29,8 @@ export async function GET(): Promise<Response> {
   }
 
   const ics = buildICS("SOEN Compass Plan", events);
+
+  void trackServer(session.user.id, ANALYTICS_EVENTS.export_ics);
 
   return new Response(ics, {
     headers: {

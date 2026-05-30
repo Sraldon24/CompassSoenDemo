@@ -1,7 +1,8 @@
 import { runEmailDraftGraph } from "@/lib/ai/graphs/email-graph";
-import { recordAIUsage } from "@/lib/ai/usage";
+import { ANALYTICS_EVENTS } from "@/lib/analytics/events";
+import { trackServer } from "@/lib/analytics/server";
 import { getSession } from "@/lib/get-session";
-import { LIMITS, rateLimitByUserId } from "@/lib/rate-limit";
+import { denyResponse, guardAiCall, withUsage } from "@/lib/limits";
 import { NextResponse } from "next/server";
 import { z } from "zod";
 
@@ -27,34 +28,30 @@ export async function POST(req: Request): Promise<Response> {
     );
   }
 
-  const limit = rateLimitByUserId(
-    session.user.id,
-    "ai-draft-email",
-    LIMITS.aiDraftEmail.limit,
-    LIMITS.aiDraftEmail.windowMs,
-  );
-  if (!limit.allowed) {
-    return NextResponse.json(
-      { error: "Daily email-drafting limit reached." },
-      {
-        status: 429,
-        headers: { "Retry-After": String(Math.ceil(limit.retryAfterMs / 1000)) },
-      },
-    );
-  }
+  const decision = guardAiCall({
+    feature: "aiDraftEmail",
+    identity: { kind: "user", id: session.user.id },
+    model: "llama-3.3-70b-versatile",
+  });
+  if (!decision.allowed) return denyResponse(decision);
 
   try {
-    const result = await runEmailDraftGraph({
-      situation: parsed.situation,
+    const result = await withUsage(
+      {
+        userId: session.user.id,
+        feature: "email-draft",
+        model: "llama-3.3-70b-versatile",
+        // Estimate tokens across both LLM passes (draft + revise).
+        estimateTokens: (r) => (r ? Math.ceil((r.firstDraft.length + r.draft.length) / 4) : 0),
+      },
+      () =>
+        runEmailDraftGraph({
+          situation: parsed.situation,
+          recipientRole: parsed.recipientRole,
+        }),
+    );
+    void trackServer(session.user.id, ANALYTICS_EVENTS.email_drafted, {
       recipientRole: parsed.recipientRole,
-    });
-    // Estimate tokens across both LLM passes (draft + revise).
-    const totalTokens = Math.ceil((result.firstDraft.length + result.draft.length) / 4);
-    await recordAIUsage({
-      userId: session.user.id,
-      feature: "email-draft",
-      model: "llama-3.3-70b-versatile",
-      tokensUsed: totalTokens,
     });
     return NextResponse.json({ draft: result.draft });
   } catch (err) {

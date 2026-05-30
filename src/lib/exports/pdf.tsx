@@ -8,6 +8,7 @@
 
 import type { CategoryProgress } from "@/lib/requirements";
 import { TOTAL_DEGREE_CREDITS } from "@/lib/requirements";
+import { groupByTerm, sortTerms } from "@/lib/term";
 import type { CourseCatalogEntry, PlannedCourse } from "@/lib/validation/plan";
 import { Document, Page, StyleSheet, Text, View, renderToBuffer } from "@react-pdf/renderer";
 
@@ -54,32 +55,13 @@ const styles = StyleSheet.create({
   footer: { fontSize: 8, color: "#999", marginTop: 24, textAlign: "center" },
 });
 
-function groupByTerm(plan: PlannedCourse[]): Map<string, PlannedCourse[]> {
-  const m = new Map<string, PlannedCourse[]>();
-  for (const p of plan) {
-    if (p.status === "dropped" || p.status === "disc" || p.status === "failed") continue;
-    if (!m.has(p.term)) m.set(p.term, []);
-    m.get(p.term)?.push(p);
-  }
-  return m;
-}
-
-const TERM_ORDER: Record<string, number> = { Winter: 0, Summer: 1, Fall: 2 };
-
-function sortTerms(terms: string[]): string[] {
-  return [...terms].sort((a, b) => {
-    const ma = a.match(/^(Fall|Winter|Summer)\s+(\d{4})$/);
-    const mb = b.match(/^(Fall|Winter|Summer)\s+(\d{4})$/);
-    if (!ma || !mb) return a.localeCompare(b);
-    const ya = Number(ma[2]);
-    const yb = Number(mb[2]);
-    if (ya !== yb) return ya - yb;
-    return (TERM_ORDER[ma[1] ?? ""] ?? 0) - (TERM_ORDER[mb[1] ?? ""] ?? 0);
-  });
+/** Active = not dropped/disc/failed. The PDF only shows active courses. */
+function isActive(c: PlannedCourse): boolean {
+  return c.status !== "dropped" && c.status !== "disc" && c.status !== "failed";
 }
 
 function PlanDocument(props: PlanPDFData): React.ReactElement {
-  const byTerm = groupByTerm(props.userPlan);
+  const byTerm = groupByTerm(props.userPlan, isActive);
   const sortedTerms = sortTerms([...byTerm.keys()]);
 
   return (

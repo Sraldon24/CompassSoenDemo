@@ -1,4 +1,5 @@
 import { CommandPalette } from "@/components/command-palette";
+import { KeyboardShortcuts } from "@/components/keyboard-shortcuts";
 import { Sidebar } from "@/components/nav/sidebar";
 import { Topbar } from "@/components/nav/topbar";
 import { db } from "@/lib/db";
@@ -34,6 +35,7 @@ export default async function DashboardLayout({
         <main className="flex-1 overflow-y-auto">{children}</main>
       </div>
       <CommandPalette />
+      <KeyboardShortcuts />
     </div>
   );
 }

@@ -58,7 +58,7 @@ export default async function DashboardPage(): Promise<React.ReactElement> {
         <div className="flex items-end justify-between gap-3 flex-wrap">
           <p className="text-sm" style={{ color: "var(--color-text-muted)" }}>
             {userPlan.length === 0
-              ? "Your plan is empty. Head to My Plan to start adding courses, or import from Excel (coming soon)."
+              ? "Your plan is empty. Head to My Plan to start adding courses, or import from Excel."
               : `Tracking ${userPlan.length} courses across your plan.`}
           </p>
           <p className="text-sm mono tnum" style={{ color: "var(--color-text-muted)" }}>

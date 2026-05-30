@@ -5,7 +5,7 @@ import { recordAIUsage } from "@/lib/ai/usage";
 import { db } from "@/lib/db";
 import { aiConversations, aiMessages } from "@/lib/db/schema";
 import { getSession } from "@/lib/get-session";
-import { LIMITS, rateLimitByUserId } from "@/lib/rate-limit";
+import { denyResponse, guardAiCall } from "@/lib/limits";
 import { eq } from "drizzle-orm";
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
@@ -16,7 +16,9 @@ export const runtime = "nodejs";
 
 const requestSchema = z.object({
   message: z.string().trim().min(1).max(2_000),
-  conversationId: z.string().uuid().optional(),
+  // Accept missing OR null — the client sends `conversationId: null` for the
+  // first message of a fresh chat; `.nullish()` normalizes both to undefined.
+  conversationId: z.string().uuid().nullish(),
 });
 
 export async function POST(req: NextRequest): Promise<Response> {
@@ -35,26 +37,13 @@ export async function POST(req: NextRequest): Promise<Response> {
     );
   }
 
-  // Rate limit BEFORE the LLM call (per ADR + audit guidance).
-  const limit = rateLimitByUserId(
-    session.user.id,
-    "ai-chat",
-    LIMITS.aiChat.limit,
-    LIMITS.aiChat.windowMs,
-  );
-  if (!limit.allowed) {
-    return NextResponse.json(
-      {
-        error: "Daily message limit reached.",
-        remaining: 0,
-        limit: limit.limit,
-      },
-      {
-        status: 429,
-        headers: { "Retry-After": String(Math.ceil(limit.retryAfterMs / 1000)) },
-      },
-    );
-  }
+  // Rate limit + system-quota check BEFORE the LLM call (per ADR + audit guidance).
+  const limit = guardAiCall({
+    feature: "aiChat",
+    identity: { kind: "user", id: session.user.id },
+    model: "llama-3.3-70b-versatile",
+  });
+  if (!limit.allowed) return denyResponse(limit);
 
   // Get or create the conversation.
   let conversationId = parsed.conversationId;

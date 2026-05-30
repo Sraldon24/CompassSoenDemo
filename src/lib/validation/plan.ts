@@ -4,7 +4,21 @@
  * No LLM, no DB calls inside the validator. Caller assembles a `Plan` snapshot
  * (user's courses with terms + status + the course catalog) and passes it in.
  * Returns a structured list of issues that the UI renders as badges/tooltips.
+ *
+ * Term parsing/ordering lives in `@/lib/term` (single source of truth). This
+ * module re-exports the historical `parseTermLabel`/`termOrdinal`/`groupByTerm`
+ * names so existing consumers and tests keep working unchanged.
  */
+
+import { groupByTerm, isSameTerm, isTermBefore, parseTerm } from "@/lib/term";
+import type { TermLabel } from "@/lib/term";
+
+// Back-compat re-exports — historical names kept so consumers/tests don't break.
+// `parseTermLabel` is the historical alias for `parseTerm`. `groupByTerm` is
+// imported above (used internally) and re-exported here for consumers.
+export { termOrdinal, parseTerm as parseTermLabel } from "@/lib/term";
+export { groupByTerm };
+export type { TermLabel, TermSeason } from "@/lib/term";
 
 export type CourseStatus =
   | "planned"
@@ -14,15 +28,6 @@ export type CourseStatus =
   | "dropped"
   | "disc"
   | "failed";
-
-export type TermSeason = "Fall" | "Winter" | "Summer";
-
-export interface TermLabel {
-  /** e.g. "Fall 2026" */
-  raw: string;
-  season: TermSeason;
-  year: number;
-}
 
 export interface CourseCatalogEntry {
   code: string;
@@ -78,35 +83,8 @@ export type ValidationRule =
   | "credit_underload"
   | "duplicate_course";
 
-const TERM_ORDER: Record<TermSeason, number> = { Winter: 0, Summer: 1, Fall: 2 };
 const FULL_TIME_MIN = 12;
 const HEAVY_LOAD_MAX = 18;
-
-export function parseTermLabel(label: string): TermLabel | null {
-  const m = label.match(/^(Fall|Winter|Summer)\s+(\d{4})$/i);
-  if (!m || !m[1] || !m[2]) return null;
-  const season = m[1].charAt(0).toUpperCase() + m[1].slice(1).toLowerCase();
-  return {
-    raw: label,
-    season: season as TermSeason,
-    year: Number(m[2]),
-  };
-}
-
-/** Total ordering across all terms — earlier returns smaller number. */
-export function termOrdinal(label: TermLabel): number {
-  return label.year * 10 + TERM_ORDER[label.season];
-}
-
-/** Does `prereq` finish strictly before `course` begins? */
-function isBefore(prereqTerm: TermLabel, courseTerm: TermLabel): boolean {
-  return termOrdinal(prereqTerm) < termOrdinal(courseTerm);
-}
-
-/** Same term as `courseTerm`? */
-function isConcurrent(otherTerm: TermLabel, courseTerm: TermLabel): boolean {
-  return termOrdinal(otherTerm) === termOrdinal(courseTerm);
-}
 
 function isSatisfiedBy(
   prereqCode: string,
@@ -124,17 +102,17 @@ function isSatisfiedBy(
     if (p.status === "transferred" || p.status === "completed") {
       return true; // transfer/completed assumed valid anytime.
     }
-    const pTerm = parseTermLabel(p.term);
+    const pTerm = parseTerm(p.term);
     if (!pTerm) continue;
-    if (isBefore(pTerm, courseTerm)) return true;
-    if (options.allowConcurrent && isConcurrent(pTerm, courseTerm)) return true;
+    if (isTermBefore(pTerm, courseTerm)) return true;
+    if (options.allowConcurrent && isSameTerm(pTerm, courseTerm)) return true;
   }
   return false;
 }
 
 function validateCoursePrereqs(planned: PlannedCourse, plan: Plan): ValidationIssue[] {
   const issues: ValidationIssue[] = [];
-  const term = parseTermLabel(planned.term);
+  const term = parseTerm(planned.term);
   if (!term) return issues;
   const entry = plan.catalog.get(planned.courseCode);
   if (!entry?.prereqs) return issues;
@@ -189,7 +167,7 @@ function validateCoursePrereqs(planned: PlannedCourse, plan: Plan): ValidationIs
 function validateTermOffering(planned: PlannedCourse, plan: Plan): ValidationIssue | null {
   const entry = plan.catalog.get(planned.courseCode);
   if (!entry) return null;
-  const term = parseTermLabel(planned.term);
+  const term = parseTerm(planned.term);
   if (!term) return null;
 
   const offeredFall = entry.offeredFall ?? true;
@@ -219,7 +197,7 @@ function validateTermLoad(
   plan: Plan,
 ): ValidationIssue[] {
   const issues: ValidationIssue[] = [];
-  const term = parseTermLabel(termLabel);
+  const term = parseTerm(termLabel);
   if (!term) return issues;
   if (term.season === "Summer") return issues; // Summer is intentionally part-time.
 
@@ -298,15 +276,6 @@ export function validatePlan(plan: Plan): ValidationIssue[] {
   issues.push(...validateDuplicates(plan));
 
   return issues;
-}
-
-export function groupByTerm(courses: PlannedCourse[]): Map<string, PlannedCourse[]> {
-  const m = new Map<string, PlannedCourse[]>();
-  for (const c of courses) {
-    if (!m.has(c.term)) m.set(c.term, []);
-    m.get(c.term)?.push(c);
-  }
-  return m;
 }
 
 /** Helper for tests + UI: build a `Plan` from raw arrays. */

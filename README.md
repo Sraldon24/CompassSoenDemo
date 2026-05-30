@@ -8,10 +8,10 @@ An AI-powered degree planner for **Concordia BEng Software Engineering** student
 [![Next.js](https://img.shields.io/badge/Next.js-16-black)](https://nextjs.org/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5-blue)](https://www.typescriptlang.org/)
 [![Tailwind](https://img.shields.io/badge/Tailwind-v4-38B2AC)](https://tailwindcss.com/)
-[![Tests](https://img.shields.io/badge/tests-98%20passing-success)](#testing)
+[![Tests](https://img.shields.io/badge/tests-313%20passing-success)](#testing)
 [![Groq](https://img.shields.io/badge/AI-Groq%20Llama%203.3%2070B-orange)](https://groq.com/)
 
-> ⚠️ Pre-launch (Phase 3 complete). Public r/Concordia launch comes after Phase 4 (community + observability).
+> ⚙️ Phase 4 feature-complete (community + observability + privacy). Deploying to Railway, then public r/Concordia launch.
 
 ---
 
@@ -33,6 +33,22 @@ An AI-powered degree planner for **Concordia BEng Software Engineering** student
 - **⌘K command palette** with keyword + semantic search across the 124-course catalog
 - **`npm run research`** CLI — manual RAG + Concordia-calendar verification of any AI claim
 
+### 👥 Community (Phase 4)
+- **Reddit insights** — per-course "What students are saying" summaries. Hybrid source: `old.reddit.com/*.json` (free, primary) → Brave Search (budget-guarded fallback). Summarized by a 5-node LangGraph chain (sentiment / prof mentions / praise / complaints / difficulty) with verbatim citations back to the threads. Cached 7 days per course.
+- **Difficulty votes** — easy / medium / hard per course, denormalized rolling average.
+- **Anonymous professor reviews** — rating + difficulty + would-take-again, anonymous by default (the author's name is *never* returned for anon reviews).
+- **Flag + moderation queue** — any user can flag a review (auto-hidden pending review); admins keep / remove / ban-author at `/admin/moderation`.
+- **Public profiles** at `/u/[slug]` — no-auth shareable degree progress with a dynamic OG image (via `next/og`). Off by default; opt in at Settings → Privacy.
+- **Demo mode** at `/demo` — no-auth sandbox with a sample plan + the live validation engine + a 5-message AI taste-test.
+- **Weekly Concordia scraper** — diffs the calendar against the catalog into a `/admin/scraped-changes` review queue (cheerio parser, prefix-scoped, Unicode-hyphen-aware).
+
+### 🔭 Observability + Privacy (Phase 4)
+- **Sentry** error tracking (client + server + edge) with source-map upload on prod builds.
+- **PostHog** analytics — 12 typed launch events, consent-gated + Do-Not-Track-respecting.
+- **Cookie banner** — analytics only initialize after explicit accept.
+- **GDPR controls** — one-click JSON data export + soft-delete with a 30-day grace window (hard purge via cron, cascade-wipes child rows).
+- **AI fallback chain** — Groq 70B → Groq 8B → OpenRouter free models, so a Groq outage degrades gracefully instead of failing. OpenRouter has hard never-spend guards (`:free`-only allowlist + pre-flight $0-balance check).
+
 ### 🎨 Design + UX
 - **Graphite Greens** palette via Tailwind v4 `@theme` tokens
 - **Dark mode** via next-themes (persists per-user)
@@ -45,6 +61,18 @@ An AI-powered degree planner for **Concordia BEng Software Engineering** student
 - **Drizzle ORM** with type-safe queries (typed `inArray` helpers, never raw `sql\`... ANY(${array})\`` — see [docs/ARCHITECTURE.md ADR-013](docs/ARCHITECTURE.md))
 - **Rate limiting** via lru-cache (50 chat / 20 recommend / 30 email / 100 search per user per day)
 - **Biome** for lint + format (no ESLint / no Prettier)
+
+---
+
+## 📸 Screenshots
+
+> Drop PNGs into `docs/screenshots/` with these names and they'll render here.
+
+| | |
+|---|---|
+| ![Term planner](docs/screenshots/planner.png) **Drag-and-drop planner** | ![Ask Compass](docs/screenshots/chat.png) **Ask Compass (RAG chat)** |
+| ![Prereq map](docs/screenshots/map.png) **Prerequisite map** | ![Course detail](docs/screenshots/course-detail.png) **Course detail + community** |
+| ![Dashboard](docs/screenshots/dashboard.png) **Dashboard + AI insight** | ![Public profile](docs/screenshots/public-profile.png) **Public profile** |
 
 ---
 
@@ -105,9 +133,11 @@ Open [http://localhost:3000](http://localhost:3000), sign up, complete onboardin
 | Auth | Better Auth (email/password) | Self-hosted, Argon2id, no vendor lock-in |
 | AI | Groq Llama 3.1 8B + 3.3 70B | Fastest free-tier inference in 2026 |
 | Embeddings | sentence-transformers `all-MiniLM-L6-v2` local | $0, runs in Node, 384 dims |
-| Lint + format | Biome 1.9 | One Rust binary, no ESLint/Prettier split |
-| Testing | Vitest (unit + integration) + Playwright (E2E) | 98 tests passing |
-| Hosting | Railway (planned) | $5/mo credit covers app + Postgres |
+| Lint + format | Biome | One Rust binary, no ESLint/Prettier split |
+| Testing | Vitest (unit + integration) + Playwright (E2E) | 313 tests passing |
+| Community sources | old.reddit.com JSON + Brave Search (fallback) | free, budget-guarded |
+| Observability | Sentry + PostHog | errors + consent-gated analytics |
+| Hosting | Railway | $5/mo credit covers app + Postgres |
 
 **Total cost: $0/month** (all free tiers).
 
@@ -171,22 +201,18 @@ CompassSoenDemo/
 
 ## 🧪 Testing
 
-**98 tests passing** as of Phase 3:
+**313 tests passing** (Phase 1–4):
 
 ```bash
-npm run test          # Vitest: unit + integration (76 + 22)
-npm run test:e2e      # Playwright: 9 E2E tests
+npm run test          # Vitest: unit + integration
+npm run test:e2e      # Playwright: E2E
 npm run lint          # Biome + SQL-pattern guard
 npm run typecheck     # tsc --noEmit
 ```
 
-| Suite | Files | Tests | What it covers |
-|---|---|---|---|
-| **Unit** | 3 | 76 | Plan validation (14), workload predictor (12), recommend-core scoring + persona scenarios (50) |
-| **Integration** | 4 | 22 | DB queries, RAG pipeline, AI endpoints, requirements math, ICS generator |
-| **E2E (Playwright)** | 2 | 9 | Anon landing, signup → onboarding → dashboard → sign out, login validation, planner page, requirements page |
+Coverage spans the planner rules engine, workload predictor, recommend scoring, the deep-module refactor (term/excel/embedder/LLM-port/repos/limiter — see [docs/REFACTOR.md](docs/REFACTOR.md)), and the Phase 4 community layer: Reddit + Brave sources, the summarization graph (incl. prof-name dedupe regression), difficulty aggregates, anonymous-review privacy invariants, the moderation flag/keep/remove/ban flow, public-profile visibility rules, GDPR export/purge, the AI fallback chain, and the OpenRouter never-spend guards.
 
-Integration tests hit real Postgres + pgvector + Groq. They auto-skip Groq-dependent tests if `GROQ_API_KEY` is unset (`describe.skipIf`).
+Integration tests hit real Postgres + pgvector + Groq. Groq-heavy graph tests are opt-in (`RUN_SUMMARIZE_GROQ_TESTS=1` / `RUN_HEAVY_GROQ_TESTS=1`) so a normal `npm test` stays under the Groq per-minute rate limit. Live-network tests skip with `SKIP_LIVE_NETWORK=1`.
 
 ### CI / pre-commit guard
 
@@ -229,7 +255,7 @@ For recommendations, the LLM only sees a pre-ranked top-12 candidate list (compu
 - **Phase 1 — Foundation** ✅ (auth, DB, app shell, design system)
 - **Phase 2 — Core Planner** ✅ (DnD, validation, workload, requirements, Excel import, onboarding)
 - **Phase 3 — AI + Polish** ✅ (RAG, chat, recommendations, prereq map, email drafting, exports)
-- **Phase 4 — Community + Launch** ⏳ (Reddit scraper, difficulty votes, prof reviews, public profiles, Sentry, PostHog, rate limiting in prod, r/Concordia launch)
+- **Phase 4 — Community + Launch** ✅ feature-complete (Reddit insights, difficulty votes, prof reviews, moderation, public profiles, demo mode, Sentry, PostHog, GDPR, AI fallback chain) — Railway deploy + r/Concordia launch in progress
 
 ---
 
@@ -248,6 +274,10 @@ npm run seed:catalog      # Seed the full 124-course Concordia catalog
 npm run seed:user-plan    # Seed a demo plan for a specific email
 npm run db:embed          # Generate course embeddings (re-runs only on changed rows)
 npm run research -- "When can I take COMP 472?"   # Manual RAG + web verification
+npm run scrape:reddit     # Scrape r/Concordia for course mentions (Reddit JSON → Brave fallback)
+npm run summarize:reddit  # Summarize scraped posts per course via the LangGraph chain
+npm run scrape:courses    # Diff Concordia calendar → /admin/scraped-changes queue
+npm run purge:accounts    # Hard-delete accounts past the 30-day soft-delete grace
 npm run test              # Vitest
 npm run test:e2e          # Playwright
 npm run lint              # Biome + SQL pattern guard

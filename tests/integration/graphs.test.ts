@@ -19,6 +19,9 @@ import { eq } from "drizzle-orm";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
 const HAS_GROQ = !!process.env.GROQ_API_KEY;
+// The email + research graphs burn extra Groq calls — opt in via env when you
+// have budget to spare. Recommendation graph stays always-on (only 1-2 calls).
+const HEAVY_OPT_IN = process.env.RUN_HEAVY_GROQ_TESTS === "1";
 const GRAPH_USER_ID = `graph-int-${Date.now()}`;
 
 describe.skipIf(!HAS_GROQ)("LangGraph: recommendation graph", () => {
@@ -104,7 +107,7 @@ describe.skipIf(!HAS_GROQ)("LangGraph: recommendation graph", () => {
   });
 });
 
-describe.skipIf(!HAS_GROQ)("LangGraph: email-drafting graph", () => {
+describe.skipIf(!HAS_GROQ || !HEAVY_OPT_IN)("LangGraph: email-drafting graph", () => {
   it("runs draft → critique → revise and returns a clean final draft", async () => {
     const result = await runEmailDraftGraph({
       situation:
@@ -123,16 +126,19 @@ describe.skipIf(!HAS_GROQ)("LangGraph: email-drafting graph", () => {
   });
 });
 
-describe.skipIf(!HAS_GROQ)("LangGraph: research graph (uses real Concordia URLs)", () => {
-  it("extracts course codes from query and produces a structured report", async () => {
-    const result = await runResearchGraph("What are the prereqs for COMP 472?");
-    expect(result.extractedCodes).toContain("COMP 472");
-    expect(result.localHits.length).toBeGreaterThan(0);
-    expect(result.webSources.length).toBe(3); // 3 Concordia URLs
-    expect(result.finalReport.length).toBeGreaterThan(0);
-    // Report should follow the prescribed structure.
-    expect(result.finalReport).toMatch(/## Answer/i);
-    expect(result.finalReport).toMatch(/## Evidence/i);
-    expect(result.finalReport).toMatch(/## Confidence/i);
-  }, 60_000); // 60s timeout — web fetches + Groq call
-});
+describe.skipIf(!HAS_GROQ || !HEAVY_OPT_IN)(
+  "LangGraph: research graph (uses real Concordia URLs)",
+  () => {
+    it("extracts course codes from query and produces a structured report", async () => {
+      const result = await runResearchGraph("What are the prereqs for COMP 472?");
+      expect(result.extractedCodes).toContain("COMP 472");
+      expect(result.localHits.length).toBeGreaterThan(0);
+      expect(result.webSources.length).toBe(3); // 3 Concordia URLs
+      expect(result.finalReport.length).toBeGreaterThan(0);
+      // Report should follow the prescribed structure.
+      expect(result.finalReport).toMatch(/## Answer/i);
+      expect(result.finalReport).toMatch(/## Evidence/i);
+      expect(result.finalReport).toMatch(/## Confidence/i);
+    }, 60_000); // 60s timeout — web fetches + Groq call
+  },
+);

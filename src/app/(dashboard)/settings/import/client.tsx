@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { CheckCircle2, FileSpreadsheet, Upload, XCircle } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useRef, useState } from "react";
+import { useState } from "react";
 import { toast } from "sonner";
 
 interface PreviewRow {
@@ -26,11 +26,21 @@ interface Preview {
 
 export function ImportClient(): React.ReactElement {
   const router = useRouter();
-  const fileInput = useRef<HTMLInputElement | null>(null);
   const [file, setFile] = useState<File | null>(null);
   const [preview, setPreview] = useState<Preview | null>(null);
   const [skipErrors, setSkipErrors] = useState(true);
   const [pending, setPending] = useState(false);
+  // Row indices the user has ticked to actually import. Seeded with every
+  // error-free row when a preview lands, so the default is "import all valid".
+  const [selected, setSelected] = useState<Set<number>>(new Set());
+
+  const toggleRow = (index: number) => {
+    setSelected((prev) => {
+      const next = new Set(prev);
+      next.has(index) ? next.delete(index) : next.add(index);
+      return next;
+    });
+  };
 
   const upload = async (mode: "preview" | "commit") => {
     if (!file) {
@@ -42,14 +52,20 @@ export function ImportClient(): React.ReactElement {
       const fd = new FormData();
       fd.append("file", file);
       fd.append("mode", mode);
-      if (mode === "commit") fd.append("skipErrors", String(skipErrors));
+      if (mode === "commit") {
+        fd.append("skipErrors", String(skipErrors));
+        fd.append("selectedIndices", [...selected].join(","));
+      }
       const res = await fetch("/api/import/excel", { method: "POST", body: fd });
       if (!res.ok) {
         const body = (await res.json().catch(() => ({}))) as { error?: string };
         throw new Error(body.error ?? "Import failed");
       }
       if (mode === "preview") {
-        setPreview((await res.json()) as Preview);
+        const data = (await res.json()) as Preview;
+        setPreview(data);
+        // Default to every valid row selected.
+        setSelected(new Set(data.rows.filter((r) => r.errors.length === 0).map((r) => r.index)));
       } else {
         const data = (await res.json()) as { imported: number };
         toast.success(`Imported ${data.imported} courses into your plan.`);
@@ -60,6 +76,15 @@ export function ImportClient(): React.ReactElement {
     } finally {
       setPending(false);
     }
+  };
+
+  // Valid (importable) rows + how many of them are currently ticked.
+  const validRows = preview?.rows.filter((r) => r.errors.length === 0) ?? [];
+  const selectedCount = validRows.filter((r) => selected.has(r.index)).length;
+  const allSelected = validRows.length > 0 && selectedCount === validRows.length;
+
+  const toggleAll = () => {
+    setSelected(allSelected ? new Set() : new Set(validRows.map((r) => r.index)));
   };
 
   return (
@@ -83,23 +108,40 @@ export function ImportClient(): React.ReactElement {
         </CardHeader>
         <CardContent className="space-y-3">
           <input
-            ref={fileInput}
             type="file"
             accept=".xlsx,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
             onChange={(e) => {
               setFile(e.target.files?.[0] ?? null);
               setPreview(null);
             }}
-            className="block w-full text-sm"
+            className="sr-only"
+            id="xlsx-upload"
           />
+          <div className="flex flex-wrap items-center gap-3">
+            <label
+              htmlFor="xlsx-upload"
+              className="inline-flex cursor-pointer items-center gap-2 rounded-md border px-3 py-2 text-sm font-medium transition-colors hover:bg-accent/10"
+              style={{ borderColor: "var(--color-border)" }}
+            >
+              <FileSpreadsheet className="h-4 w-4" aria-hidden="true" />
+              Choose .xlsx file
+            </label>
+            <span className="text-sm" style={{ color: "var(--color-text-muted)" }}>
+              {file ? file.name : "No file chosen"}
+            </span>
+          </div>
           <div className="flex gap-2">
             <Button onClick={() => upload("preview")} disabled={!file || pending}>
               <Upload className="mr-2 h-4 w-4" />
               {pending ? "Parsing…" : "Preview"}
             </Button>
             {preview && preview.ok > 0 && (
-              <Button onClick={() => upload("commit")} disabled={pending} variant="ghost">
-                Commit {skipErrors ? preview.ok : preview.total} rows
+              <Button
+                onClick={() => upload("commit")}
+                disabled={pending || selectedCount === 0}
+                variant="ghost"
+              >
+                Commit {selectedCount} selected
               </Button>
             )}
           </div>
@@ -132,6 +174,15 @@ export function ImportClient(): React.ReactElement {
               <table className="w-full text-xs">
                 <thead style={{ background: "var(--color-surface-2)" }}>
                   <tr>
+                    <th className="p-2 w-8">
+                      <input
+                        type="checkbox"
+                        aria-label="Select all importable rows"
+                        checked={allSelected}
+                        onChange={toggleAll}
+                        disabled={validRows.length === 0}
+                      />
+                    </th>
                     <th className="text-left p-2">Code</th>
                     <th className="text-left p-2">Term</th>
                     <th className="text-left p-2">Status</th>
@@ -139,35 +190,50 @@ export function ImportClient(): React.ReactElement {
                   </tr>
                 </thead>
                 <tbody>
-                  {preview.rows.map((r) => (
-                    <tr
-                      key={r.index}
-                      style={{
-                        borderTop: "1px solid var(--color-border)",
-                        opacity: r.errors.length > 0 ? 0.6 : 1,
-                      }}
-                    >
-                      <td className="p-2 mono tnum">
-                        {r.errors.length === 0 ? (
-                          <CheckCircle2
-                            className="inline h-3 w-3 mr-1"
-                            style={{ color: "var(--color-success)" }}
+                  {preview.rows.map((r) => {
+                    const importable = r.errors.length === 0;
+                    return (
+                      <tr
+                        key={r.index}
+                        style={{
+                          borderTop: "1px solid var(--color-border)",
+                          opacity: importable ? 1 : 0.6,
+                        }}
+                      >
+                        <td className="p-2 text-center">
+                          <input
+                            type="checkbox"
+                            aria-label={`Import ${r.courseCode}`}
+                            checked={importable && selected.has(r.index)}
+                            disabled={!importable}
+                            onChange={() => toggleRow(r.index)}
                           />
-                        ) : (
-                          <XCircle
-                            className="inline h-3 w-3 mr-1"
-                            style={{ color: "var(--color-danger)" }}
-                          />
-                        )}
-                        {r.courseCode}
-                      </td>
-                      <td className="p-2">{r.term}</td>
-                      <td className="p-2">{r.status}</td>
-                      <td className="p-2 text-[11px]" style={{ color: "var(--color-text-muted)" }}>
-                        {r.errors.join("; ") || "—"}
-                      </td>
-                    </tr>
-                  ))}
+                        </td>
+                        <td className="p-2 mono tnum">
+                          {importable ? (
+                            <CheckCircle2
+                              className="inline h-3 w-3 mr-1"
+                              style={{ color: "var(--color-success)" }}
+                            />
+                          ) : (
+                            <XCircle
+                              className="inline h-3 w-3 mr-1"
+                              style={{ color: "var(--color-danger)" }}
+                            />
+                          )}
+                          {r.courseCode}
+                        </td>
+                        <td className="p-2">{r.term}</td>
+                        <td className="p-2">{r.status}</td>
+                        <td
+                          className="p-2 text-[11px]"
+                          style={{ color: "var(--color-text-muted)" }}
+                        >
+                          {r.errors.join("; ") || "—"}
+                        </td>
+                      </tr>
+                    );
+                  })}
                 </tbody>
               </table>
             </div>

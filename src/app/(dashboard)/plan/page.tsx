@@ -1,5 +1,5 @@
 import { PlannerBoard } from "@/components/planner/planner-board";
-import { getUserPlanSnapshot, termRange } from "@/lib/db/queries/plan";
+import { getAllCourses, getUserPlanSnapshot, termRange } from "@/lib/db/queries/plan";
 import { getSession } from "@/lib/get-session";
 import { redirect } from "next/navigation";
 
@@ -14,7 +14,13 @@ export default async function PlanPage(): Promise<React.ReactElement> {
   const session = await getSession();
   if (!session) redirect("/login");
 
-  const { userPlan, catalog } = await getUserPlanSnapshot(session.user.id);
+  // The snapshot's `catalog` only covers courses the user already references, so
+  // the "+ Add course" picker needs the FULL catalog instead — otherwise it
+  // shows "No matching courses" for an empty plan.
+  const [{ userPlan }, fullCatalog] = await Promise.all([
+    getUserPlanSnapshot(session.user.id),
+    getAllCourses(),
+  ]);
   const allTerms = termRange(DEFAULT_START, DEFAULT_END);
 
   return (
@@ -55,11 +61,7 @@ export default async function PlanPage(): Promise<React.ReactElement> {
         </div>
       </header>
 
-      <PlannerBoard
-        initialCourses={userPlan}
-        catalogList={[...catalog.values()]}
-        visibleTerms={allTerms}
-      />
+      <PlannerBoard initialCourses={userPlan} catalogList={fullCatalog} visibleTerms={allTerms} />
     </div>
   );
 }

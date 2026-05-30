@@ -1,7 +1,6 @@
 import { runRecommendationGraph } from "@/lib/ai/graphs/recommend-graph";
-import { recordAIUsage } from "@/lib/ai/usage";
 import { getSession } from "@/lib/get-session";
-import { LIMITS, rateLimitByUserId } from "@/lib/rate-limit";
+import { denyResponse, guardAiCall, withUsage } from "@/lib/limits";
 import { NextResponse } from "next/server";
 import { z } from "zod";
 
@@ -39,37 +38,30 @@ export async function POST(req: Request): Promise<Response> {
     );
   }
 
-  const limit = rateLimitByUserId(
-    session.user.id,
-    "ai-recommend",
-    LIMITS.aiRecommend.limit,
-    LIMITS.aiRecommend.windowMs,
-  );
-  if (!limit.allowed) {
-    return NextResponse.json(
-      { error: "Daily recommendation limit reached." },
-      {
-        status: 429,
-        headers: { "Retry-After": String(Math.ceil(limit.retryAfterMs / 1000)) },
-      },
-    );
-  }
+  const decision = guardAiCall({
+    feature: "aiRecommend",
+    identity: { kind: "user", id: session.user.id },
+    model: "llama-3.3-70b-versatile",
+  });
+  if (!decision.allowed) return denyResponse(decision);
 
   try {
-    const recs = await runRecommendationGraph({
-      userId: session.user.id,
-      interests: parsed.interests,
-      categoryFilter: parsed.categoryFilter,
-    });
-    // H4 fix: estimate from actual response sizes (one token ≈ 4 chars).
-    // The "why" strings are the only LLM-generated output; the rest is deterministic.
-    const tokensUsed = recs.reduce((sum, r) => sum + Math.ceil(r.why.length / 4), 0);
-    await recordAIUsage({
-      userId: session.user.id,
-      feature: "recommend",
-      model: "llama-3.3-70b-versatile",
-      tokensUsed,
-    });
+    const recs = await withUsage(
+      {
+        userId: session.user.id,
+        feature: "recommend",
+        model: "llama-3.3-70b-versatile",
+        // Estimate from actual response sizes (one token ≈ 4 chars). The "why"
+        // strings are the only LLM-generated output; the rest is deterministic.
+        estimateTokens: (r) => (r ?? []).reduce((sum, x) => sum + Math.ceil(x.why.length / 4), 0),
+      },
+      () =>
+        runRecommendationGraph({
+          userId: session.user.id,
+          interests: parsed.interests,
+          categoryFilter: parsed.categoryFilter,
+        }),
+    );
     return NextResponse.json({ recommendations: recs });
   } catch (err) {
     console.error("[ai] recommend failed:", err);

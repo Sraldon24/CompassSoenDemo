@@ -76,15 +76,10 @@ export function rateLimitByIp(
   return rateLimit({ feature, identity: `ip:${ip}`, limit, windowMs });
 }
 
-/** Standard limits — single source of truth for both UI counters + enforcement. */
-export const LIMITS = {
-  aiChat: { limit: 50, windowMs: 24 * 60 * 60 * 1000 },
-  aiRecommend: { limit: 20, windowMs: 24 * 60 * 60 * 1000 },
-  aiDraftEmail: { limit: 30, windowMs: 24 * 60 * 60 * 1000 },
-  search: { limit: 100, windowMs: 60 * 60 * 1000 },
-  import: { limit: 5, windowMs: 60 * 60 * 1000 },
-  moderationFlag: { limit: 10, windowMs: 24 * 60 * 60 * 1000 },
-} as const;
+// `LIMITS` is defined once in `@/lib/limits/config` and re-exported here so the
+// legacy `@/lib/rate-limit` import path stays stable for callers not yet migrated
+// to the `@/lib/limits` facade.
+export { LIMITS } from "@/lib/limits/config";
 
 /** Reset all buckets — only used by tests. */
 export function _resetRateLimitForTesting(): void {

@@ -11,9 +11,39 @@
  */
 
 import { groq } from "@ai-sdk/groq";
-import { generateText, streamText } from "ai";
+import { streamText } from "ai";
 import { checkQuota, recordGroqUsage } from "./groq-quota";
+import type { LlmProvider } from "./llm-port";
+import { groqProvider } from "./providers/groq-provider";
+import { openRouterProvider } from "./providers/openrouter-provider";
 import type { AITask, GroqModel } from "./types";
+
+// The non-streaming model round-trip goes through this injectable port so
+// retry/backoff/quota are unit-testable against a fake (no live key). Streaming
+// stays on the Vercel SDK directly (its result shape is the route's contract).
+let activeProvider: LlmProvider = groqProvider;
+
+// Cross-provider fallback (task #101). When Groq exhausts retries with a
+// retryable error (429/5xx), we fall back to OpenRouter free models. Separate
+// seam so tests can inject a fake fallback independently of the primary.
+let fallbackProvider: LlmProvider = openRouterProvider;
+
+/** TEST-ONLY: swap the primary LLM provider (e.g. a fake that throws 429s). */
+export function _setLlmProviderForTesting(provider: LlmProvider): void {
+  activeProvider = provider;
+}
+/** TEST-ONLY: restore the real Groq provider. */
+export function _resetLlmProviderForTesting(): void {
+  activeProvider = groqProvider;
+}
+/** TEST-ONLY: swap the fallback provider. */
+export function _setFallbackProviderForTesting(provider: LlmProvider): void {
+  fallbackProvider = provider;
+}
+/** TEST-ONLY: restore the real OpenRouter fallback. */
+export function _resetFallbackProviderForTesting(): void {
+  fallbackProvider = openRouterProvider;
+}
 
 if (!process.env.GROQ_API_KEY) {
   // Don't throw at module load — let Better Auth + plan pages keep rendering
@@ -99,56 +129,117 @@ function retryAfterMsFromError(err: unknown): number | null {
   return Math.min(seconds, 60) * 1000;
 }
 
-/** Generate a complete (non-streaming) response. Used for recommendations, insights, etc. */
-export async function generateResponse(
-  opts: CallOptions,
-): Promise<{ text: string; model: GroqModel; usage: { tokens: number } }> {
-  const model = selectModel(opts.task);
-  const maxAttempts = opts.maxAttempts ?? 3;
+export interface GenerateResult {
+  text: string;
+  /** The Groq model selected for the request (for usage accounting). */
+  model: GroqModel;
+  usage: { tokens: number };
+  /** Which backend actually served the response. */
+  servedBy: "groq" | "openrouter";
+}
+
+/** Generate a complete (non-streaming) response. Used for recommendations, insights, etc.
+ *
+ * Fallback chain (task #101):
+ *   1. Groq @ selected model, with retry/backoff honoring Retry-After.
+ *   2. If the selected model was 70B and Groq still fails retryably, retry on
+ *      Groq 8B (cheaper, far higher RPD) before leaving Groq.
+ *   3. If Groq is fully exhausted (retryable failure), fall back to OpenRouter
+ *      free models. OpenRouter has its own never-spend guards; if it's
+ *      unavailable we surface the original Groq error.
+ */
+export async function generateResponse(opts: CallOptions): Promise<GenerateResult> {
+  const primaryModel = selectModel(opts.task);
 
   // Circuit breaker — refuse to hit Groq if we're already at 85%+ of the daily cap.
-  // Better to surface a clean 503 than burn the last few requests on retries.
-  const quota = checkQuota(model);
-  if (quota.shouldThrottle) {
+  // Note: we DON'T short-circuit to a hard 503 anymore — a throttled primary is
+  // exactly when the OpenRouter fallback earns its keep. We skip Groq and go
+  // straight to fallback.
+  const quota = checkQuota(primaryModel);
+  const groqThrottled = quota.shouldThrottle;
+
+  let lastErr: unknown;
+
+  if (!groqThrottled) {
+    // Try Groq at the selected model, then (if 70B) downgrade to 8B.
+    const groqModels: GroqModel[] =
+      primaryModel === "llama-3.3-70b-versatile"
+        ? ["llama-3.3-70b-versatile", "llama-3.1-8b-instant"]
+        : [primaryModel];
+
+    for (const model of groqModels) {
+      const result = await tryGroq(model, opts);
+      if (result.ok) {
+        recordGroqUsage(model, result.value.usage.tokens);
+        return { text: result.value.text, model, usage: result.value.usage, servedBy: "groq" };
+      }
+      lastErr = result.err;
+      // Only roll to the next Groq model / fallback on a retryable failure.
+      if (!isRetryable(result.err)) break;
+    }
+  }
+
+  // Groq exhausted (or throttled). Try the OpenRouter free fallback.
+  if (groqThrottled || isRetryable(lastErr) || lastErr === undefined) {
+    try {
+      const fb = await fallbackProvider.generate({
+        model: primaryModel, // ignored by OpenRouter (uses its free allowlist)
+        system: opts.system,
+        messages: opts.messages,
+        temperature: opts.temperature,
+        maxTokens: opts.maxTokens,
+      });
+      return { text: fb.text, model: primaryModel, usage: fb.usage, servedBy: "openrouter" };
+    } catch (fbErr) {
+      // Fallback failed too — fall through to the Groq error surface below.
+      if (groqThrottled && lastErr === undefined) lastErr = fbErr;
+    }
+  }
+
+  if (groqThrottled && lastErr === undefined) {
     throw new AIError(
-      `Daily AI quota nearly exhausted (${quota.reason}). Try again after UTC midnight.`,
+      `Daily AI quota nearly exhausted (${quota.reason}) and fallback unavailable. Try again after UTC midnight.`,
       { status: 503, retryable: false },
     );
   }
 
+  const status = statusOf(lastErr);
+  throw new AIError(
+    status === 429
+      ? "AI rate limit hit (Groq + fallback). Try again in a few minutes."
+      : "AI provider unavailable. Try again shortly.",
+    { status: status === 429 ? 429 : 503, retryable: isRetryable(lastErr) },
+  );
+}
+
+type TryResult =
+  | { ok: true; value: { text: string; usage: { tokens: number } } }
+  | { ok: false; err: unknown };
+
+/** One Groq model with retry/backoff. Returns a result union rather than throwing
+ * so the caller can decide whether to downgrade / fall back. */
+async function tryGroq(model: GroqModel, opts: CallOptions): Promise<TryResult> {
+  const maxAttempts = opts.maxAttempts ?? 3;
   let lastErr: unknown;
   for (let attempt = 0; attempt < maxAttempts; attempt++) {
     try {
-      const result = await generateText({
-        model: groq(model),
+      const result = await activeProvider.generate({
+        model,
         system: opts.system,
         messages: opts.messages,
         temperature: opts.temperature ?? 0.4,
-        maxRetries: 0, // we handle retries ourselves
+        maxTokens: opts.maxTokens,
       });
-      // Record system-wide usage so circuit breaker stays accurate.
-      recordGroqUsage(model, result.usage?.totalTokens ?? 0);
-      return {
-        text: result.text,
-        model,
-        usage: { tokens: result.usage?.totalTokens ?? 0 },
-      };
+      return { ok: true, value: { text: result.text, usage: result.usage } };
     } catch (err) {
       lastErr = err;
       if (!isRetryable(err) || attempt === maxAttempts - 1) break;
-      // Honor Groq's Retry-After header if present; fall back to exponential.
       const headerWait = retryAfterMsFromError(err);
       const wait = headerWait ?? 1000 * 2 ** attempt; // 1s, 2s, 4s
       await sleep(wait);
     }
   }
-  const status = statusOf(lastErr);
-  throw new AIError(
-    status === 429
-      ? "Groq rate limit hit. Try again in a few minutes."
-      : "AI provider unavailable. Try again shortly.",
-    { status: status === 429 ? 429 : 503, retryable: isRetryable(lastErr) },
-  );
+  return { ok: false, err: lastErr };
 }
 
 /**

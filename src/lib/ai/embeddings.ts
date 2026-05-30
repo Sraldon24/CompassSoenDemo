@@ -1,61 +1,37 @@
 /**
- * Local embeddings via @xenova/transformers (no API calls).
- * Model: Xenova/all-MiniLM-L6-v2 — 384 dims, ~80MB, runs in Node.
+ * Local embeddings — public surface (preserved for all callers).
  *
- * Singleton pipeline. Lazy-loaded on first embed() call. Subsequent calls
- * reuse the same in-memory model — first call costs ~500ms cold start.
+ * Delegates to a swappable {@link Embedder}. The default is the real Xenova
+ * adapter (lazy-loaded ~80MB model, ~500ms cold start, reused after). Tests
+ * call {@link setEmbedder} with a fake so they never load the model.
+ *
+ * Model details + the port live in `./embedder`; the real adapter (the only
+ * importer of `@xenova/transformers`) lives in `./embedder.xenova`.
  */
 
-const EMBEDDING_MODEL = "Xenova/all-MiniLM-L6-v2";
-const EMBEDDING_DIMS = 384;
+import { EMBEDDING, type Embedder } from "./embedder";
+import { createXenovaEmbedder } from "./embedder.xenova";
 
-// Use `any` (deliberate, with biome-ignore) because @xenova/transformers
-// has no exported FeatureExtractionPipeline type that survives bundling.
-// biome-ignore lint/suspicious/noExplicitAny: third-party type opacity
-let pipelinePromise: Promise<any> | null = null;
+let active: Embedder | null = null;
 
-async function getPipeline(): Promise<unknown> {
-  if (pipelinePromise) return pipelinePromise;
-  pipelinePromise = (async () => {
-    const { pipeline, env } = await import("@xenova/transformers");
-    // Cache models in .cache/transformers/ (gitignored).
-    env.cacheDir = ".cache/transformers";
-    return pipeline("feature-extraction", EMBEDDING_MODEL);
-  })();
-  return pipelinePromise;
+function get(): Embedder {
+  if (!active) active = createXenovaEmbedder();
+  return active;
 }
 
-/**
- * Embed a single string into a 384-dim normalized vector.
- * Use {@link embedBatch} for many strings — it's much faster.
- */
+/** TEST-ONLY seam. Pass an Embedder to override; pass null to reset to the real one. */
+export function setEmbedder(embedder: Embedder | null): void {
+  active = embedder;
+}
+
+/** Embed a single string into a 384-dim normalized vector. */
 export async function embed(text: string): Promise<number[]> {
-  const pipe = (await getPipeline()) as (
-    input: string,
-    options: { pooling: string; normalize: boolean },
-  ) => Promise<{ data: Float32Array }>;
-  const output = await pipe(text, { pooling: "mean", normalize: true });
-  return Array.from(output.data);
+  return get().embed(text);
 }
 
-/**
- * Embed many strings in a single forward pass. Returns an array of vectors
- * in the same order as the input.
- */
+/** Embed many strings in a single pass. Returns vectors in input order. */
 export async function embedBatch(texts: string[]): Promise<number[][]> {
-  if (texts.length === 0) return [];
-  const pipe = (await getPipeline()) as (
-    input: string[],
-    options: { pooling: string; normalize: boolean },
-  ) => Promise<{ data: Float32Array; dims: number[] }>;
-  const out = await pipe(texts, { pooling: "mean", normalize: true });
-  // Reshape flat Float32Array into [batch, dim] vectors.
-  const result: number[][] = [];
-  const dim = out.dims[out.dims.length - 1] ?? EMBEDDING_DIMS;
-  for (let i = 0; i < texts.length; i++) {
-    result.push(Array.from(out.data.slice(i * dim, (i + 1) * dim)));
-  }
-  return result;
+  return get().embedBatch(texts);
 }
 
 /** Pre-warm the pipeline at boot (instrumentation hook). Safe to call multiple times. */
@@ -67,7 +43,4 @@ export async function warmEmbeddings(): Promise<void> {
   }
 }
 
-export const EMBEDDING = {
-  model: EMBEDDING_MODEL,
-  dimensions: EMBEDDING_DIMS,
-};
+export { EMBEDDING };

@@ -5,7 +5,6 @@
 
 import { db } from "@/lib/db";
 import { aiUsage } from "@/lib/db/schema";
-import { sql } from "drizzle-orm";
 import type { GroqModel } from "./types";
 
 interface RecordUsageInput {
@@ -33,18 +32,4 @@ export async function recordAIUsage(input: RecordUsageInput): Promise<void> {
     // Never let usage tracking fail an AI request.
     console.warn("[ai] failed to record usage:", err);
   }
-}
-
-/** How many AI chat messages has this user used in the last 24h? */
-export async function chatUsageToday(userId: string): Promise<number> {
-  const [row] = await db.execute<{ count: number }>(
-    sql`
-      SELECT COUNT(*)::int AS count
-      FROM ai_usage
-      WHERE user_id = ${userId}
-        AND feature = 'chat'
-        AND created_at > NOW() - INTERVAL '24 hours'
-    `,
-  );
-  return row?.count ?? 0;
 }

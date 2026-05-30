@@ -51,7 +51,11 @@ export function ChatUI(): React.ReactElement {
         const res = await fetch("/api/ai/chat", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ message: trimmed, conversationId }),
+          // Omit conversationId entirely until the server hands us one — sending
+          // an explicit null tripped the request validator.
+          body: JSON.stringify(
+            conversationId ? { message: trimmed, conversationId } : { message: trimmed },
+          ),
         });
 
         if (!res.ok) {

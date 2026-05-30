@@ -447,6 +447,41 @@ export const redditEmbeddings = pgTable(
   }),
 );
 
+// Tracks Brave Search API usage per UTC month so we can refuse calls before
+// crossing the free-credit ceiling. Single row per month_key (YYYY-MM).
+// monthlyBudget is denormalized into the row when the month opens — that way
+// changing BRAVE_MONTHLY_BUDGET in env only affects future months, not
+// retroactive accounting.
+export const braveUsage = pgTable("brave_usage", {
+  monthKey: text("month_key").primaryKey(),
+  requestCount: integer("request_count").default(0).notNull(),
+  monthlyBudget: integer("monthly_budget").default(1000).notNull(),
+  lastRequestAt: timestamp("last_request_at"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+// Cached LLM summaries of Reddit threads per course. 7-day TTL — re-summarize
+// when stale. Single row per course (one summary per course at a time).
+export const redditSummaries = pgTable("reddit_summaries", {
+  courseCode: text("course_code")
+    .primaryKey()
+    .references(() => courses.code, { onDelete: "cascade" }),
+  summary: jsonb("summary")
+    .$type<{
+      sentiment: "positive" | "mixed" | "negative" | "insufficient_data";
+      commonComplaints: string[];
+      commonPraise: string[];
+      profMentions: { name: string; count: number; sentiment: string }[];
+      difficultyEstimate: "easy" | "medium" | "hard" | "unknown";
+      citations: { permalink: string; quote: string }[];
+    }>()
+    .notNull(),
+  postCount: integer("post_count").default(0).notNull(),
+  model: aiModelEnum("model"),
+  tokensUsed: integer("tokens_used"),
+  generatedAt: timestamp("generated_at").defaultNow().notNull(),
+});
+
 // ============================================================================
 // RELATIONS
 // ============================================================================
