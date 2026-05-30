@@ -7,11 +7,11 @@
  */
 
 import { db } from "@/lib/db";
-import { courses, importJobs, userCourses } from "@/lib/db/schema";
+import { checklistItems, courses, importJobs, userCourses } from "@/lib/db/schema";
 import { getSession } from "@/lib/get-session";
-import { parseExcelPlan } from "@/lib/imports/excel-engine";
+import { extractMilestones, parseExcelPlan } from "@/lib/imports/excel-engine";
 import { denyResponse, guardAiCall } from "@/lib/limits";
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import { NextResponse } from "next/server";
 
 export const dynamic = "force-dynamic";
@@ -100,6 +100,12 @@ export async function POST(req: Request): Promise<Response> {
 
   // Wipe-and-replace the plan inside a transaction so a partial-insert failure
   // rolls back the wipe — never leave the user with a half-corrupted plan.
+  // Non-course milestones (e.g. EWT) land on the Deadlines checklist, not the
+  // planner board. Only routed when the user is committing the whole file
+  // (no explicit row selection) so a partial course import doesn't silently
+  // add checklist items the user didn't choose.
+  const milestones = selected ? [] : extractMilestones(buf, validCodes);
+
   let inserted = 0;
   try {
     inserted = await db.transaction(async (tx) => {
@@ -115,6 +121,22 @@ export async function POST(req: Request): Promise<Response> {
           notes: r.notes,
         });
         count += 1;
+      }
+      // Upsert milestones as checklist items (skip dupes by task text).
+      for (const m of milestones) {
+        const existing = await tx
+          .select({ id: checklistItems.id })
+          .from(checklistItems)
+          .where(and(eq(checklistItems.userId, session.user.id), eq(checklistItems.task, m.task)))
+          .limit(1);
+        if (existing.length === 0) {
+          await tx.insert(checklistItems).values({
+            userId: session.user.id,
+            task: m.task,
+            category: "Imported milestone",
+            notes: m.notes,
+          });
+        }
       }
       return count;
     });

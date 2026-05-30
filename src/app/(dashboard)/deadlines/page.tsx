@@ -1,8 +1,8 @@
 import { db } from "@/lib/db";
-import { deadlines } from "@/lib/db/schema";
+import { checklistItems, deadlines } from "@/lib/db/schema";
 import { getSession } from "@/lib/get-session";
-import { asc } from "drizzle-orm";
-import { CalendarClock, Download } from "lucide-react";
+import { asc, eq } from "drizzle-orm";
+import { CalendarClock, Download, ListChecks } from "lucide-react";
 import { redirect } from "next/navigation";
 
 export const metadata = {
@@ -20,7 +20,19 @@ export default async function DeadlinesPage(): Promise<React.ReactElement> {
   const session = await getSession();
   if (!session) redirect("/login");
 
-  const rows = await db.select().from(deadlines).orderBy(asc(deadlines.date));
+  const [rows, checklist] = await Promise.all([
+    db.select().from(deadlines).orderBy(asc(deadlines.date)),
+    db
+      .select({
+        id: checklistItems.id,
+        task: checklistItems.task,
+        notes: checklistItems.notes,
+        completed: checklistItems.completed,
+      })
+      .from(checklistItems)
+      .where(eq(checklistItems.userId, session.user.id))
+      .orderBy(asc(checklistItems.createdAt)),
+  ]);
   const now = Date.now();
   const upcoming = rows.filter((r) => r.date.getTime() >= now);
   const past = rows.filter((r) => r.date.getTime() < now);
@@ -44,7 +56,52 @@ export default async function DeadlinesPage(): Promise<React.ReactElement> {
         </a>
       </header>
 
-      {rows.length === 0 ? (
+      {checklist.length > 0 && (
+        <section className="space-y-3">
+          <h2
+            className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wide"
+            style={{ color: "var(--color-text-muted)" }}
+          >
+            <ListChecks className="h-4 w-4" aria-hidden="true" />
+            Your checklist ({checklist.length})
+          </h2>
+          <ul className="space-y-2">
+            {checklist.map((c) => (
+              <li
+                key={c.id}
+                className="flex items-start gap-3 rounded-lg border p-3"
+                style={{ borderColor: "var(--color-border)", background: "var(--color-surface)" }}
+              >
+                <span
+                  className="mt-0.5 inline-block h-4 w-4 shrink-0 rounded border"
+                  style={{
+                    borderColor: "var(--color-border)",
+                    background: c.completed ? "var(--color-accent)" : "transparent",
+                  }}
+                  aria-hidden="true"
+                />
+                <div className="min-w-0 flex-1">
+                  <span
+                    className="text-sm font-medium"
+                    style={
+                      c.completed ? { textDecoration: "line-through", opacity: 0.6 } : undefined
+                    }
+                  >
+                    {c.task}
+                  </span>
+                  {c.notes && (
+                    <p className="mt-1 text-xs" style={{ color: "var(--color-text-muted)" }}>
+                      {c.notes}
+                    </p>
+                  )}
+                </div>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
+
+      {rows.length === 0 && checklist.length === 0 ? (
         <EmptyState />
       ) : (
         <div className="space-y-8">

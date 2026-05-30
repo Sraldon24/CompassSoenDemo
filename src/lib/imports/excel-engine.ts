@@ -64,8 +64,14 @@ export function parseExcelPlan(buffer: ArrayBuffer, knownCodes: ReadonlySet<stri
     const term = cellStr(r[0]).trim();
     const rawCode = cellStr(r[1]).trim();
     if (!rawCode) continue;
-    const status = cellStr(r[5] ?? r[4]);
+    const type = cellStr(r[4]); // "Type" column — may say "Transfer"/"Transferred"
+    const rawStatus = cellStr(r[5] ?? r[4]);
     let notes = cellStr(r[6] ?? r[5]) || null;
+
+    // A row counts as transferred credit when either the Status or the Type
+    // column mentions transfer (e.g. CEGEP credits). statusFromString already
+    // maps "transfer" -> "transferred"; fold Type in so Type="Transfer" wins.
+    const status = /transfer/i.test(type) ? "transferred" : rawStatus;
 
     // Some planners split a capstone into "SOEN 490a"/"490b". The catalog only
     // has the base "SOEN 490", so fold a trailing letter onto the base code
@@ -81,7 +87,8 @@ export function parseExcelPlan(buffer: ArrayBuffer, knownCodes: ReadonlySet<stri
 
     const errors: string[] = [];
     if (!isCourseCode(code)) {
-      errors.push(`"${code}" is not a valid course code`);
+      // Echo what the user actually typed, not the upper-cased/folded form.
+      errors.push(`"${rawCode}" is not a valid course code`);
     }
     if (!TERM_REGEX.test(term)) {
       errors.push(`"${term}" is not a recognized term (need "Fall 2026")`);
@@ -101,5 +108,56 @@ export function parseExcelPlan(buffer: ArrayBuffer, knownCodes: ReadonlySet<stri
     });
   }
 
+  return out;
+}
+
+export interface ImportMilestone {
+  /** Short label shown as a checklist task, e.g. "EWT retake". */
+  task: string;
+  /** Optional free-text detail from the Notes column. */
+  notes: string | null;
+}
+
+/**
+ * Extract non-course milestones (e.g. the English Writing Test) from the same
+ * Term Plan sheet. These are rows whose "Course" cell isn't a real course code
+ * but represent a tracked requirement — they belong on the Deadlines checklist,
+ * not the planner board. Kept separate from parseExcelPlan so that function
+ * stays a pure course parser and its existing tests are unaffected.
+ */
+export function extractMilestones(
+  buffer: ArrayBuffer,
+  knownCodes: ReadonlySet<string>,
+): ImportMilestone[] {
+  const wb = XLSX.read(buffer, { type: "array" });
+  const target =
+    wb.SheetNames.find((n) => n.toLowerCase().includes("term plan")) ?? wb.SheetNames[0];
+  if (!target) return [];
+  const ws = wb.Sheets[target];
+  if (!ws) return [];
+  const rows = XLSX.utils.sheet_to_json<Row>(ws, { header: 1, defval: null });
+
+  const out: ImportMilestone[] = [];
+  const seen = new Set<string>();
+  for (const r of rows) {
+    if (!r) continue;
+    const label = cellStr(r[1]).trim();
+    if (!label) continue;
+    const type = cellStr(r[4]);
+    const notes = cellStr(r[6] ?? r[5]) || null;
+
+    // A milestone is a non-course row that's either explicitly "Required" in the
+    // Type column or mentions the EWT. Skip anything that IS a real course code
+    // (those are handled by parseExcelPlan) and obvious header rows.
+    const upper = label.toUpperCase();
+    const looksLikeCourse = isCourseCode(upper) || knownCodes.has(upper);
+    const isMilestone = !looksLikeCourse && (/required/i.test(type) || /\bEWT\b/i.test(label));
+    if (!isMilestone) continue;
+
+    const key = label.toLowerCase();
+    if (seen.has(key)) continue;
+    seen.add(key);
+    out.push({ task: label, notes });
+  }
   return out;
 }

@@ -77,9 +77,17 @@ export function PlannerBoard({
     return set;
   }, [issues]);
 
+  // Transferred (CEGEP) credits have no Concordia term — they live in their own
+  // lane above the term board rather than in a Fall/Winter column.
+  const transferredCourses = useMemo(
+    () => courses.filter((c) => c.status === "transferred"),
+    [courses],
+  );
+
   const byTerm = useMemo(() => {
     const m = new Map<string, PlannerCourse[]>();
     for (const c of courses) {
+      if (c.status === "transferred") continue; // shown in the Transfer lane
       if (!m.has(c.term)) m.set(c.term, []);
       m.get(c.term)?.push(c);
     }
@@ -167,6 +175,14 @@ export function PlannerBoard({
       onDragStart={handleDragStart}
       onDragEnd={handleDragEnd}
     >
+      {transferredCourses.length > 0 && (
+        <TransferLane
+          courses={transferredCourses}
+          catalog={catalog}
+          onRemove={handleRemoveCourse}
+        />
+      )}
+
       <div className="flex gap-3 overflow-x-auto pb-4 -mx-4 px-4 md:-mx-8 md:px-8">
         {renderTerms.map((term) => (
           <DroppableTerm
@@ -208,6 +224,52 @@ export function PlannerBoard({
         {isPending ? "Saving…" : "Up to date"}
       </span>
     </DndContext>
+  );
+}
+
+interface TransferLaneProps {
+  courses: PlannerCourse[];
+  catalog: Map<string, CourseCatalogEntry>;
+  onRemove: (userCourseId: string) => void;
+}
+
+/**
+ * Non-term lane for transferred / CEGEP credits. These satisfy requirements but
+ * weren't taken in a Concordia term, so they don't belong in a Fall/Winter
+ * column. Not draggable — moving a transfer "to a term" would be meaningless.
+ */
+function TransferLane({ courses, catalog, onRemove }: TransferLaneProps): React.ReactElement {
+  const credits = courses.reduce((sum, c) => sum + (catalog.get(c.courseCode)?.credits ?? 0), 0);
+  return (
+    <section
+      className="rounded-lg border p-3 mb-1"
+      style={{ borderColor: "var(--color-border)", background: "var(--color-surface-2)" }}
+      aria-label="Transferred credits"
+    >
+      <header className="flex items-baseline justify-between gap-2 pb-2">
+        <h3 className="text-sm font-semibold">Transfer credits</h3>
+        <span className="mono tnum text-xs" style={{ color: "var(--color-text-muted)" }}>
+          {credits} cr · CEGEP / transferred
+        </span>
+      </header>
+      <div className="flex flex-wrap gap-2">
+        {courses.map((c) => (
+          <div key={c.id} className="group relative w-[220px]">
+            <CourseCard planned={c} course={catalog.get(c.courseCode)} hasViolation={false} />
+            <button
+              type="button"
+              aria-label={`Remove ${c.courseCode} from plan`}
+              title="Remove course"
+              onClick={() => onRemove(c.id)}
+              className="absolute right-1.5 top-1.5 hidden h-5 w-5 items-center justify-center rounded text-xs transition-colors group-hover:flex hover:bg-danger/15 focus-visible:flex focus-visible:outline-none"
+              style={{ color: "var(--color-text-muted)" }}
+            >
+              <X className="h-3.5 w-3.5" />
+            </button>
+          </div>
+        ))}
+      </div>
+    </section>
   );
 }
 
