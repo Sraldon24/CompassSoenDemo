@@ -4,7 +4,7 @@
     "builder": "NIXPACKS"
   },
   "deploy": {
-    "startCommand": "npm run db:migrate && npm run start",
+    "startCommand": "node scripts/ensure-pgvector.mjs && npm run db:migrate && npm run start",
     "restartPolicyType": "ON_FAILURE",
     "restartPolicyMaxRetries": 3
   }
