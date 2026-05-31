@@ -17,8 +17,19 @@ const AUTH_PAGES = new Set(["/login", "/signup"]);
 
 const SESSION_COOKIE = "compass.session_token";
 
+// In production over HTTPS, Better Auth prefixes the cookie with `__Secure-`
+// (e.g. `__Secure-compass.session_token`); locally over HTTP it's unprefixed.
+// The middleware must accept both, or authenticated users get bounced to
+// /login on every protected route in prod.
+const SESSION_COOKIE_NAMES = [
+  SESSION_COOKIE,
+  `__Secure-${SESSION_COOKIE}`,
+  `${SESSION_COOKIE}.sig`,
+  `__Secure-${SESSION_COOKIE}.sig`,
+];
+
 function hasSession(req: NextRequest): boolean {
-  return req.cookies.has(SESSION_COOKIE) || req.cookies.has(`${SESSION_COOKIE}.sig`);
+  return SESSION_COOKIE_NAMES.some((name) => req.cookies.has(name));
 }
 
 export function middleware(req: NextRequest): NextResponse {
