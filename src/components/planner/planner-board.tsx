@@ -2,8 +2,10 @@
 
 import {
   addCourseToPlan,
+  addTransferCredit,
   moveCourseToTerm,
   removeCourseFromPlan,
+  setCourseStatus,
 } from "@/app/(dashboard)/plan/actions";
 import { CourseCard } from "@/components/planner/course-card";
 import { CoursePicker } from "@/components/planner/course-picker";
@@ -24,7 +26,7 @@ import {
   useSensor,
   useSensors,
 } from "@dnd-kit/core";
-import { Plus, X } from "lucide-react";
+import { ArrowRightLeft, Plus, Undo2, X } from "lucide-react";
 import { useEffect, useMemo, useState, useTransition } from "react";
 import { toast } from "sonner";
 
@@ -57,6 +59,10 @@ export function PlannerBoard({
   // action's revalidatePath (which re-renders this client with fresh props).
   const [courses, setCourses] = useState<PlannerCourse[]>(initialCourses);
   const [pickerTerm, setPickerTerm] = useState<string | null>(null);
+  // When true, the course picker adds a transferred credit instead of a termed course.
+  const [transferPickerOpen, setTransferPickerOpen] = useState(false);
+  // First non-transfer term — used as the destination when moving a transfer back.
+  const firstTerm = visibleTerms[0] ?? "Fall 2026";
 
   // Keep local state in sync when the server snapshot changes (after revalidate).
   useEffect(() => {
@@ -165,6 +171,46 @@ export function PlannerBoard({
     });
   };
 
+  // Mark a termed course as a transferred credit, or move a transfer back into a term.
+  const handleSetTransfer = (userCourseId: string, toTransfer: boolean) => {
+    const prev = courses;
+    const term = toTransfer ? "" : firstTerm;
+    setCourses((cs) =>
+      cs.map((c) =>
+        c.id === userCourseId ? { ...c, status: toTransfer ? "transferred" : "planned", term } : c,
+      ),
+    );
+    startTransition(async () => {
+      const result = await setCourseStatus({
+        userCourseId,
+        status: toTransfer ? "transferred" : "planned",
+        term: toTransfer ? undefined : firstTerm,
+      });
+      if (!result.success) {
+        setCourses(prev);
+        toast.error(result.error);
+      } else {
+        toast.success(toTransfer ? "Marked as transfer credit" : `Moved to ${firstTerm}`);
+      }
+    });
+  };
+
+  const handleAddTransfer = (courseCode: string) => {
+    setTransferPickerOpen(false);
+    const tempId = `temp-transfer-${courseCode}`;
+    setCourses((cs) => [...cs, { id: tempId, courseCode, term: "", status: "transferred" }]);
+    startTransition(async () => {
+      const result = await addTransferCredit({ courseCode });
+      if (!result.success) {
+        setCourses((cs) => cs.filter((c) => c.id !== tempId));
+        toast.error(result.error);
+      } else {
+        setCourses((cs) => cs.map((c) => (c.id === tempId ? { ...c, id: result.data.id } : c)));
+        toast.success(`Added ${courseCode} as transfer credit`);
+      }
+    });
+  };
+
   const plannedCodes = useMemo(() => new Set(courses.map((c) => c.courseCode)), [courses]);
   const activeCourse = activeId ? courses.find((c) => c.id === activeId) : undefined;
 
@@ -175,13 +221,14 @@ export function PlannerBoard({
       onDragStart={handleDragStart}
       onDragEnd={handleDragEnd}
     >
-      {transferredCourses.length > 0 && (
-        <TransferLane
-          courses={transferredCourses}
-          catalog={catalog}
-          onRemove={handleRemoveCourse}
-        />
-      )}
+      <TransferLane
+        courses={transferredCourses}
+        catalog={catalog}
+        onRemove={handleRemoveCourse}
+        onAddClick={() => setTransferPickerOpen(true)}
+        onMoveBack={(id) => handleSetTransfer(id, false)}
+        moveBackTerm={firstTerm}
+      />
 
       <div className="flex gap-3 overflow-x-auto pb-4 -mx-4 px-4 md:-mx-8 md:px-8">
         {renderTerms.map((term) => (
@@ -193,6 +240,7 @@ export function PlannerBoard({
             violationsByCourse={violationCodes}
             onAddClick={() => setPickerTerm(term)}
             onRemove={handleRemoveCourse}
+            onMarkTransfer={(id) => handleSetTransfer(id, true)}
           />
         ))}
       </div>
@@ -204,6 +252,16 @@ export function PlannerBoard({
           excludeCodes={plannedCodes}
           onPick={(code) => handleAddCourse(pickerTerm, code)}
           onClose={() => setPickerTerm(null)}
+        />
+      )}
+
+      {transferPickerOpen && (
+        <CoursePicker
+          term="Transfer credits"
+          catalog={catalogList}
+          excludeCodes={plannedCodes}
+          onPick={(code) => handleAddTransfer(code)}
+          onClose={() => setTransferPickerOpen(false)}
         />
       )}
 
@@ -231,14 +289,25 @@ interface TransferLaneProps {
   courses: PlannerCourse[];
   catalog: Map<string, CourseCatalogEntry>;
   onRemove: (userCourseId: string) => void;
+  onAddClick: () => void;
+  onMoveBack: (userCourseId: string) => void;
+  moveBackTerm: string;
 }
 
 /**
- * Non-term lane for transferred / CEGEP credits. These satisfy requirements but
- * weren't taken in a Concordia term, so they don't belong in a Fall/Winter
- * column. Not draggable — moving a transfer "to a term" would be meaningless.
+ * Non-term lane for transferred / CEGEP credits (e.g. MATH 204 from CEGEP).
+ * These satisfy requirements but weren't taken in a Concordia term, so they
+ * don't belong in a Fall/Winter column. Always rendered (even when empty) so
+ * the user can add a transfer credit by hand.
  */
-function TransferLane({ courses, catalog, onRemove }: TransferLaneProps): React.ReactElement {
+function TransferLane({
+  courses,
+  catalog,
+  onRemove,
+  onAddClick,
+  onMoveBack,
+  moveBackTerm,
+}: TransferLaneProps): React.ReactElement {
   const credits = courses.reduce((sum, c) => sum + (catalog.get(c.courseCode)?.credits ?? 0), 0);
   return (
     <section
@@ -252,23 +321,51 @@ function TransferLane({ courses, catalog, onRemove }: TransferLaneProps): React.
           {credits} cr · CEGEP / transferred
         </span>
       </header>
-      <div className="flex flex-wrap gap-2">
+      <div className="flex flex-wrap items-stretch gap-2">
         {courses.map((c) => (
           <div key={c.id} className="group relative w-[220px]">
             <CourseCard planned={c} course={catalog.get(c.courseCode)} hasViolation={false} />
-            <button
-              type="button"
-              aria-label={`Remove ${c.courseCode} from plan`}
-              title="Remove course"
-              onClick={() => onRemove(c.id)}
-              className="absolute right-1.5 top-1.5 hidden h-5 w-5 items-center justify-center rounded text-xs transition-colors group-hover:flex hover:bg-danger/15 focus-visible:flex focus-visible:outline-none"
-              style={{ color: "var(--color-text-muted)" }}
-            >
-              <X className="h-3.5 w-3.5" />
-            </button>
+            <div className="absolute right-1.5 top-1.5 hidden gap-1 group-hover:flex focus-within:flex">
+              <button
+                type="button"
+                aria-label={`Move ${c.courseCode} back to ${moveBackTerm}`}
+                title={`Move back to ${moveBackTerm}`}
+                onClick={() => onMoveBack(c.id)}
+                className="h-5 w-5 items-center justify-center rounded text-xs transition-colors flex hover:bg-accent/15 focus-visible:outline-none"
+                style={{ color: "var(--color-text-muted)" }}
+              >
+                <Undo2 className="h-3.5 w-3.5" />
+              </button>
+              <button
+                type="button"
+                aria-label={`Remove ${c.courseCode} from plan`}
+                title="Remove course"
+                onClick={() => onRemove(c.id)}
+                className="h-5 w-5 items-center justify-center rounded text-xs transition-colors flex hover:bg-danger/15 focus-visible:outline-none"
+                style={{ color: "var(--color-text-muted)" }}
+              >
+                <X className="h-3.5 w-3.5" />
+              </button>
+            </div>
           </div>
         ))}
+        <button
+          type="button"
+          onClick={onAddClick}
+          aria-label="Add a transfer credit"
+          className="flex w-[220px] items-center justify-center gap-1.5 rounded-md border border-dashed py-2 text-xs transition-colors hover:bg-accent/10 focus-visible:outline-none"
+          style={{ borderColor: "var(--color-border)", color: "var(--color-text-muted)" }}
+        >
+          <Plus className="h-3.5 w-3.5" />
+          Add transfer credit
+        </button>
       </div>
+      {courses.length === 0 && (
+        <p className="mt-2 text-xs" style={{ color: "var(--color-text-subtle)" }}>
+          CEGEP / advanced-standing credits (e.g. MATH 204). Add them here, or hover a course in a
+          term and click ⇄ to move it here.
+        </p>
+      )}
     </section>
   );
 }
@@ -280,6 +377,7 @@ interface DroppableTermProps {
   violationsByCourse: Set<string>;
   onAddClick: () => void;
   onRemove: (userCourseId: string) => void;
+  onMarkTransfer: (userCourseId: string) => void;
 }
 
 function DroppableTerm({
@@ -289,6 +387,7 @@ function DroppableTerm({
   violationsByCourse,
   onAddClick,
   onRemove,
+  onMarkTransfer,
 }: DroppableTermProps): React.ReactElement {
   const { setNodeRef, isOver } = useDroppable({ id: term });
   const workload = calculateTermWorkload(courses, catalog);
@@ -347,6 +446,7 @@ function DroppableTerm({
               catalogEntry={catalog.get(c.courseCode)}
               hasViolation={violationsByCourse.has(c.courseCode)}
               onRemove={onRemove}
+              onMarkTransfer={onMarkTransfer}
             />
           ))
         )}
@@ -374,6 +474,7 @@ interface DraggableCourseProps {
   catalogEntry: CourseCatalogEntry | undefined;
   hasViolation: boolean;
   onRemove: (userCourseId: string) => void;
+  onMarkTransfer: (userCourseId: string) => void;
 }
 
 function DraggableCourse({
@@ -381,12 +482,13 @@ function DraggableCourse({
   catalogEntry,
   hasViolation,
   onRemove,
+  onMarkTransfer,
 }: DraggableCourseProps): React.ReactElement {
   const { attributes, listeners, setNodeRef, isDragging } = useDraggable({ id: course.id });
   return (
     <div ref={setNodeRef} className="group relative" data-testid={`course-${course.courseCode}`}>
-      {/* Drag handle wraps the card; the remove button sits outside the listeners
-          so a click removes rather than starting a drag. */}
+      {/* Drag handle wraps the card; the action buttons sit outside the listeners
+          so a click acts rather than starting a drag. */}
       <div {...attributes} {...listeners}>
         <CourseCard
           planned={course}
@@ -395,20 +497,36 @@ function DraggableCourse({
           dragging={isDragging}
         />
       </div>
-      <button
-        type="button"
-        aria-label={`Remove ${course.courseCode} from plan`}
-        title="Remove course"
-        onClick={(e) => {
-          e.stopPropagation();
-          onRemove(course.id);
-        }}
-        onPointerDown={(e) => e.stopPropagation()}
-        className="absolute right-1.5 top-1.5 hidden h-5 w-5 items-center justify-center rounded text-xs transition-colors group-hover:flex hover:bg-danger/15 focus-visible:flex focus-visible:outline-none"
-        style={{ color: "var(--color-text-muted)" }}
-      >
-        <X className="h-3.5 w-3.5" />
-      </button>
+      <div className="absolute right-1.5 top-1.5 hidden gap-1 group-hover:flex focus-within:flex">
+        <button
+          type="button"
+          aria-label={`Mark ${course.courseCode} as a transfer credit`}
+          title="Move to transfer credits"
+          onClick={(e) => {
+            e.stopPropagation();
+            onMarkTransfer(course.id);
+          }}
+          onPointerDown={(e) => e.stopPropagation()}
+          className="h-5 w-5 items-center justify-center rounded text-xs transition-colors flex hover:bg-accent/15 focus-visible:outline-none"
+          style={{ color: "var(--color-text-muted)" }}
+        >
+          <ArrowRightLeft className="h-3.5 w-3.5" />
+        </button>
+        <button
+          type="button"
+          aria-label={`Remove ${course.courseCode} from plan`}
+          title="Remove course"
+          onClick={(e) => {
+            e.stopPropagation();
+            onRemove(course.id);
+          }}
+          onPointerDown={(e) => e.stopPropagation()}
+          className="h-5 w-5 items-center justify-center rounded text-xs transition-colors flex hover:bg-danger/15 focus-visible:outline-none"
+          style={{ color: "var(--color-text-muted)" }}
+        >
+          <X className="h-3.5 w-3.5" />
+        </button>
+      </div>
     </div>
   );
 }

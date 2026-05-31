@@ -15,12 +15,15 @@
  * ============================================================================= */
 
 @theme {
-  /* ---- COLOR (light) — apply on :root ---- */
-  --color-bg: oklch(0.99 0.002 240);
-  --color-surface: oklch(0.98 0.002 240);
-  --color-surface-2: oklch(0.965 0.003 240);
-  --color-border: oklch(0.91 0.004 240);
-  --color-border-strong: oklch(0.84 0.005 240);
+  /* ---- COLOR (light) — apply on :root ----
+     Page bg is a soft grey; cards are pure white and sit clearly on top.
+     (Previously bg 0.99 / surface 0.98 were ~indistinguishable, so cards
+     looked like blank white space — the onboarding "empty page" bug.) */
+  --color-bg: oklch(0.955 0.003 240);
+  --color-surface: oklch(1 0 0);
+  --color-surface-2: oklch(0.975 0.003 240);
+  --color-border: oklch(0.88 0.005 240);
+  --color-border-strong: oklch(0.8 0.006 240);
   --color-text: oklch(0.18 0.005 240);
   --color-text-muted: oklch(0.5 0.005 240);
   --color-text-subtle: oklch(0.63 0.005 240);

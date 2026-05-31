@@ -2,8 +2,9 @@ import { db } from "@/lib/db";
 import { checklistItems, deadlines } from "@/lib/db/schema";
 import { getSession } from "@/lib/get-session";
 import { asc, eq } from "drizzle-orm";
-import { CalendarClock, Download, ListChecks } from "lucide-react";
+import { CalendarClock, Download } from "lucide-react";
 import { redirect } from "next/navigation";
+import { Checklist } from "./checklist";
 
 export const metadata = {
   title: "Deadlines",
@@ -56,52 +57,9 @@ export default async function DeadlinesPage(): Promise<React.ReactElement> {
         </a>
       </header>
 
-      {checklist.length > 0 && (
-        <section className="space-y-3">
-          <h2
-            className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wide"
-            style={{ color: "var(--color-text-muted)" }}
-          >
-            <ListChecks className="h-4 w-4" aria-hidden="true" />
-            Your checklist ({checklist.length})
-          </h2>
-          <ul className="space-y-2">
-            {checklist.map((c) => (
-              <li
-                key={c.id}
-                className="flex items-start gap-3 rounded-lg border p-3"
-                style={{ borderColor: "var(--color-border)", background: "var(--color-surface)" }}
-              >
-                <span
-                  className="mt-0.5 inline-block h-4 w-4 shrink-0 rounded border"
-                  style={{
-                    borderColor: "var(--color-border)",
-                    background: c.completed ? "var(--color-accent)" : "transparent",
-                  }}
-                  aria-hidden="true"
-                />
-                <div className="min-w-0 flex-1">
-                  <span
-                    className="text-sm font-medium"
-                    style={
-                      c.completed ? { textDecoration: "line-through", opacity: 0.6 } : undefined
-                    }
-                  >
-                    {c.task}
-                  </span>
-                  {c.notes && (
-                    <p className="mt-1 text-xs" style={{ color: "var(--color-text-muted)" }}>
-                      {c.notes}
-                    </p>
-                  )}
-                </div>
-              </li>
-            ))}
-          </ul>
-        </section>
-      )}
+      <Checklist initial={checklist} />
 
-      {rows.length === 0 && checklist.length === 0 ? (
+      {rows.length === 0 ? (
         <EmptyState />
       ) : (
         <div className="space-y-8">
