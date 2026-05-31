@@ -117,10 +117,7 @@ export async function removeCourseFromPlan(input: {
   const [deleted] = await db
     .delete(userCourses)
     .where(
-      and(
-        eq(userCourses.id, parsed.data.userCourseId),
-        eq(userCourses.userId, session.user.id),
-      ),
+      and(eq(userCourses.id, parsed.data.userCourseId), eq(userCourses.userId, session.user.id)),
     )
     .returning({ id: userCourses.id });
 

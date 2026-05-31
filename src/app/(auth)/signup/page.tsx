@@ -9,13 +9,11 @@ import { authClient } from "@/lib/auth-client";
 import { type SignUpInput, signUpSchema } from "@/lib/validations/auth";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 
 export default function SignUpPage(): React.ReactElement {
-  const router = useRouter();
   const [serverError, setServerError] = useState<string | null>(null);
   const {
     register,
@@ -37,7 +35,9 @@ export default function SignUpPage(): React.ReactElement {
       return;
     }
     toast.success("Welcome to SOEN Compass");
-    router.push("/dashboard");
+    // Full navigation (not router.push) so middleware sees the freshly-set
+    // session cookie on the server before rendering the onboarding/dashboard.
+    window.location.assign("/onboarding");
   };
 
   return (

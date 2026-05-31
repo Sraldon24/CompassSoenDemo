@@ -70,7 +70,8 @@ export async function searchRedditForCourse(
       signal: AbortSignal.timeout(15_000),
     });
   } catch (err) {
-    const reason = err instanceof Error && err.name === "TimeoutError" ? "timed out" : "network error";
+    const reason =
+      err instanceof Error && err.name === "TimeoutError" ? "timed out" : "network error";
     throw new RedditSearchError(`Reddit search ${reason} for ${courseCode}`, 504);
   }
 

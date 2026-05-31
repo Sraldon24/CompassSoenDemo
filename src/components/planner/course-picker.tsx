@@ -18,7 +18,13 @@ interface Props {
   onClose: () => void;
 }
 
-export function CoursePicker({ term, catalog, excludeCodes, onPick, onClose }: Props): React.ReactElement {
+export function CoursePicker({
+  term,
+  catalog,
+  excludeCodes,
+  onPick,
+  onClose,
+}: Props): React.ReactElement {
   const [query, setQuery] = useState("");
 
   const matches = useMemo(() => {
@@ -30,6 +36,7 @@ export function CoursePicker({ term, catalog, excludeCodes, onPick, onClose }: P
   }, [catalog, excludeCodes, query]);
 
   return (
+    // biome-ignore lint/a11y/useKeyWithClickEvents: backdrop click is a mouse convenience; Escape (handled on the input) is the keyboard equivalent.
     <div
       className="fixed inset-0 z-50 flex items-start justify-center p-4 pt-24"
       style={{ background: "rgba(0,0,0,0.5)" }}
@@ -38,6 +45,7 @@ export function CoursePicker({ term, catalog, excludeCodes, onPick, onClose }: P
       aria-modal="true"
       aria-label={`Add a course to ${term}`}
     >
+      {/* biome-ignore lint/a11y/useKeyWithClickEvents: stops backdrop dismissal; no keyboard action intended. */}
       <div
         className="w-full max-w-md rounded-lg border shadow-lg"
         style={{ background: "var(--color-surface)", borderColor: "var(--color-border)" }}
@@ -45,8 +53,8 @@ export function CoursePicker({ term, catalog, excludeCodes, onPick, onClose }: P
       >
         <div className="p-3 border-b" style={{ borderColor: "var(--color-border)" }}>
           <div className="text-sm font-semibold mb-2">Add course to {term}</div>
-          {/* biome-ignore lint/a11y/noAutofocus: search field in a modal the user just opened */}
           <input
+            // biome-ignore lint/a11y/noAutofocus: search field in a modal the user just opened
             autoFocus
             className="w-full rounded border px-2 py-1.5 text-sm"
             style={{ borderColor: "var(--color-border)", background: "var(--color-surface-2)" }}
@@ -58,7 +66,10 @@ export function CoursePicker({ term, catalog, excludeCodes, onPick, onClose }: P
         </div>
         <ul className="max-h-80 overflow-y-auto p-1">
           {matches.length === 0 ? (
-            <li className="px-3 py-4 text-center text-sm" style={{ color: "var(--color-text-muted)" }}>
+            <li
+              className="px-3 py-4 text-center text-sm"
+              style={{ color: "var(--color-text-muted)" }}
+            >
               No matching courses.
             </li>
           ) : (
@@ -73,7 +84,10 @@ export function CoursePicker({ term, catalog, excludeCodes, onPick, onClose }: P
                   <span className="truncate" style={{ color: "var(--color-text-muted)" }}>
                     {c.title}
                   </span>
-                  <span className="ml-auto shrink-0 text-xs" style={{ color: "var(--color-text-muted)" }}>
+                  <span
+                    className="ml-auto shrink-0 text-xs"
+                    style={{ color: "var(--color-text-muted)" }}
+                  >
                     {c.credits} cr
                   </span>
                 </button>

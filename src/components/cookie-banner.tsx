@@ -35,10 +35,9 @@ export function CookieBanner(): React.ReactElement | null {
   };
 
   return (
-    <div
+    <section
       className="fixed inset-x-0 bottom-0 z-50 border-t px-4 py-3"
       style={{ background: "var(--color-surface)", borderColor: "var(--color-border)" }}
-      role="dialog"
       aria-label="Cookie consent"
     >
       <div className="max-w-4xl mx-auto flex flex-col sm:flex-row items-start sm:items-center gap-3 text-sm">
@@ -69,6 +68,6 @@ export function CookieBanner(): React.ReactElement | null {
           </button>
         </div>
       </div>
-    </div>
+    </section>
   );
 }

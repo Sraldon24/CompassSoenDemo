@@ -57,6 +57,7 @@ export function KeyboardShortcuts(): React.ReactElement | null {
   if (!open) return null;
 
   return (
+    // biome-ignore lint/a11y/useKeyWithClickEvents: backdrop click is a mouse convenience; Escape (global keydown above) is the keyboard equivalent.
     <div
       className="fixed inset-0 z-50 flex items-center justify-center p-4"
       style={{ background: "rgba(0,0,0,0.5)" }}
@@ -65,6 +66,7 @@ export function KeyboardShortcuts(): React.ReactElement | null {
       aria-modal="true"
       aria-label="Keyboard shortcuts"
     >
+      {/* biome-ignore lint/a11y/useKeyWithClickEvents: stops backdrop dismissal; no keyboard action intended. */}
       <div
         className="w-full max-w-md rounded-lg border p-5 space-y-3"
         style={{ background: "var(--color-surface)", borderColor: "var(--color-border)" }}

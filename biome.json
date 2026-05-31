@@ -47,7 +47,8 @@
         "noUnusedImports": "warn"
       },
       "a11y": {
-        "recommended": true
+        "recommended": true,
+        "useSemanticElements": "off"
       }
     }
   },

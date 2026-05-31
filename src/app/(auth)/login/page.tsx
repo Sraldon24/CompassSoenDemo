@@ -9,13 +9,16 @@ import { authClient } from "@/lib/auth-client";
 import { type SignInInput, signInSchema } from "@/lib/validations/auth";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 
+/** Only allow same-site relative return paths to avoid open-redirects. */
+function safeReturnPath(from: string | null): string {
+  return from?.startsWith("/") && !from.startsWith("//") ? from : "/dashboard";
+}
+
 export default function LoginPage(): React.ReactElement {
-  const router = useRouter();
   const [serverError, setServerError] = useState<string | null>(null);
   const {
     register,
@@ -36,7 +39,12 @@ export default function LoginPage(): React.ReactElement {
       return;
     }
     toast.success("Welcome back");
-    router.push("/dashboard");
+    // Full navigation (not router.push) so middleware sees the freshly-set
+    // session cookie on the server before rendering the protected route.
+    // Read `from` from the live URL (not useSearchParams) so the page can still
+    // be statically prerendered without a Suspense bailout.
+    const from = new URLSearchParams(window.location.search).get("from");
+    window.location.assign(safeReturnPath(from));
   };
 
   return (

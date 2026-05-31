@@ -35,7 +35,8 @@ const DIFFICULTIES: Difficulty[] = ["easy", "medium", "hard", "unknown"];
 
 function validate(s: SummaryInput): void {
   if (!s.courseCode) throw new Error("missing courseCode");
-  if (!SENTIMENTS.includes(s.sentiment)) throw new Error(`${s.courseCode}: bad sentiment ${s.sentiment}`);
+  if (!SENTIMENTS.includes(s.sentiment))
+    throw new Error(`${s.courseCode}: bad sentiment ${s.sentiment}`);
   if (!DIFFICULTIES.includes(s.difficultyEstimate))
     throw new Error(`${s.courseCode}: bad difficulty ${s.difficultyEstimate}`);
 }

@@ -56,8 +56,7 @@ export default async function PrivacySettingsPage(): Promise<React.ReactElement>
 }
 
 function slugFromName(name: string): string {
-  return name
-    .split("@")[0]!
+  return (name.split("@")[0] ?? name)
     .toLowerCase()
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/^-+|-+$/g, "")

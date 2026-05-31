@@ -40,6 +40,7 @@ export function PrivacyForm({ initial, suggestedSlug }: Props): React.ReactEleme
 
       <div className="space-y-1">
         <label
+          htmlFor="profile-slug"
           className="block text-xs uppercase tracking-wide"
           style={{ color: "var(--color-text-muted)" }}
         >
@@ -48,6 +49,7 @@ export function PrivacyForm({ initial, suggestedSlug }: Props): React.ReactEleme
         <div className="flex items-center gap-1 text-sm">
           <span style={{ color: "var(--color-text-muted)" }}>/u/</span>
           <input
+            id="profile-slug"
             className="flex-1 rounded border px-2 py-1"
             style={{ borderColor: "var(--color-border)", background: "var(--color-surface)" }}
             value={slug}
