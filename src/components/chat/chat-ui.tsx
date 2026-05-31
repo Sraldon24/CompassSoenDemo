@@ -187,6 +187,27 @@ export function ChatUI(): React.ReactElement {
                 </div>
                 {m.content === "" && m.role === "assistant" ? (
                   <div className="space-y-2">
+                    <div
+                      className="flex items-center gap-2 text-sm"
+                      style={{ color: "var(--color-text-muted)" }}
+                      aria-live="polite"
+                    >
+                      <span className="flex gap-1" aria-hidden>
+                        <span
+                          className="h-1.5 w-1.5 rounded-full animate-bounce [animation-delay:-0.3s]"
+                          style={{ background: "var(--color-accent)" }}
+                        />
+                        <span
+                          className="h-1.5 w-1.5 rounded-full animate-bounce [animation-delay:-0.15s]"
+                          style={{ background: "var(--color-accent)" }}
+                        />
+                        <span
+                          className="h-1.5 w-1.5 rounded-full animate-bounce"
+                          style={{ background: "var(--color-accent)" }}
+                        />
+                      </span>
+                      Compass is thinking… this can take a few seconds.
+                    </div>
                     <Skeleton className="h-3 w-3/4" />
                     <Skeleton className="h-3 w-1/2" />
                   </div>
