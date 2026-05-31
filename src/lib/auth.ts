@@ -23,6 +23,17 @@ export const auth = betterAuth({
     },
   }),
   baseURL: process.env.BETTER_AUTH_URL ?? "http://localhost:3000",
+  // Origins allowed to call the auth API. Derived from the configured public
+  // URLs so a domain change only needs the env vars updated (no code edit).
+  // Both vars must point at the domain the app is actually served from, or the
+  // browser's same-origin auth fetch is rejected as a cross-origin request.
+  trustedOrigins: [
+    ...new Set(
+      [process.env.BETTER_AUTH_URL, process.env.NEXT_PUBLIC_SITE_URL]
+        .filter((u): u is string => Boolean(u))
+        .map((u) => u.replace(/\/$/, "")),
+    ),
+  ],
   secret: process.env.BETTER_AUTH_SECRET,
   emailAndPassword: {
     enabled: true,
