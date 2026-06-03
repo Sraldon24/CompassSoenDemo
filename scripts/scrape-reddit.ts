@@ -18,6 +18,7 @@
 
 import { sql } from "drizzle-orm";
 import { braveSource } from "../src/lib/community/brave";
+import { concordiaCoursesSource } from "../src/lib/community/concordia-courses";
 import { fetchPostsForCourse } from "../src/lib/community/fetch-posts";
 import { redditSource } from "../src/lib/community/reddit";
 import type { CommunityPost } from "../src/lib/community/source";
@@ -49,7 +50,7 @@ async function getCoursesToScrape(opts: CliOptions): Promise<string[]> {
 
 interface PerCourseResult {
   code: string;
-  source: "reddit" | "brave" | "none";
+  source: "concordia-courses" | "reddit" | "brave" | "none";
   count: number;
   error: string | null;
   /** True when Brave's monthly budget is exhausted — main() stops the loop. */
@@ -57,12 +58,15 @@ interface PerCourseResult {
 }
 
 async function scrapeOne(code: string, opts: CliOptions): Promise<PerCourseResult> {
-  // The Reddit→Brave fallback decision is the pure fetchPostsForCourse(); this
-  // shell just persists the winning posts.
-  const result = await fetchPostsForCourse(code, redditSource, braveSource, {
-    limit: opts.limit,
-    useFallback: opts.fallback,
-  });
+  // Source order: concordia.courses (richest) → reddit → brave. The pure
+  // fetchPostsForCourse() owns the fallback decision; this shell persists posts.
+  const result = await fetchPostsForCourse(
+    code,
+    redditSource,
+    braveSource,
+    { limit: opts.limit, useFallback: opts.fallback },
+    concordiaCoursesSource,
+  );
 
   if (!result.ok) {
     const error =
@@ -124,7 +128,20 @@ async function main() {
 
   const results: PerCourseResult[] = [];
   for (const code of codes) {
-    const result = await scrapeOne(code, opts);
+    // One course's failure (timeout, network blip) must NOT abort the whole
+    // run — log it and move on so a 124-course scrape always completes.
+    let result: PerCourseResult;
+    try {
+      result = await scrapeOne(code, opts);
+    } catch (err) {
+      result = {
+        code,
+        source: "none",
+        count: 0,
+        error: err instanceof Error ? err.message : String(err),
+        budgetStop: false,
+      };
+    }
     results.push(result);
     const status = result.error
       ? `ERR ${result.error}`
@@ -143,6 +160,7 @@ async function main() {
 
   const summary = {
     total: results.length,
+    concordiaCourses: results.filter((r) => r.source === "concordia-courses").length,
     reddit: results.filter((r) => r.source === "reddit").length,
     brave: results.filter((r) => r.source === "brave").length,
     empty: results.filter((r) => r.source === "none" && !r.error).length,

@@ -26,11 +26,11 @@ export interface CommunityPost {
   /** When the post was originally published. `null` if unknown. */
   postedAt: Date | null;
   /** Where this row came from — used for moderation + debugging. */
-  source: "reddit" | "brave";
+  source: "reddit" | "brave" | "concordia-courses";
 }
 
 export interface CommunitySource {
-  readonly name: "reddit" | "brave";
+  readonly name: "reddit" | "brave" | "concordia-courses";
   /**
    * Returns up to `limit` posts about `courseCode`. Empty array = source
    * has nothing (vs. an error, which throws). Throwing tells the orchestrator

@@ -11,6 +11,7 @@
  */
 
 import { BraveBudgetExceededError } from "./brave";
+import { ConcordiaCoursesError } from "./concordia-courses";
 import { RedditSearchError } from "./reddit";
 import type { CommunityPost, CommunitySource } from "./source";
 
@@ -25,7 +26,7 @@ export interface FetchPostsOptions {
 }
 
 export type FetchPostsResult =
-  | { ok: true; posts: CommunityPost[]; source: "reddit" | "brave" | "none" }
+  | { ok: true; posts: CommunityPost[]; source: "concordia-courses" | "reddit" | "brave" | "none" }
   | { ok: false; source: "none"; reason: "budget_exhausted"; used: number; budget: number }
   | { ok: false; source: "none"; reason: "error"; message: string };
 
@@ -45,7 +46,21 @@ export async function fetchPostsForCourse(
   primary: CommunitySource,
   fallback: CommunitySource,
   opts: FetchPostsOptions,
+  /** Optional richest source (concordia.courses), tried BEFORE reddit. A
+   * ConcordiaCoursesError is non-fatal → fall through to reddit→brave. */
+  richPrimary?: CommunitySource,
 ): Promise<FetchPostsResult> {
+  // 0) concordia.courses — densest Concordia-specific reviews. Try first.
+  if (richPrimary) {
+    try {
+      const rich = await richPrimary.search(code, opts.limit);
+      if (rich.length > 0) return { ok: true, posts: rich, source: "concordia-courses" };
+    } catch (err) {
+      if (!(err instanceof ConcordiaCoursesError)) throw err; // genuine bug — surface it
+      // expected (rate-limit/network/4xx) → fall through to reddit→brave.
+    }
+  }
+
   let posts: CommunityPost[] = [];
 
   try {
