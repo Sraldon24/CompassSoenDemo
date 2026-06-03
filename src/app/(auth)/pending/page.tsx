@@ -28,11 +28,11 @@ export default async function PendingPage(): Promise<React.ReactElement> {
   const rejected = account?.status === "rejected";
 
   return (
-    <Card className="w-full">
+    <Card featured className="w-full">
       <CardHeader className="space-y-2">
         <div
           className="flex h-12 w-12 items-center justify-center rounded-full"
-          style={{ background: "var(--color-accent-soft)", color: "var(--color-accent)" }}
+          style={{ background: "var(--gradient-accent-soft)", color: "var(--color-accent)" }}
         >
           <Clock className="h-6 w-6" aria-hidden />
         </div>

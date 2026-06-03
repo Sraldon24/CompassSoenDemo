@@ -48,7 +48,7 @@ export default function LoginPage(): React.ReactElement {
   };
 
   return (
-    <Card>
+    <Card featured>
       <CardHeader className="space-y-1">
         <CardTitle className="text-2xl">Sign in</CardTitle>
         <CardDescription>Enter your email and password to continue.</CardDescription>
@@ -94,7 +94,7 @@ export default function LoginPage(): React.ReactElement {
             )}
           </div>
 
-          <Button type="submit" className="w-full" disabled={isSubmitting}>
+          <Button type="submit" variant="accent" className="w-full" disabled={isSubmitting}>
             {isSubmitting ? "Signing in..." : "Sign in"}
           </Button>
         </form>

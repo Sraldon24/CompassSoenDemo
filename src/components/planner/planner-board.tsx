@@ -311,8 +311,8 @@ function TransferLane({
   const credits = courses.reduce((sum, c) => sum + (catalog.get(c.courseCode)?.credits ?? 0), 0);
   return (
     <section
-      className="rounded-lg border p-3 mb-1"
-      style={{ borderColor: "var(--color-border)", background: "var(--color-surface-2)" }}
+      className="rounded-xl border p-3 mb-1"
+      style={{ borderColor: "var(--color-border)", background: "var(--gradient-surface)" }}
       aria-label="Transferred credits"
     >
       <header className="flex items-baseline justify-between gap-2 pb-2">
@@ -397,12 +397,13 @@ function DroppableTerm({
   return (
     <section
       ref={setNodeRef}
-      className="flex w-[280px] shrink-0 flex-col gap-2 rounded-lg border p-3 transition-colors"
+      className="flex w-[280px] shrink-0 flex-col gap-2 rounded-xl border p-3 transition-all duration-200"
       style={{
         background: isOver
           ? "color-mix(in oklch, var(--color-accent-soft) 60%, var(--color-surface-2))"
-          : "var(--color-surface-2)",
+          : "var(--gradient-surface)",
         borderColor: isOver ? "var(--color-accent)" : "var(--color-border)",
+        boxShadow: isOver ? "var(--shadow-glow)" : "none",
       }}
       aria-label={`${term} courses`}
     >

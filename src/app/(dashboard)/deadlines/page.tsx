@@ -40,7 +40,7 @@ export default async function DeadlinesPage(): Promise<React.ReactElement> {
 
   return (
     <div className="px-4 md:px-8 py-6 md:py-10 max-w-[960px] mx-auto space-y-8">
-      <header className="flex flex-wrap items-end justify-between gap-3">
+      <header className="flex flex-wrap items-end justify-between gap-3 animate-rise">
         <div className="space-y-2">
           <h1 className="text-3xl font-semibold tracking-tight">Deadlines</h1>
           <p className="text-sm" style={{ color: "var(--color-text-muted)" }}>
@@ -97,18 +97,23 @@ function DeadlineSection({
       >
         {title} ({rows.length})
       </h2>
-      <ul className="space-y-2" style={muted ? { opacity: 0.6 } : undefined}>
-        {rows.map((r) => (
+      <ul className="space-y-2 stagger" style={muted ? { opacity: 0.6 } : undefined}>
+        {rows.map((r, i) => (
           <li
             key={r.id}
-            className="flex items-start gap-3 rounded-lg border p-3"
-            style={{ borderColor: "var(--color-border)", background: "var(--color-surface)" }}
+            style={{ ["--i" as string]: i, background: "var(--gradient-surface)" }}
+            className="lift flex items-start gap-3 rounded-xl border p-3 hover:border-accent/40"
           >
-            <CalendarClock
-              className="mt-0.5 h-4 w-4 shrink-0"
-              style={{ color: "var(--color-accent)" }}
-              aria-hidden="true"
-            />
+            <span
+              className="mt-0.5 inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-lg"
+              style={{ background: "var(--gradient-accent-soft)" }}
+            >
+              <CalendarClock
+                className="h-4 w-4"
+                style={{ color: "var(--color-accent)" }}
+                aria-hidden="true"
+              />
+            </span>
             <div className="min-w-0 flex-1">
               <div className="flex flex-wrap items-baseline justify-between gap-2">
                 <span className="text-sm font-medium">{r.title}</span>

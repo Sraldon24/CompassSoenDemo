@@ -55,13 +55,22 @@ export function AIReview(): React.ReactElement {
 
   return (
     <section
-      className="rounded-lg border p-4"
-      style={{ borderColor: "var(--color-border)", background: "var(--color-surface)" }}
+      className="relative overflow-hidden rounded-xl border p-4 ring-1 ring-accent/20"
+      style={{
+        borderColor: "var(--color-border)",
+        background: "var(--gradient-surface)",
+        boxShadow: "var(--shadow-glow)",
+      }}
       aria-label="AI Review"
     >
       <header className="flex items-center justify-between gap-2 pb-3">
         <h2 className="flex items-center gap-2 text-sm font-semibold">
-          <Sparkles className="h-4 w-4" style={{ color: "var(--color-accent)" }} aria-hidden />
+          <span
+            className="inline-flex h-6 w-6 items-center justify-center rounded-lg text-white"
+            style={{ backgroundImage: "var(--gradient-accent)" }}
+          >
+            <Sparkles className="h-3.5 w-3.5" aria-hidden />
+          </span>
           AI Review
         </h2>
         <button
@@ -107,19 +116,22 @@ export function AIReview(): React.ReactElement {
           </button>
         </p>
       ) : suggestions && suggestions.length > 0 ? (
-        <ul className="space-y-2">
+        <ul className="space-y-2 stagger">
           {suggestions.map((s, i) => {
             const meta = KIND_META[s.kind];
             const Icon = meta.Icon;
             return (
               <li
                 key={`${s.kind}-${i}`}
-                className="flex items-start gap-3 rounded-md border p-3"
-                style={{ borderColor: "var(--color-border)", background: "var(--color-surface-2)" }}
+                style={{ ["--i" as string]: i, background: "var(--color-surface)" }}
+                className="lift flex items-start gap-3 rounded-lg border p-3 hover:border-accent/40"
               >
                 <span
                   className="mt-0.5 inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full"
-                  style={{ background: "var(--color-accent-soft)", color: "var(--color-accent)" }}
+                  style={{
+                    background: "var(--gradient-accent-soft)",
+                    color: "var(--color-accent)",
+                  }}
                   title={meta.label}
                 >
                   <Icon className="h-3.5 w-3.5" aria-hidden />
