@@ -1,14 +1,37 @@
 "use client";
 
 import { Card, CardContent } from "@/components/ui/card";
-import type { LucideIcon } from "lucide-react";
+import {
+  AlertTriangle,
+  CircleDot,
+  GraduationCap,
+  Layers,
+  type LucideIcon,
+  TrendingUp,
+} from "lucide-react";
 import { useEffect, useState } from "react";
+
+/**
+ * Icon registry. The icon is referenced by a STRING key (not the component
+ * itself) because StatTile data is built in a server component and passed to
+ * this client component — and React components/functions can't cross the
+ * server→client boundary ("Functions cannot be passed to Client Components").
+ */
+const ICONS = {
+  graduation: GraduationCap,
+  inProgress: CircleDot,
+  planned: Layers,
+  remaining: TrendingUp,
+  deficiency: AlertTriangle,
+} as const satisfies Record<string, LucideIcon>;
+
+export type StatIconKey = keyof typeof ICONS;
 
 export type StatTile = {
   label: string;
   value: number;
-  /** lucide icon component */
-  icon: LucideIcon;
+  /** key into the icon registry (string — safe to pass from server) */
+  icon: StatIconKey;
   /** css color (var(--…)) for the icon + accent */
   color: string;
   /** optional suffix, e.g. "cr" or "%" */
@@ -56,7 +79,7 @@ function useCountUp(target: number, enabled: boolean): number {
 function Tile({ tile, index }: { tile: StatTile; index: number }): React.ReactElement {
   const reduced = usePrefersReducedMotion();
   const value = useCountUp(tile.value, !reduced);
-  const Icon = tile.icon;
+  const Icon = ICONS[tile.icon];
   return (
     <Card interactive size="sm" style={{ ["--i" as string]: index }} className="animate-rise">
       <CardContent className="p-4">

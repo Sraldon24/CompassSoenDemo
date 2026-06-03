@@ -6,17 +6,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { getSession } from "@/lib/auth/get-session";
 import { getUserPlanSnapshot } from "@/lib/data/queries/plan";
 import { computeCategoryProgress, totalDegreeProgress } from "@/lib/domain/requirements";
-import {
-  AlertTriangle,
-  ArrowRight,
-  Calendar,
-  CircleDot,
-  Clock,
-  GraduationCap,
-  Layers,
-  Sparkles,
-  TrendingUp,
-} from "lucide-react";
+import { ArrowRight, Calendar, Clock, Sparkles, TrendingUp } from "lucide-react";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { Suspense } from "react";
@@ -55,22 +45,27 @@ export default async function DashboardPage(): Promise<React.ReactElement> {
     {
       label: "Completed",
       value: counts.completed,
-      icon: GraduationCap,
+      icon: "graduation",
       color: "var(--color-success)",
     },
-    { label: "In Progress", value: counts.enrolled, icon: CircleDot, color: "var(--color-accent)" },
-    { label: "Planned", value: counts.planned, icon: Layers, color: "var(--color-text-muted)" },
+    {
+      label: "In Progress",
+      value: counts.enrolled,
+      icon: "inProgress",
+      color: "var(--color-accent)",
+    },
+    { label: "Planned", value: counts.planned, icon: "planned", color: "var(--color-text-muted)" },
     {
       label: "Remaining",
       value: remainingCredits,
-      icon: TrendingUp,
+      icon: "remaining",
       color: "var(--color-text-muted)",
       suffix: "cr",
     },
     {
       label: "Deficiencies",
       value: counts.deficiencies,
-      icon: AlertTriangle,
+      icon: "deficiency",
       color: "var(--color-warning)",
     },
   ];
