@@ -89,6 +89,10 @@ interface CallOptions {
   maxAttempts?: number;
   /** Chat router: skip the deep (70B) model and go straight to the fast model. */
   preferFast?: boolean;
+  /** Force a specific Groq model, bypassing task-based selection. Used by the
+   * summarize graph to run cheap extraction nodes on 8B while keeping 70B for
+   * the quality-critical ones. Still falls back to 8B/OpenRouter on failure. */
+  modelOverride?: GroqModel;
 }
 
 async function sleep(ms: number): Promise<void> {
@@ -152,7 +156,7 @@ export interface GenerateResult {
  *      unavailable we surface the original Groq error.
  */
 export async function generateResponse(opts: CallOptions): Promise<GenerateResult> {
-  const primaryModel = selectModel(opts.task);
+  const primaryModel = opts.modelOverride ?? selectModel(opts.task);
 
   // Circuit breaker — refuse to hit Groq if we're already at 85%+ of the daily cap.
   // Note: we DON'T short-circuit to a hard 503 anymore — a throttled primary is

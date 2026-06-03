@@ -1,7 +1,9 @@
+import { isSignupAllowed } from "@/lib/access-control";
 import { db } from "@/lib/db";
 import { accounts, sessions, users, verifications } from "@/lib/db/schema";
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
+import { APIError } from "better-auth/api";
 
 if (!process.env.BETTER_AUTH_SECRET) {
   throw new Error("BETTER_AUTH_SECRET is not set");
@@ -52,10 +54,32 @@ export const auth = betterAuth({
   user: {
     additionalFields: {
       role: { type: "string", required: false, defaultValue: "user", input: false },
+      status: { type: "string", required: false, defaultValue: "approved", input: false },
     },
   },
   advanced: {
     cookiePrefix: "compass",
+  },
+  databaseHooks: {
+    user: {
+      create: {
+        // Invite-only: reject account creation for emails not on the allowlist
+        // (ALLOWED_EMAILS env + ADMIN_EMAIL). Layer 1 of access control; layer 2
+        // (admin approval via users.status) gates login after this passes.
+        before: async (user) => {
+          if (!isSignupAllowed(user.email)) {
+            throw new APIError("FORBIDDEN", {
+              message: "Compass is invite-only right now. Ask the owner for access.",
+            });
+          }
+          // New accounts start "pending" and need admin approval (layer 2), EXCEPT
+          // the bootstrap admin, who is auto-approved so they can run /admin/users.
+          const isAdminEmail =
+            user.email.trim().toLowerCase() === process.env.ADMIN_EMAIL?.trim().toLowerCase();
+          return { data: { ...user, status: isAdminEmail ? "approved" : "pending" } };
+        },
+      },
+    },
   },
 });
 

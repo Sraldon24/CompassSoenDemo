@@ -2,18 +2,19 @@
  * Reddit thread summarization graph (LangGraph v1).
  *
  * State machine:
- *   START → loadPosts → classifySignal → extractProfMentions
- *         → extractComplaintsAndPraise → rateDifficulty → emitSummary → END
+ *   START → fanOut → END
+ * where fanOut runs all 5 extraction steps CONCURRENTLY (they're independent).
  *
  * Why multi-step instead of one giant prompt?
- *   - Each node uses a small focused prompt → less hallucination per call.
- *   - Deterministic logic between LLM calls: dedupe prof names (normalize
+ *   - Each step uses a small focused prompt → less hallucination per call.
+ *   - Deterministic logic inside each step: dedupe prof names (normalize
  *     casing + diacritics), drop low-score posts before difficulty rating,
  *     hard-cap citation list to what exists in input.
- *   - Failures are localized — if classifySignal returns garbage we don't
- *     poison downstream nodes.
+ *   - Failures are localized — a failed step degrades to its empty default.
  *
- * Total Groq calls: 5 (one per LLM node). All 70B for quality.
+ * Total Groq calls: 5, run in PARALLEL. Only complaints/praise uses 70B
+ * (quality-critical); the rest use 8B-instant (enum/verbatim extraction). So
+ * per course: 1×70B + 4×8B instead of 5×70B — far kinder to the 70B daily cap.
  *
  * Output is cached in `reddit_summaries` for 7 days per course.
  */
@@ -138,6 +139,7 @@ async function classifySignalNode(state: GraphState): Promise<Partial<GraphState
   }
   const { text } = await generateResponse({
     task: "reddit-summarize",
+    modelOverride: "llama-3.1-8b-instant", // single-enum classification → fast model
     system: CLASSIFY_SYSTEM,
     messages: [
       {
@@ -170,6 +172,7 @@ async function extractProfMentionsNode(state: GraphState): Promise<Partial<Graph
 
   const { text } = await generateResponse({
     task: "reddit-summarize",
+    modelOverride: "llama-3.1-8b-instant", // verbatim name extraction → fast model
     system: PROF_SYSTEM,
     messages: [
       {
@@ -302,6 +305,7 @@ async function rateDifficultyNode(state: GraphState): Promise<Partial<GraphState
 
   const { text } = await generateResponse({
     task: "reddit-summarize",
+    modelOverride: "llama-3.1-8b-instant", // single-enum rating → fast model
     system: DIFFICULTY_SYSTEM,
     messages: [
       {
@@ -335,6 +339,7 @@ async function emitSummaryNode(state: GraphState): Promise<Partial<GraphState>> 
   }
   const { text } = await generateResponse({
     task: "reddit-summarize",
+    modelOverride: "llama-3.1-8b-instant", // verbatim quote selection → fast model
     system: CITATIONS_SYSTEM,
     messages: [
       {
@@ -359,6 +364,40 @@ async function emitSummaryNode(state: GraphState): Promise<Partial<GraphState>> 
   return { citations: safe.slice(0, 4) };
 }
 
+// ---------- Fan-out node ----------------------------------------------------
+
+/**
+ * The 5 extraction steps are INDEPENDENT — each reads only `posts` + `courseCode`,
+ * none consumes another's output. So we run them concurrently instead of in a
+ * 5-deep sequential chain. On free-tier this cuts wall-clock ~5× and, with the
+ * per-node model downgrades (only complaints/praise stays on 70B), slashes the
+ * 70B request count per course from 5 → 1 — the key to surviving launch volume.
+ *
+ * A node that throws degrades to its empty default rather than failing the whole
+ * summary (each is wrapped). Deterministic post-processing already lives inside
+ * each node, so merging their partial states is safe (disjoint keys).
+ */
+async function fanOutNode(state: GraphState): Promise<Partial<GraphState>> {
+  const safe = async (fn: () => Promise<Partial<GraphState>>): Promise<Partial<GraphState>> => {
+    try {
+      return await fn();
+    } catch (err) {
+      console.warn("[summarize-graph] node failed, using defaults:", err);
+      return {};
+    }
+  };
+
+  const [sentiment, profs, complaints, difficulty, citations] = await Promise.all([
+    safe(() => classifySignalNode(state)),
+    safe(() => extractProfMentionsNode(state)),
+    safe(() => extractComplaintsAndPraiseNode(state)),
+    safe(() => rateDifficultyNode(state)),
+    safe(() => emitSummaryNode(state)),
+  ]);
+
+  return { ...sentiment, ...profs, ...complaints, ...difficulty, ...citations };
+}
+
 // ---------- Graph construction --------------------------------------------
 
 const channels = {
@@ -373,17 +412,9 @@ const channels = {
 };
 
 const builder = new StateGraph<GraphState>({ channels })
-  .addNode("classifySignalStep", classifySignalNode)
-  .addNode("extractProfMentionsStep", extractProfMentionsNode)
-  .addNode("extractComplaintsAndPraiseStep", extractComplaintsAndPraiseNode)
-  .addNode("rateDifficultyStep", rateDifficultyNode)
-  .addNode("emitSummaryStep", emitSummaryNode)
-  .addEdge(START, "classifySignalStep")
-  .addEdge("classifySignalStep", "extractProfMentionsStep")
-  .addEdge("extractProfMentionsStep", "extractComplaintsAndPraiseStep")
-  .addEdge("extractComplaintsAndPraiseStep", "rateDifficultyStep")
-  .addEdge("rateDifficultyStep", "emitSummaryStep")
-  .addEdge("emitSummaryStep", END);
+  .addNode("fanOutStep", fanOutNode)
+  .addEdge(START, "fanOutStep")
+  .addEdge("fanOutStep", END);
 
 export const summarizeGraph = builder.compile();
 

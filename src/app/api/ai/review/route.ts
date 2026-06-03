@@ -10,11 +10,16 @@
  * balance, sequencing/prereqs, and elective ideas.
  */
 
+import { createHash } from "node:crypto";
 import { generateResponse } from "@/lib/ai/provider";
+import { db } from "@/lib/db";
 import { getAllCourses, getUserPlanSnapshot } from "@/lib/db/queries/plan";
+import { aiReviewCache } from "@/lib/db/schema";
 import { getSession } from "@/lib/get-session";
 import { denyResponse, guardAiCall, withUsage } from "@/lib/limits";
 import { buildPlan, validatePlan } from "@/lib/validation/plan";
+import { eq } from "drizzle-orm";
+import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 
 export const dynamic = "force-dynamic";
@@ -36,16 +41,13 @@ Be specific — name the course code and term. Don't repeat an issue verbatim; t
 Respond with ONLY a JSON array (no prose, no markdown) of objects:
 [{"kind":"workload"|"sequencing"|"elective","title":"<one line>","detail":"<one sentence, optional>"}]`;
 
-export async function GET(): Promise<Response> {
+export async function GET(req: NextRequest): Promise<Response> {
   const session = await getSession();
   if (!session) return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
 
-  const decision = guardAiCall({
-    feature: "aiReview",
-    identity: { kind: "user", id: session.user.id },
-    model: "llama-3.3-70b-versatile",
-  });
-  if (!decision.allowed) return denyResponse(decision);
+  // ?refresh=1 forces a fresh LLM pass (the Refresh button); otherwise we serve
+  // a cached review when the plan hasn't changed — avoiding repeat token spend.
+  const refresh = req.nextUrl.searchParams.get("refresh") === "1";
 
   const [{ userPlan }, catalogList] = await Promise.all([
     getUserPlanSnapshot(session.user.id),
@@ -62,7 +64,7 @@ export async function GET(): Promise<Response> {
           detail: "Once there are courses to look at, I'll suggest workload and sequencing tweaks.",
         },
       ] satisfies ReviewSuggestion[],
-      remaining: decision.remaining,
+      cached: false,
     });
   }
 
@@ -89,6 +91,28 @@ export async function GET(): Promise<Response> {
 
   const userPrompt = `STUDENT PLAN (by term):\n${planText}\n\nDETECTED ISSUES:\n${issuesText}\n\nGive 3-5 suggestions as the JSON array described.`;
 
+  // Cache key = hash of exactly what the model sees. Same plan+issues → cache hit.
+  const planHash = createHash("sha256").update(userPrompt).digest("hex");
+
+  if (!refresh) {
+    const [hit] = await db
+      .select({ planHash: aiReviewCache.planHash, suggestions: aiReviewCache.suggestions })
+      .from(aiReviewCache)
+      .where(eq(aiReviewCache.userId, session.user.id))
+      .limit(1);
+    if (hit && hit.planHash === planHash) {
+      return NextResponse.json({ suggestions: hit.suggestions, cached: true });
+    }
+  }
+
+  // Cache miss (or refresh) → this is when we spend an LLM call, so rate-limit here.
+  const decision = guardAiCall({
+    feature: "aiReview",
+    identity: { kind: "user", id: session.user.id },
+    model: "llama-3.3-70b-versatile",
+  });
+  if (!decision.allowed) return denyResponse(decision);
+
   try {
     const result = await withUsage(
       {
@@ -112,7 +136,17 @@ export async function GET(): Promise<Response> {
         return parseSuggestions(res.text);
       },
     );
-    return NextResponse.json({ suggestions: result, remaining: decision.remaining });
+
+    // Store for next time (one row per user; upsert on the plan hash).
+    await db
+      .insert(aiReviewCache)
+      .values({ userId: session.user.id, planHash, suggestions: result })
+      .onConflictDoUpdate({
+        target: aiReviewCache.userId,
+        set: { planHash, suggestions: result, generatedAt: new Date() },
+      });
+
+    return NextResponse.json({ suggestions: result, remaining: decision.remaining, cached: false });
   } catch (err) {
     console.error("[ai] review failed:", err);
     return NextResponse.json(

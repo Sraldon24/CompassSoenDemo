@@ -15,6 +15,13 @@
       "when": 1779983206553,
       "tag": "0001_abnormal_wither",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1780501289816,
+      "tag": "0002_military_senator_kelly",
+      "breakpoints": true
     }
   ]
 }

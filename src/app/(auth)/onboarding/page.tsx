@@ -1,5 +1,5 @@
 import { db } from "@/lib/db";
-import { profiles } from "@/lib/db/schema";
+import { profiles, users } from "@/lib/db/schema";
 import { getSession } from "@/lib/get-session";
 import { eq } from "drizzle-orm";
 import { redirect } from "next/navigation";
@@ -12,6 +12,14 @@ export const metadata = {
 export default async function OnboardingPage(): Promise<React.ReactElement> {
   const session = await getSession();
   if (!session) redirect("/login");
+
+  // Access gate: unapproved invite-only accounts can't onboard either.
+  const [account] = await db
+    .select({ status: users.status })
+    .from(users)
+    .where(eq(users.id, session.user.id))
+    .limit(1);
+  if (account && account.status !== "approved") redirect("/pending");
 
   const [profile] = await db
     .select()

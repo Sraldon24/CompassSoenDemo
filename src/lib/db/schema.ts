@@ -84,6 +84,10 @@ export const users = pgTable("users", {
   name: text("name"),
   image: text("image"),
   role: text("role").default("user").notNull(),
+  // Invite-only access (layer 2). New signups start "pending"; an admin approves
+  // them via /admin/users. Default "approved" so the migration grandfathers in
+  // all existing accounts. Values: "pending" | "approved" | "rejected".
+  status: text("status").default("approved").notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
   deletedAt: timestamp("deleted_at"),
@@ -353,6 +357,20 @@ export const aiMessages = pgTable("ai_messages", {
   tokensUsed: integer("tokens_used"),
   contextSources: jsonb("context_sources").$type<string[]>(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+/**
+ * AI Review cache — one row per user. Stores the last generated review keyed by
+ * a hash of the plan it was generated from. If the plan hasn't changed, /plan
+ * reloads serve this instead of paying for another LLM call. Refresh bypasses.
+ */
+export const aiReviewCache = pgTable("ai_review_cache", {
+  userId: text("user_id")
+    .primaryKey()
+    .references(() => users.id, { onDelete: "cascade" }),
+  planHash: text("plan_hash").notNull(),
+  suggestions: jsonb("suggestions").notNull(),
+  generatedAt: timestamp("generated_at").defaultNow().notNull(),
 });
 
 export const aiUsage = pgTable(

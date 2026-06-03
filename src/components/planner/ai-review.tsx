@@ -28,11 +28,12 @@ export function AIReview(): React.ReactElement {
   // Guard against double-fetch in React StrictMode dev double-mount.
   const fetchedRef = useRef(false);
 
-  const load = useCallback(async () => {
+  const load = useCallback(async (refresh = false) => {
     setLoading(true);
     setError(null);
     try {
-      const res = await fetch("/api/ai/review", { method: "GET", cache: "no-store" });
+      const url = refresh ? "/api/ai/review?refresh=1" : "/api/ai/review";
+      const res = await fetch(url, { method: "GET", cache: "no-store" });
       if (!res.ok) {
         const body = (await res.json().catch(() => ({}))) as { error?: string };
         throw new Error(body.error ?? `AI Review failed (${res.status})`);
@@ -65,7 +66,7 @@ export function AIReview(): React.ReactElement {
         </h2>
         <button
           type="button"
-          onClick={load}
+          onClick={() => load(true)}
           disabled={loading}
           aria-label="Refresh AI Review"
           className="inline-flex items-center gap-1.5 rounded-md border px-2.5 py-1 text-xs transition-colors hover:bg-accent/10 disabled:opacity-50 focus-visible:outline-none"
@@ -101,7 +102,7 @@ export function AIReview(): React.ReactElement {
       ) : error ? (
         <p className="text-sm" style={{ color: "var(--color-text-muted)" }}>
           {error}{" "}
-          <button type="button" onClick={load} className="underline">
+          <button type="button" onClick={() => load(true)} className="underline">
             Try again
           </button>
         </p>

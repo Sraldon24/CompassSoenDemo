@@ -19,7 +19,7 @@ import { courses, profiles, userCourses } from "@/lib/db/schema";
 import type { CourseCatalogEntry } from "@/lib/validation/plan";
 import { END, START, StateGraph } from "@langchain/langgraph";
 import { eq, ne } from "drizzle-orm";
-import { embed } from "../embeddings";
+import { embedBatch } from "../embeddings";
 import { RECOMMEND_SYSTEM } from "../prompts";
 import { generateResponse } from "../provider";
 import {
@@ -121,6 +121,9 @@ async function loadSignalsNode(state: GraphState): Promise<Partial<GraphState>> 
     offeredWinter: r.offeredWinter ?? true,
     offeredSummer: r.offeredSummer ?? false,
     avgHoursPerWeek: r.avgHoursPerWeek ?? undefined,
+    // Description enriches both the candidate embedding (so ranking isn't
+    // title-only → generic) and the LLM rationale payload below.
+    description: r.description ?? null,
   }));
 
   return {
@@ -159,17 +162,24 @@ async function rankCandidatesNode(state: GraphState): Promise<Partial<GraphState
 
   const interestText =
     state.interests.length > 0 ? state.interests.join(", ") : "general software engineering";
-  const interestVec = await embed(interestText);
+
+  // Embed the interest vector + all candidate texts in ONE batch (was a serial
+  // per-candidate await loop — the recommend critical path). embedBatch runs
+  // them together; the local MiniLM model has no per-call network cost.
+  const candidateTexts = state.eligibleCandidates.map(
+    (c) => `${c.code} ${c.title}. ${c.description ?? ""}`,
+  );
+  const [interestVec, ...candidateVecs] = await embedBatch([interestText, ...candidateTexts]);
 
   const candidateEmbeds = new Map<string, number[]>();
-  for (const c of state.eligibleCandidates) {
-    const text = `${c.code} ${c.title}. ${(c as { description?: string }).description ?? ""}`;
-    candidateEmbeds.set(c.code, await embed(text));
-  }
+  state.eligibleCandidates.forEach((c, i) => {
+    const vec = candidateVecs[i];
+    if (vec) candidateEmbeds.set(c.code, vec);
+  });
 
   const getInterestScore = (c: CourseCatalogEntry): number => {
     const vec = candidateEmbeds.get(c.code);
-    if (!vec) return 0;
+    if (!vec || !interestVec) return 0;
     return Math.max(0, cosineSimilarity(interestVec, vec));
   };
 
@@ -195,6 +205,9 @@ async function llmRationalizeNode(state: GraphState): Promise<Partial<GraphState
     title: s.course.title,
     credits: s.course.credits,
     category: s.course.category,
+    // Trim long catalog text so the prompt stays small but the model has
+    // something concrete to reason about (was title-only → generic rationale).
+    description: s.course.description ? s.course.description.slice(0, 240) : undefined,
     prereq_status:
       s.prereqDistance === 0
         ? "ready to take"

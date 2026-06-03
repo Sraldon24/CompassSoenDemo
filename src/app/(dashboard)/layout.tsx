@@ -3,7 +3,7 @@ import { KeyboardShortcuts } from "@/components/keyboard-shortcuts";
 import { Sidebar } from "@/components/nav/sidebar";
 import { Topbar } from "@/components/nav/topbar";
 import { db } from "@/lib/db";
-import { profiles } from "@/lib/db/schema";
+import { profiles, users } from "@/lib/db/schema";
 import { getSession } from "@/lib/get-session";
 import { eq } from "drizzle-orm";
 import { redirect } from "next/navigation";
@@ -14,6 +14,16 @@ export default async function DashboardLayout({
   const session = await getSession();
   if (!session) {
     redirect("/login");
+  }
+
+  // Access gate (invite-only): non-approved accounts can't reach the app.
+  const [account] = await db
+    .select({ status: users.status })
+    .from(users)
+    .where(eq(users.id, session.user.id))
+    .limit(1);
+  if (account && account.status !== "approved") {
+    redirect("/pending");
   }
 
   // Onboarding gate: route incomplete users to /onboarding for any /dashboard,

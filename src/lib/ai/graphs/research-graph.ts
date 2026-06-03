@@ -114,38 +114,39 @@ async function webSearchNode(state: GraphState): Promise<Partial<GraphState>> {
     };
   }
 
-  const out: WebSource[] = [];
-  for (const url of CONCORDIA_PAGES) {
-    try {
-      const res = await fetch(url, {
-        headers: { "User-Agent": "SOEN-Compass-Research/1.0 (sraldon24@gmail.com)" },
-        signal: AbortSignal.timeout(15_000),
-      });
-      if (!res.ok) {
-        out.push({ url, summary: `[fetch failed: HTTP ${res.status}]` });
-        continue;
+  // Fetch all Concordia pages concurrently — they're independent and each can
+  // take up to 15s, so serial fetching needlessly serialized the timeouts.
+  const out = await Promise.all(
+    CONCORDIA_PAGES.map(async (url): Promise<WebSource> => {
+      try {
+        const res = await fetch(url, {
+          headers: { "User-Agent": "SOEN-Compass-Research/1.0 (sraldon24@gmail.com)" },
+          signal: AbortSignal.timeout(15_000),
+        });
+        if (!res.ok) {
+          return { url, summary: `[fetch failed: HTTP ${res.status}]` };
+        }
+        const html = await res.text();
+        const mentions = codes.filter((code) => html.includes(code));
+        if (mentions.length > 0) {
+          const firstCode = mentions[0] ?? "";
+          const idx = html.indexOf(firstCode);
+          const excerpt = html
+            .slice(Math.max(0, idx - 200), idx + 600)
+            .replace(/<[^>]+>/g, " ")
+            .replace(/\s+/g, " ")
+            .trim();
+          return { url, summary: excerpt.slice(0, 800) };
+        }
+        return { url, summary: "(no direct mention of queried codes)" };
+      } catch (err) {
+        return {
+          url,
+          summary: `[fetch error: ${err instanceof Error ? err.message : "unknown"}]`,
+        };
       }
-      const html = await res.text();
-      const mentions = codes.filter((code) => html.includes(code));
-      if (mentions.length > 0) {
-        const firstCode = mentions[0] ?? "";
-        const idx = html.indexOf(firstCode);
-        const excerpt = html
-          .slice(Math.max(0, idx - 200), idx + 600)
-          .replace(/<[^>]+>/g, " ")
-          .replace(/\s+/g, " ")
-          .trim();
-        out.push({ url, summary: excerpt.slice(0, 800) });
-      } else {
-        out.push({ url, summary: "(no direct mention of queried codes)" });
-      }
-    } catch (err) {
-      out.push({
-        url,
-        summary: `[fetch error: ${err instanceof Error ? err.message : "unknown"}]`,
-      });
-    }
-  }
+    }),
+  );
   return { webSources: out };
 }
 

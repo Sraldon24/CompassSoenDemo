@@ -47,6 +47,8 @@ export interface CourseCatalogEntry {
   isDeficiency?: boolean;
   /** Community-rated workload (used by the predictor when available). */
   avgHoursPerWeek?: number;
+  /** Catalog description — enriches recommendation embeddings + LLM rationale. */
+  description?: string | null;
 }
 
 export interface PlannedCourse {
