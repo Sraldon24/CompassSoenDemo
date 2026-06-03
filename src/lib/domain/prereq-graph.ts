@@ -82,13 +82,47 @@ export function buildPrereqGraph(catalogList: CourseCatalogEntry[]): PrereqGraph
     levelOf(c.code, catalog, levelMemo, new Set());
   }
 
-  // 2. Bucket by level + sort within bucket.
+  // 2. Bucket by level + sort within bucket (alphabetical = stable seed order).
   const buckets = new Map<number, string[]>();
   for (const [code, level] of levelMemo.entries()) {
     if (!buckets.has(level)) buckets.set(level, []);
     buckets.get(level)?.push(code);
   }
   for (const arr of buckets.values()) arr.sort();
+
+  // 2b. Barycenter ordering: sweep levels left→right and reorder each level by
+  // the mean index of each node's prereqs in the previous level. This pulls a
+  // course vertically toward its parents, so edges bow gently instead of
+  // crisscrossing the whole canvas. Alphabetical order is the stable tiebreak,
+  // so the layout stays deterministic.
+  const orderInLevel = new Map<string, number>();
+  const sortedLevels = [...buckets.keys()].sort((a, b) => a - b);
+  for (const level of sortedLevels) {
+    const codes = buckets.get(level);
+    if (!codes) continue;
+    if (level === 0) {
+      codes.forEach((code, idx) => orderInLevel.set(code, idx));
+      continue;
+    }
+    const withBary = codes.map((code, alphaIdx) => {
+      const c = catalog.get(code);
+      const prereqs = [...(c?.prereqs?.all ?? []), ...(c?.prereqs?.any ?? [])].filter((p) =>
+        catalog.has(p),
+      );
+      const indices = prereqs
+        .map((p) => orderInLevel.get(p))
+        .filter((i): i is number => i !== undefined);
+      const bary =
+        indices.length > 0
+          ? indices.reduce((s, i) => s + i, 0) / indices.length
+          : Number.POSITIVE_INFINITY; // no positioned parent → sink to bottom, stable
+      return { code, bary, alphaIdx };
+    });
+    withBary.sort((a, b) => a.bary - b.bary || a.alphaIdx - b.alphaIdx);
+    const reordered = withBary.map((w) => w.code);
+    buckets.set(level, reordered);
+    reordered.forEach((code, idx) => orderInLevel.set(code, idx));
+  }
 
   // 3. Assign x,y.
   const nodes: GraphNode[] = [];
@@ -151,4 +185,83 @@ const CATEGORY_COLOR: Record<string, string> = {
 export function categoryColor(category: string | null): string {
   if (!category) return "var(--color-text-muted)";
   return CATEGORY_COLOR[category] ?? "var(--color-text-muted)";
+}
+
+// ============================================================================
+// Traversal — for click-to-pin path highlighting in the interactive map.
+// ============================================================================
+
+export interface PrereqChain {
+  /** All courses that `code` (transitively) depends on. Excludes `code`. */
+  ancestors: Set<string>;
+  /** All courses that (transitively) depend on `code`. Excludes `code`. */
+  descendants: Set<string>;
+  /** Every node in the chain, including `code` itself. */
+  nodes: Set<string>;
+  /** "from->to" keys for every edge that lies on the chain. */
+  edges: Set<string>;
+}
+
+/** Build forward (to→from-set) and backward (from→to-set) adjacency maps. */
+function buildAdjacency(edges: GraphEdge[]): {
+  parents: Map<string, Set<string>>;
+  children: Map<string, Set<string>>;
+} {
+  const parents = new Map<string, Set<string>>(); // node → its prereqs
+  const children = new Map<string, Set<string>>(); // node → courses it unlocks
+  for (const e of edges) {
+    if (!parents.has(e.to)) parents.set(e.to, new Set());
+    parents.get(e.to)?.add(e.from);
+    if (!children.has(e.from)) children.set(e.from, new Set());
+    children.get(e.from)?.add(e.to);
+  }
+  return { parents, children };
+}
+
+/**
+ * Compute the full prerequisite chain for a course: everything it transitively
+ * depends on (ancestors), everything that transitively depends on it
+ * (descendants), and the edges connecting them. Used to spotlight one course's
+ * path through the degree while dimming the rest.
+ *
+ * Pure + cycle-safe (visited set). Same graph + code → same result.
+ */
+export function computeChain(code: string, edges: GraphEdge[]): PrereqChain {
+  const { parents, children } = buildAdjacency(edges);
+  const ancestors = new Set<string>();
+  const descendants = new Set<string>();
+
+  const walk = (start: string, adj: Map<string, Set<string>>, out: Set<string>) => {
+    const stack = [start];
+    while (stack.length > 0) {
+      const cur = stack.pop();
+      if (cur === undefined) continue;
+      for (const next of adj.get(cur) ?? []) {
+        if (!out.has(next)) {
+          out.add(next);
+          stack.push(next);
+        }
+      }
+    }
+  };
+  walk(code, parents, ancestors);
+  walk(code, children, descendants);
+
+  const nodes = new Set<string>([code, ...ancestors, ...descendants]);
+  const chainEdges = new Set<string>();
+  for (const e of edges) {
+    if (nodes.has(e.from) && nodes.has(e.to)) chainEdges.add(`${e.from}->${e.to}`);
+  }
+
+  return { ancestors, descendants, nodes, edges: chainEdges };
+}
+
+/**
+ * Cubic-bezier path string for an edge, curving horizontally between two
+ * points. Control points sit at the horizontal midpoint so lines bow smoothly
+ * left→right instead of crossing as harsh straight diagonals.
+ */
+export function bezierPath(x1: number, y1: number, x2: number, y2: number): string {
+  const mx = (x1 + x2) / 2;
+  return `M ${x1},${y1} C ${mx},${y1} ${mx},${y2} ${x2},${y2}`;
 }

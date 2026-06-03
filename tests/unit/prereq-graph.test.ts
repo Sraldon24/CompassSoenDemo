@@ -1,4 +1,10 @@
-import { buildPrereqGraph, categoryColor } from "@/lib/domain/prereq-graph";
+import {
+  type GraphEdge,
+  bezierPath,
+  buildPrereqGraph,
+  categoryColor,
+  computeChain,
+} from "@/lib/domain/prereq-graph";
 import type { CourseCatalogEntry } from "@/lib/validation/plan";
 import { describe, expect, it } from "vitest";
 
@@ -82,6 +88,103 @@ describe("buildPrereqGraph", () => {
     // Adding the node body width (~160) and trailing padding (40) → ≥ 600.
     expect(graph.width).toBeGreaterThanOrEqual(440);
     expect(graph.height).toBeGreaterThanOrEqual(80);
+  });
+});
+
+describe("computeChain", () => {
+  // A → B → C, and B → D. (A unlocks B; B unlocks C and D.)
+  const edges: GraphEdge[] = [
+    { from: "A", to: "B", kind: "prereq" },
+    { from: "B", to: "C", kind: "prereq" },
+    { from: "B", to: "D", kind: "prereq" },
+  ];
+
+  it("collects transitive ancestors (what a course depends on)", () => {
+    const chain = computeChain("C", edges);
+    expect([...chain.ancestors].sort()).toEqual(["A", "B"]);
+  });
+
+  it("collects transitive descendants (what a course unlocks)", () => {
+    const chain = computeChain("A", edges);
+    expect([...chain.descendants].sort()).toEqual(["B", "C", "D"]);
+  });
+
+  it("includes the course itself in nodes but not in ancestors/descendants", () => {
+    const chain = computeChain("B", edges);
+    expect(chain.nodes.has("B")).toBe(true);
+    expect(chain.ancestors.has("B")).toBe(false);
+    expect(chain.descendants.has("B")).toBe(false);
+    // B's chain: ancestor A, descendants C + D, plus B → 4 nodes.
+    expect(chain.nodes.size).toBe(4);
+  });
+
+  it("marks only edges that lie within the chain", () => {
+    const chain = computeChain("C", edges);
+    // C's chain is {A,B,C}; the B→D edge is NOT on it.
+    expect(chain.edges.has("A->B")).toBe(true);
+    expect(chain.edges.has("B->C")).toBe(true);
+    expect(chain.edges.has("B->D")).toBe(false);
+  });
+
+  it("is cycle-safe", () => {
+    const cyclic: GraphEdge[] = [
+      { from: "X", to: "Y", kind: "prereq" },
+      { from: "Y", to: "X", kind: "prereq" },
+    ];
+    expect(() => computeChain("X", cyclic)).not.toThrow();
+  });
+
+  it("returns empty chain for an isolated node", () => {
+    const chain = computeChain("Z", edges);
+    expect(chain.ancestors.size).toBe(0);
+    expect(chain.descendants.size).toBe(0);
+    expect([...chain.nodes]).toEqual(["Z"]);
+  });
+});
+
+describe("bezierPath", () => {
+  it("starts at the source and ends at the target point", () => {
+    const d = bezierPath(0, 10, 100, 50);
+    expect(d.startsWith("M 0,10")).toBe(true);
+    expect(d.endsWith("100,50")).toBe(true);
+  });
+
+  it("puts both control points at the horizontal midpoint", () => {
+    // midpoint of x 0→100 is 50; both control x's should be 50.
+    const d = bezierPath(0, 0, 100, 80);
+    expect(d).toContain("C 50,0 50,80");
+  });
+});
+
+describe("buildPrereqGraph — barycenter ordering", () => {
+  const mk = (
+    code: string,
+    prereqs: CourseCatalogEntry["prereqs"] = { all: [], any: [], concurrent: [] },
+  ): CourseCatalogEntry => ({ code, title: code, credits: 3, category: "se_core", prereqs });
+
+  it("reorders a level so children follow their parents' vertical order", () => {
+    // Level 0 (alphabetical): AAA(0), BBB(1), CCC(2).
+    // Level 1 children: childOfCCC depends on CCC(2), childOfAAA depends on AAA(0).
+    // Alphabetically "childA…" < "childC…", but barycenter must put childOfAAA
+    // ABOVE childOfCCC (parent idx 0 < 2) — i.e. ordering follows parents, not the alphabet.
+    const graph = buildPrereqGraph([
+      mk("AAA 100"),
+      mk("BBB 100"),
+      mk("CCC 100"),
+      mk("MMM 200", { all: ["CCC 100"] }), // parent idx 2 → bary 2
+      mk("NNN 200", { all: ["AAA 100"] }), // parent idx 0 → bary 0
+    ]);
+    const level1 = graph.nodes.filter((n) => n.level === 1).sort((a, b) => a.y - b.y);
+    // NNN (parent AAA, idx 0) should come before MMM (parent CCC, idx 2),
+    // even though "MMM" < "NNN" alphabetically.
+    expect(level1.map((n) => n.code)).toEqual(["NNN 200", "MMM 200"]);
+  });
+
+  it("stays deterministic: same input → same ordering", () => {
+    const input = [mk("AAA 100"), mk("BBB 100", { all: ["AAA 100"] })];
+    const a = buildPrereqGraph(input).nodes.map((n) => `${n.code}@${n.x},${n.y}`);
+    const b = buildPrereqGraph(input).nodes.map((n) => `${n.code}@${n.x},${n.y}`);
+    expect(a).toEqual(b);
   });
 });
 
