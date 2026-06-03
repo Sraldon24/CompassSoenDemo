@@ -1,7 +1,7 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { db } from "@/lib/db";
-import { users } from "@/lib/db/schema";
-import { getSession } from "@/lib/get-session";
+import { getSession } from "@/lib/auth/get-session";
+import { db } from "@/lib/data/db";
+import { users } from "@/lib/data/schema";
 import { eq } from "drizzle-orm";
 import { Clock } from "lucide-react";
 import { redirect } from "next/navigation";

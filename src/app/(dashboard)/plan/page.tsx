@@ -1,7 +1,7 @@
 import { AIReview } from "@/components/planner/ai-review";
 import { PlannerBoard } from "@/components/planner/planner-board";
-import { getAllCourses, getUserPlanSnapshot, termRange } from "@/lib/db/queries/plan";
-import { getSession } from "@/lib/get-session";
+import { getSession } from "@/lib/auth/get-session";
+import { getAllCourses, getUserPlanSnapshot, termRange } from "@/lib/data/queries/plan";
 import { redirect } from "next/navigation";
 
 export const metadata = {

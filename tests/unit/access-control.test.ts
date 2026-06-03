@@ -7,7 +7,7 @@
  *   - ADMIN_EMAIL always allowed; matching is case-insensitive.
  */
 
-import { isSignupAllowed } from "@/lib/access-control";
+import { isSignupAllowed } from "@/lib/auth/access-control";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
 const ORIG_ALLOWED = process.env.ALLOWED_EMAILS;

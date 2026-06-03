@@ -8,8 +8,8 @@
  * never lag.
  */
 
-import { db } from "@/lib/db";
-import { courses, difficultyVotes } from "@/lib/db/schema";
+import { db } from "@/lib/data/db";
+import { courses, difficultyVotes } from "@/lib/data/schema";
 import { and, eq, sql } from "drizzle-orm";
 import { type DifficultyVoteValue, difficultyBucket } from "./aggregates";
 

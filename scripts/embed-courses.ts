@@ -13,8 +13,8 @@
 
 import { sql } from "drizzle-orm";
 import { embed, embedBatch } from "../src/lib/ai/embeddings";
-import { db } from "../src/lib/db";
-import { courseEmbeddings, courses } from "../src/lib/db/schema";
+import { db } from "../src/lib/data/db";
+import { courseEmbeddings, courses } from "../src/lib/data/schema";
 
 const BATCH_SIZE = 16;
 

@@ -8,8 +8,8 @@
  */
 
 import { castDifficultyVote, getDifficultySummary } from "@/lib/community/difficulty";
-import { db } from "@/lib/db";
-import { courses, difficultyVotes, users } from "@/lib/db/schema";
+import { db } from "@/lib/data/db";
+import { courses, difficultyVotes, users } from "@/lib/data/schema";
 import { eq, inArray } from "drizzle-orm";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 

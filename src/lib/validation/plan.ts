@@ -10,15 +10,15 @@
  * names so existing consumers and tests keep working unchanged.
  */
 
-import { groupByTerm, isSameTerm, isTermBefore, parseTerm } from "@/lib/term";
-import type { TermLabel } from "@/lib/term";
+import { groupByTerm, isSameTerm, isTermBefore, parseTerm } from "@/lib/domain/term";
+import type { TermLabel } from "@/lib/domain/term";
 
 // Back-compat re-exports — historical names kept so consumers/tests don't break.
 // `parseTermLabel` is the historical alias for `parseTerm`. `groupByTerm` is
 // imported above (used internally) and re-exported here for consumers.
-export { termOrdinal, parseTerm as parseTermLabel } from "@/lib/term";
+export { termOrdinal, parseTerm as parseTermLabel } from "@/lib/domain/term";
 export { groupByTerm };
-export type { TermLabel, TermSeason } from "@/lib/term";
+export type { TermLabel, TermSeason } from "@/lib/domain/term";
 
 export type CourseStatus =
   | "planned"

@@ -12,10 +12,10 @@
  * already-resolved change does nothing.
  */
 
-import { db } from "@/lib/db";
-import { scrapedChanges } from "@/lib/db/schema";
-import { getSession } from "@/lib/get-session";
-import { isAdmin } from "@/lib/is-admin";
+import { getSession } from "@/lib/auth/get-session";
+import { isAdmin } from "@/lib/auth/is-admin";
+import { db } from "@/lib/data/db";
+import { scrapedChanges } from "@/lib/data/schema";
 import { and, eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { applyCourseChange } from "./apply";

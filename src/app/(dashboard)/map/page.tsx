@@ -1,5 +1,5 @@
-import { getAllCourses, getUserPlanSnapshot } from "@/lib/db/queries/plan";
-import { getSession } from "@/lib/get-session";
+import { getSession } from "@/lib/auth/get-session";
+import { getAllCourses, getUserPlanSnapshot } from "@/lib/data/queries/plan";
 import { redirect } from "next/navigation";
 import { PrereqMapClient } from "./client";
 

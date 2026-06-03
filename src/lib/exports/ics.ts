@@ -60,4 +60,4 @@ export function buildICS(calendarName: string, events: ICSEvent[]): string {
 
 // `termToStartDate` now lives in `@/lib/term` (single source of truth).
 // Re-exported so the existing `@/lib/exports/ics` import path stays stable.
-export { termToStartDate } from "@/lib/term";
+export { termToStartDate } from "@/lib/domain/term";

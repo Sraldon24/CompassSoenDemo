@@ -2,7 +2,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { DASHBOARD_INSIGHT_SYSTEM } from "@/lib/ai/prompts";
 import { AIError, generateResponse } from "@/lib/ai/provider";
 import { recordAIUsage } from "@/lib/ai/usage";
-import { getUserPlanSnapshot } from "@/lib/db/queries/plan";
+import { getUserPlanSnapshot } from "@/lib/data/queries/plan";
 import { LRUCache } from "lru-cache";
 import { Sparkles } from "lucide-react";
 

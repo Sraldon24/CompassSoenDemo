@@ -1,8 +1,8 @@
 "use server";
 
-import { db } from "@/lib/db";
-import { checklistItems } from "@/lib/db/schema";
-import { getSession } from "@/lib/get-session";
+import { getSession } from "@/lib/auth/get-session";
+import { db } from "@/lib/data/db";
+import { checklistItems } from "@/lib/data/schema";
 import { and, eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";

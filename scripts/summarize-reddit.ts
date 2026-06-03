@@ -12,8 +12,8 @@
  */
 
 import { isStale, regenerateSummary } from "../src/lib/community/summaries";
-import { db } from "../src/lib/db";
-import { redditPosts } from "../src/lib/db/schema";
+import { db } from "../src/lib/data/db";
+import { redditPosts } from "../src/lib/data/schema";
 
 interface CliOptions {
   code?: string;

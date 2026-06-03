@@ -4,9 +4,9 @@
  * Server actions for the admin moderation queue.
  */
 
+import { getSession } from "@/lib/auth/get-session";
+import { isAdmin } from "@/lib/auth/is-admin";
 import { type ResolveAction, resolveFlag } from "@/lib/community/moderation";
-import { getSession } from "@/lib/get-session";
-import { isAdmin } from "@/lib/is-admin";
 import { revalidatePath } from "next/cache";
 
 export type ActionResult = { ok: true } | { ok: false; error: string };

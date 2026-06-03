@@ -8,8 +8,8 @@
  */
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { db } from "@/lib/db";
-import { scrapedChanges } from "@/lib/db/schema";
+import { db } from "@/lib/data/db";
+import { scrapedChanges } from "@/lib/data/schema";
 import { desc, eq } from "drizzle-orm";
 import { ApproveRejectButtons } from "./buttons";
 

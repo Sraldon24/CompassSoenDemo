@@ -1,5 +1,5 @@
-import { CookieBanner } from "@/components/cookie-banner";
-import { ThemeProvider } from "@/components/theme-provider";
+import { CookieBanner } from "@/components/common/cookie-banner";
+import { ThemeProvider } from "@/components/providers/theme-provider";
 import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { AnalyticsProvider } from "@/lib/analytics/client";

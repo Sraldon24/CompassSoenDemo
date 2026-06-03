@@ -1,5 +1,5 @@
-import { db } from "@/lib/db";
-import { users } from "@/lib/db/schema";
+import { db } from "@/lib/data/db";
+import { users } from "@/lib/data/schema";
 import { asc, desc } from "drizzle-orm";
 import { UserStatusButtons } from "./buttons";
 

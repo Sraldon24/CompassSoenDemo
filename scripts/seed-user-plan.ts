@@ -14,8 +14,8 @@
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { eq, sql } from "drizzle-orm";
-import { db } from "../src/lib/db";
-import { profiles, userCourses, users } from "../src/lib/db/schema";
+import { db } from "../src/lib/data/db";
+import { profiles, userCourses, users } from "../src/lib/data/schema";
 
 interface SeedPlanEntry {
   courseCode: string;

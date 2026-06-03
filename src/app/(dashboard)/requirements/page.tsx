@@ -1,11 +1,11 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { getUserPlanSnapshot } from "@/lib/db/queries/plan";
-import { getSession } from "@/lib/get-session";
+import { getSession } from "@/lib/auth/get-session";
+import { getUserPlanSnapshot } from "@/lib/data/queries/plan";
 import {
   TOTAL_DEGREE_CREDITS,
   computeCategoryProgress,
   totalDegreeProgress,
-} from "@/lib/requirements";
+} from "@/lib/domain/requirements";
 import { redirect } from "next/navigation";
 
 export const metadata = {

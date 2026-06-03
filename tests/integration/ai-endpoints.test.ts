@@ -9,8 +9,8 @@
  * If Groq is unavailable, tests are skipped with a clear message.
  */
 
-import { db } from "@/lib/db";
-import { profiles, userCourses, users } from "@/lib/db/schema";
+import { db } from "@/lib/data/db";
+import { profiles, userCourses, users } from "@/lib/data/schema";
 import { eq } from "drizzle-orm";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 

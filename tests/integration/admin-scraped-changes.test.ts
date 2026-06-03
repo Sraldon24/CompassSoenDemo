@@ -12,8 +12,8 @@
  */
 
 import { applyCourseChangeForTesting } from "@/app/admin/scraped-changes/test-helpers";
-import { db } from "@/lib/db";
-import { courses } from "@/lib/db/schema";
+import { db } from "@/lib/data/db";
+import { courses } from "@/lib/data/schema";
 import { eq } from "drizzle-orm";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 

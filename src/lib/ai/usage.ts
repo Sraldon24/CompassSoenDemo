@@ -3,8 +3,8 @@
  * even if the in-memory limiter is reset (e.g. server restart).
  */
 
-import { db } from "@/lib/db";
-import { aiUsage } from "@/lib/db/schema";
+import { db } from "@/lib/data/db";
+import { aiUsage } from "@/lib/data/schema";
 import type { GroqModel } from "./types";
 
 interface RecordUsageInput {

@@ -10,7 +10,7 @@ import {
   termRange,
   termToStartDate,
   termYear,
-} from "@/lib/term";
+} from "@/lib/domain/term";
 import { describe, expect, it } from "vitest";
 
 describe("parseTerm", () => {

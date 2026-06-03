@@ -15,8 +15,8 @@
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { sql } from "drizzle-orm";
-import { db } from "../src/lib/db";
-import { courses } from "../src/lib/db/schema";
+import { db } from "../src/lib/data/db";
+import { courses } from "../src/lib/data/schema";
 
 // Env is loaded by scripts/load-env.ts via the `--import` flag in package.json.
 

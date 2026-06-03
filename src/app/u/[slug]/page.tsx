@@ -12,7 +12,7 @@
 import { ANALYTICS_EVENTS } from "@/lib/analytics/events";
 import { trackServer } from "@/lib/analytics/server";
 import { getPublicProfileBySlug } from "@/lib/community/public-profile";
-import { TOTAL_DEGREE_CREDITS } from "@/lib/requirements";
+import { TOTAL_DEGREE_CREDITS } from "@/lib/domain/requirements";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";

@@ -6,7 +6,7 @@
  */
 
 import { getPublicProfileBySlug } from "@/lib/community/public-profile";
-import { TOTAL_DEGREE_CREDITS } from "@/lib/requirements";
+import { TOTAL_DEGREE_CREDITS } from "@/lib/domain/requirements";
 import { ImageResponse } from "next/og";
 
 export const runtime = "nodejs";

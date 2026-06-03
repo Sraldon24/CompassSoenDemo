@@ -4,7 +4,7 @@ import {
   rateLimit,
   rateLimitByIp,
   rateLimitByUserId,
-} from "@/lib/rate-limit";
+} from "@/lib/ip-rate-limit";
 import { afterEach, describe, expect, it } from "vitest";
 
 describe("rateLimit", () => {

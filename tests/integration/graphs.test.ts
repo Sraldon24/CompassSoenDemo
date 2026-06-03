@@ -13,8 +13,8 @@
 import { runEmailDraftGraph } from "@/lib/ai/graphs/email-graph";
 import { runRecommendationGraph } from "@/lib/ai/graphs/recommend-graph";
 import { runResearchGraph } from "@/lib/ai/graphs/research-graph";
-import { db } from "@/lib/db";
-import { profiles, userCourses, users } from "@/lib/db/schema";
+import { db } from "@/lib/data/db";
+import { profiles, userCourses, users } from "@/lib/data/schema";
 import { eq } from "drizzle-orm";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 

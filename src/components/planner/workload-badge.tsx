@@ -1,6 +1,6 @@
 "use client";
 
-import type { WorkloadLevel } from "@/lib/workload";
+import type { WorkloadLevel } from "@/lib/domain/workload";
 
 interface WorkloadBadgeProps {
   level: WorkloadLevel;

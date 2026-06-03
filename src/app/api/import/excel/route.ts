@@ -6,9 +6,9 @@
  * lives in `@/lib/imports/excel-engine` (unit-tested without DB/HTTP).
  */
 
-import { db } from "@/lib/db";
-import { checklistItems, courses, importJobs, userCourses } from "@/lib/db/schema";
-import { getSession } from "@/lib/get-session";
+import { getSession } from "@/lib/auth/get-session";
+import { db } from "@/lib/data/db";
+import { checklistItems, courses, importJobs, userCourses } from "@/lib/data/schema";
 import { extractMilestones, parseExcelPlan } from "@/lib/imports/excel-engine";
 import { denyResponse, guardAiCall } from "@/lib/limits";
 import { and, eq } from "drizzle-orm";

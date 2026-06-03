@@ -6,9 +6,9 @@
  * pages so a printed copy is recognizable.
  */
 
-import type { CategoryProgress } from "@/lib/requirements";
-import { TOTAL_DEGREE_CREDITS } from "@/lib/requirements";
-import { groupByTerm, sortTerms } from "@/lib/term";
+import type { CategoryProgress } from "@/lib/domain/requirements";
+import { TOTAL_DEGREE_CREDITS } from "@/lib/domain/requirements";
+import { groupByTerm, sortTerms } from "@/lib/domain/term";
 import type { CourseCatalogEntry, PlannedCourse } from "@/lib/validation/plan";
 import { Document, Page, StyleSheet, Text, View, renderToBuffer } from "@react-pdf/renderer";
 

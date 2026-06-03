@@ -14,9 +14,9 @@ import { afterAll, beforeAll, describe, expect, it } from "vitest";
 config({ path: ".env.local" });
 
 import { buildRAGContext } from "@/lib/ai/rag";
-import { db } from "@/lib/db";
-import { getAllCourses, getUserPlanSnapshot } from "@/lib/db/queries/plan";
-import { courses, profiles, userCourses, users } from "@/lib/db/schema";
+import { db } from "@/lib/data/db";
+import { getAllCourses, getUserPlanSnapshot } from "@/lib/data/queries/plan";
+import { courses, profiles, userCourses, users } from "@/lib/data/schema";
 // Lazy imports so the env vars are loaded first.
 import { eq, sql } from "drizzle-orm";
 

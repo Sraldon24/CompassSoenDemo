@@ -1,6 +1,6 @@
-import { ThemeToggle } from "@/components/theme-toggle";
+import { ThemeToggle } from "@/components/providers/theme-toggle";
 import { Button } from "@/components/ui/button";
-import { getSession } from "@/lib/get-session";
+import { getSession } from "@/lib/auth/get-session";
 import Image from "next/image";
 import Link from "next/link";
 import { redirect } from "next/navigation";

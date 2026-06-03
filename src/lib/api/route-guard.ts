@@ -15,7 +15,7 @@
  */
 
 import type { GroqModel } from "@/lib/ai/types";
-import { getSession } from "@/lib/get-session";
+import { getSession } from "@/lib/auth/get-session";
 import {
   type Feature,
   type GuardDecision,

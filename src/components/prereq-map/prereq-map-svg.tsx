@@ -1,6 +1,6 @@
 "use client";
 
-import { buildPrereqGraph, categoryColor } from "@/lib/prereq-graph";
+import { buildPrereqGraph, categoryColor } from "@/lib/domain/prereq-graph";
 import type { CourseCatalogEntry } from "@/lib/validation/plan";
 import { useMemo, useState } from "react";
 

@@ -5,10 +5,10 @@
  * slug, and per-field visibility.
  */
 
+import { getSession } from "@/lib/auth/get-session";
 import { SLUG_RX, slugify } from "@/lib/community/slug";
-import { db } from "@/lib/db";
-import { profiles } from "@/lib/db/schema";
-import { getSession } from "@/lib/get-session";
+import { db } from "@/lib/data/db";
+import { profiles } from "@/lib/data/schema";
 import { and, eq, ne } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 

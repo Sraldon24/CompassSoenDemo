@@ -7,8 +7,8 @@
  * what a no-auth visitor sees.
  */
 
-import { db } from "@/lib/db";
-import { courses, profiles, userCourses, users } from "@/lib/db/schema";
+import { db } from "@/lib/data/db";
+import { courses, profiles, userCourses, users } from "@/lib/data/schema";
 import { and, eq } from "drizzle-orm";
 
 export interface PublicProfile {

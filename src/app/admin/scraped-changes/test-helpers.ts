@@ -4,7 +4,7 @@
  * (which requires a session). Production code does NOT import this file.
  */
 
-import { db } from "@/lib/db";
+import { db } from "@/lib/data/db";
 import { type ScrapedChangeRow, applyCourseChange } from "./apply";
 
 export async function applyCourseChangeForTesting(change: ScrapedChangeRow): Promise<void> {

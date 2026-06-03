@@ -10,9 +10,9 @@ import {
 import { CourseCard } from "@/components/planner/course-card";
 import { CoursePicker } from "@/components/planner/course-picker";
 import { WorkloadBadge } from "@/components/planner/workload-badge";
+import { calculateTermWorkload } from "@/lib/domain/workload";
 import type { CourseCatalogEntry, PlannedCourse, ValidationIssue } from "@/lib/validation/plan";
 import { buildPlan, validatePlan } from "@/lib/validation/plan";
-import { calculateTermWorkload } from "@/lib/workload";
 import {
   DndContext,
   type DragEndEvent,

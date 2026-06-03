@@ -7,8 +7,8 @@
  * Folds in the former `getUserPlanSnapshot` from `db/queries/plan.ts`.
  */
 
-import { db } from "@/lib/db";
-import { userCourses } from "@/lib/db/schema";
+import { db } from "@/lib/data/db";
+import { userCourses } from "@/lib/data/schema";
 import type { CourseCatalogEntry, PlannedCourse } from "@/lib/validation/plan";
 import { asc, eq } from "drizzle-orm";
 import { makeCourseCatalogRepository } from "./course-catalog-repo";

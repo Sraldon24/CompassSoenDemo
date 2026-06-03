@@ -12,7 +12,7 @@
  * delete is recoverable for 30 days.
  */
 
-import { db } from "@/lib/db";
+import { db } from "@/lib/data/db";
 import {
   aiConversations,
   aiMessages,
@@ -21,7 +21,7 @@ import {
   profiles,
   userCourses,
   users,
-} from "@/lib/db/schema";
+} from "@/lib/data/schema";
 import { and, eq, inArray, isNotNull, lte } from "drizzle-orm";
 
 export interface UserDataExport {

@@ -9,7 +9,7 @@
 
 import { cellStr, isCourseCode, statusFromString } from "@/lib/courses/code";
 import type { UserCourseStatus } from "@/lib/courses/code";
-import { TERM_REGEX, termYear } from "@/lib/term";
+import { TERM_REGEX, termYear } from "@/lib/domain/term";
 import * as XLSX from "xlsx";
 
 type Row = (string | number | null)[];

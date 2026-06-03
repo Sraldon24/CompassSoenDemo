@@ -4,7 +4,7 @@
  * action files can only export server actions).
  */
 
-import { courses } from "@/lib/db/schema";
+import { courses } from "@/lib/data/schema";
 import { eq } from "drizzle-orm";
 
 export interface ScrapedChangeRow {
@@ -17,9 +17,9 @@ export interface ScrapedChangeRow {
 // `db.transaction` callback param type — kept loose so this module doesn't
 // have to import the heavy Drizzle types into a hot path.
 type DbTx = {
-  insert: typeof import("@/lib/db")["db"]["insert"];
-  update: typeof import("@/lib/db")["db"]["update"];
-  delete: typeof import("@/lib/db")["db"]["delete"];
+  insert: typeof import("@/lib/data/db")["db"]["insert"];
+  update: typeof import("@/lib/data/db")["db"]["update"];
+  delete: typeof import("@/lib/data/db")["db"]["delete"];
 };
 
 export async function applyCourseChange(tx: DbTx, change: ScrapedChangeRow): Promise<void> {

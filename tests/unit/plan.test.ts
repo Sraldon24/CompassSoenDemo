@@ -1,4 +1,4 @@
-import { termOrdinal } from "@/lib/term";
+import { termOrdinal } from "@/lib/domain/term";
 import {
   type CourseCatalogEntry,
   type PlannedCourse,

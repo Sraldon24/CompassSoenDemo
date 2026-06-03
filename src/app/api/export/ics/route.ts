@@ -1,8 +1,8 @@
 import { ANALYTICS_EVENTS } from "@/lib/analytics/events";
 import { trackServer } from "@/lib/analytics/server";
-import { getUserPlanSnapshot } from "@/lib/db/queries/plan";
+import { getSession } from "@/lib/auth/get-session";
+import { getUserPlanSnapshot } from "@/lib/data/queries/plan";
 import { type ICSEvent, buildICS, termToStartDate } from "@/lib/exports/ics";
-import { getSession } from "@/lib/get-session";
 import { NextResponse } from "next/server";
 
 export const dynamic = "force-dynamic";

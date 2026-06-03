@@ -1,6 +1,6 @@
 "use client";
 
-import { ThemeToggle } from "@/components/theme-toggle";
+import { ThemeToggle } from "@/components/providers/theme-toggle";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -10,7 +10,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { authClient } from "@/lib/auth-client";
+import { authClient } from "@/lib/auth/auth-client";
 import { LogOut, Settings as SettingsIcon, User as UserIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";

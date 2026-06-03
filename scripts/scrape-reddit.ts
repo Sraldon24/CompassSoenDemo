@@ -22,8 +22,8 @@ import { concordiaCoursesSource } from "../src/lib/community/concordia-courses";
 import { fetchPostsForCourse } from "../src/lib/community/fetch-posts";
 import { redditSource } from "../src/lib/community/reddit";
 import type { CommunityPost } from "../src/lib/community/source";
-import { db } from "../src/lib/db";
-import { courses, redditPosts } from "../src/lib/db/schema";
+import { db } from "../src/lib/data/db";
+import { courses, redditPosts } from "../src/lib/data/schema";
 
 interface CliOptions {
   code?: string;

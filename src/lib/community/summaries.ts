@@ -10,8 +10,8 @@
  * regeneration would burn the daily budget in one user's pageview spree.
  */
 
-import { db } from "@/lib/db";
-import { redditPosts, redditSummaries } from "@/lib/db/schema";
+import { db } from "@/lib/data/db";
+import { redditPosts, redditSummaries } from "@/lib/data/schema";
 import { desc, eq } from "drizzle-orm";
 import {
   type CourseSummary,

@@ -3,9 +3,9 @@
  * export/delete (#94 appends here).
  */
 
-import { db } from "@/lib/db";
-import { profiles } from "@/lib/db/schema";
-import { getSession } from "@/lib/get-session";
+import { getSession } from "@/lib/auth/get-session";
+import { db } from "@/lib/data/db";
+import { profiles } from "@/lib/data/schema";
 import { eq } from "drizzle-orm";
 import { redirect } from "next/navigation";
 import { DataControls } from "./data-controls";

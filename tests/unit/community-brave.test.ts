@@ -14,8 +14,8 @@ import {
   isBraveBudgetExhausted,
   searchBraveForCourse,
 } from "@/lib/community/brave";
-import { db } from "@/lib/db";
-import { braveUsage } from "@/lib/db/schema";
+import { db } from "@/lib/data/db";
+import { braveUsage } from "@/lib/data/schema";
 import { eq } from "drizzle-orm";
 import { afterAll, afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 

@@ -1,6 +1,6 @@
-import { isSignupAllowed } from "@/lib/access-control";
-import { db } from "@/lib/db";
-import { accounts, sessions, users, verifications } from "@/lib/db/schema";
+import { isSignupAllowed } from "@/lib/auth/access-control";
+import { db } from "@/lib/data/db";
+import { accounts, sessions, users, verifications } from "@/lib/data/schema";
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { APIError } from "better-auth/api";

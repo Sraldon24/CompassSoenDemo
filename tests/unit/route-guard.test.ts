@@ -11,7 +11,7 @@ import { NextResponse } from "next/server";
 const getSessionMock = vi.fn();
 const guardAiCallMock = vi.fn();
 
-vi.mock("@/lib/get-session", () => ({ getSession: () => getSessionMock() }));
+vi.mock("@/lib/auth/get-session", () => ({ getSession: () => getSessionMock() }));
 vi.mock("@/lib/limits", () => ({
   guardAiCall: (...args: unknown[]) => guardAiCallMock(...args),
   // Real-shaped deny envelope so aiGuard's 429/503 mapping is exercised honestly.

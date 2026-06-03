@@ -13,8 +13,8 @@
  *     dedupe / self-edit, but is never returned to the UI.
  */
 
-import { db } from "@/lib/db";
-import { professorReviews, professors } from "@/lib/db/schema";
+import { db } from "@/lib/data/db";
+import { professorReviews, professors } from "@/lib/data/schema";
 import { and, asc, desc, eq, sql } from "drizzle-orm";
 import { computeReviewAggregate } from "./aggregates";
 

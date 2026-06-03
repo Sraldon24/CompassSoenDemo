@@ -14,8 +14,8 @@
 
 import { readFileSync } from "node:fs";
 import { sql } from "drizzle-orm";
-import { db } from "../src/lib/db";
-import { redditPosts, redditSummaries } from "../src/lib/db/schema";
+import { db } from "../src/lib/data/db";
+import { redditPosts, redditSummaries } from "../src/lib/data/schema";
 
 type Sentiment = "positive" | "mixed" | "negative" | "insufficient_data";
 type Difficulty = "easy" | "medium" | "hard" | "unknown";

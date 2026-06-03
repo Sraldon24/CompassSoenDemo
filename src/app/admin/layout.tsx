@@ -8,8 +8,8 @@
 
 import { Sidebar } from "@/components/nav/sidebar";
 import { Topbar } from "@/components/nav/topbar";
-import { getSession } from "@/lib/get-session";
-import { isAdmin } from "@/lib/is-admin";
+import { getSession } from "@/lib/auth/get-session";
+import { isAdmin } from "@/lib/auth/is-admin";
 import { notFound, redirect } from "next/navigation";
 
 export const metadata = {

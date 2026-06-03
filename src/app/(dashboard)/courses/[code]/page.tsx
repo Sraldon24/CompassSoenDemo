@@ -12,12 +12,12 @@
  */
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { getSession } from "@/lib/auth/get-session";
 import { getDifficultySummary, getUserVote } from "@/lib/community/difficulty";
 import { getCourseReviews } from "@/lib/community/reviews";
 import { getCachedSummary } from "@/lib/community/summaries";
-import { db } from "@/lib/db";
-import { courses } from "@/lib/db/schema";
-import { getSession } from "@/lib/get-session";
+import { db } from "@/lib/data/db";
+import { courses } from "@/lib/data/schema";
 import { eq } from "drizzle-orm";
 import { notFound, redirect } from "next/navigation";
 import { DifficultyVote } from "./difficulty-vote";

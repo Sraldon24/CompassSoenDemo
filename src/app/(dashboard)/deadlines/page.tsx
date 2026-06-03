@@ -1,6 +1,6 @@
-import { db } from "@/lib/db";
-import { checklistItems, deadlines } from "@/lib/db/schema";
-import { getSession } from "@/lib/get-session";
+import { getSession } from "@/lib/auth/get-session";
+import { db } from "@/lib/data/db";
+import { checklistItems, deadlines } from "@/lib/data/schema";
 import { asc, eq } from "drizzle-orm";
 import { CalendarClock, Download } from "lucide-react";
 import { redirect } from "next/navigation";

@@ -6,8 +6,8 @@
  * singleton `courseCatalogRepo` is bound to the pooled handle for app code.
  */
 
-import { db } from "@/lib/db";
-import { courses } from "@/lib/db/schema";
+import { db } from "@/lib/data/db";
+import { courses } from "@/lib/data/schema";
 import type { CourseCatalogEntry } from "@/lib/validation/plan";
 import { asc, inArray } from "drizzle-orm";
 import type { DbHandle } from "./types";

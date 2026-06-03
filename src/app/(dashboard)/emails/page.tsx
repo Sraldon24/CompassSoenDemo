@@ -2,7 +2,7 @@ import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { EmailDraftAssistant } from "@/components/emails/email-draft-assistant";
 import { EmailTemplateList } from "@/components/emails/email-template-list";
-import { getSession } from "@/lib/get-session";
+import { getSession } from "@/lib/auth/get-session";
 import { Mail } from "lucide-react";
 import { redirect } from "next/navigation";
 

@@ -10,8 +10,8 @@
  *    surfaced as citation chips below the AI message.
  */
 
-import { db } from "@/lib/db";
-import { courses, userCourses } from "@/lib/db/schema";
+import { db } from "@/lib/data/db";
+import { courses, userCourses } from "@/lib/data/schema";
 import { and, eq, inArray, sql } from "drizzle-orm";
 import { embed } from "./embeddings";
 import type { RAGContext, RAGSource } from "./types";

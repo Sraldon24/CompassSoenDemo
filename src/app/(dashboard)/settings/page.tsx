@@ -3,7 +3,7 @@
  * footer links here, so this must exist (previously 404'd).
  */
 
-import { getSession } from "@/lib/get-session";
+import { getSession } from "@/lib/auth/get-session";
 import { FileSpreadsheet, ShieldCheck } from "lucide-react";
 import Link from "next/link";
 import { redirect } from "next/navigation";

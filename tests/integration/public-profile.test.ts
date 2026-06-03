@@ -9,8 +9,8 @@
  */
 
 import { getPublicProfileBySlug } from "@/lib/community/public-profile";
-import { db } from "@/lib/db";
-import { courses, profiles, userCourses, users } from "@/lib/db/schema";
+import { db } from "@/lib/data/db";
+import { courses, profiles, userCourses, users } from "@/lib/data/schema";
 import { eq, inArray } from "drizzle-orm";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 

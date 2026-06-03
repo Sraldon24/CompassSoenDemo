@@ -1,7 +1,7 @@
 import { embed } from "@/lib/ai/embeddings";
-import { db } from "@/lib/db";
-import { courses } from "@/lib/db/schema";
-import { getSession } from "@/lib/get-session";
+import { getSession } from "@/lib/auth/get-session";
+import { db } from "@/lib/data/db";
+import { courses } from "@/lib/data/schema";
 import { denyResponse, guardAiCall } from "@/lib/limits";
 import { ilike, or, sql } from "drizzle-orm";
 import { NextResponse } from "next/server";

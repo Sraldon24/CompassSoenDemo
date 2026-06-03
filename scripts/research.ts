@@ -17,7 +17,7 @@
 import { sql } from "drizzle-orm";
 import { embed } from "../src/lib/ai/embeddings";
 import { AIError, generateResponse } from "../src/lib/ai/provider";
-import { db } from "../src/lib/db";
+import { db } from "../src/lib/data/db";
 
 interface CourseHit {
   code: string;

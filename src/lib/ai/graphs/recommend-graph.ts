@@ -14,8 +14,8 @@
  * the graph end-to-end.
  */
 
-import { db } from "@/lib/db";
-import { courses, profiles, userCourses } from "@/lib/db/schema";
+import { db } from "@/lib/data/db";
+import { courses, profiles, userCourses } from "@/lib/data/schema";
 import type { CourseCatalogEntry } from "@/lib/validation/plan";
 import { END, START, StateGraph } from "@langchain/langgraph";
 import { eq, ne } from "drizzle-orm";

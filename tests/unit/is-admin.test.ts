@@ -4,7 +4,7 @@
  * Pure function, deterministic — no DB, no env mocking magic.
  */
 
-import { isAdmin } from "@/lib/is-admin";
+import { isAdmin } from "@/lib/auth/is-admin";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
 const ORIGINAL_ADMIN = process.env.ADMIN_EMAIL;

@@ -8,8 +8,8 @@
  */
 
 import { getCourseReviews, getProfessorsForCourse, submitReview } from "@/lib/community/reviews";
-import { db } from "@/lib/db";
-import { courses, professorReviews, professors, users } from "@/lib/db/schema";
+import { db } from "@/lib/data/db";
+import { courses, professorReviews, professors, users } from "@/lib/data/schema";
 import { eq, inArray } from "drizzle-orm";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 

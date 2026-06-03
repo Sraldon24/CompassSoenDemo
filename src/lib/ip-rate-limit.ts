@@ -77,7 +77,7 @@ export function rateLimitByIp(
 }
 
 // `LIMITS` is defined once in `@/lib/limits/config` and re-exported here so the
-// legacy `@/lib/rate-limit` import path stays stable for callers not yet migrated
+// legacy `@/lib/ip-rate-limit` import path stays stable for callers not yet migrated
 // to the `@/lib/limits` facade.
 export { LIMITS } from "@/lib/limits/config";
 

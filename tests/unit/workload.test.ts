@@ -1,11 +1,11 @@
-import type { CourseCatalogEntry, PlannedCourse } from "@/lib/validation/plan";
 import {
   WORKLOAD_THRESHOLDS,
   calculateTermWorkload,
   estimateCourseHours,
   workloadColor,
   workloadDescription,
-} from "@/lib/workload";
+} from "@/lib/domain/workload";
+import type { CourseCatalogEntry, PlannedCourse } from "@/lib/validation/plan";
 import { describe, expect, it } from "vitest";
 
 const CATALOG = new Map<string, CourseCatalogEntry>([

@@ -9,7 +9,7 @@
 
 import { generateResponse } from "@/lib/ai/provider";
 import { DEMO_AI_MESSAGE_CAP, DEMO_PLAN } from "@/lib/demo/sample-plan";
-import { rateLimitByIp } from "@/lib/rate-limit";
+import { rateLimitByIp } from "@/lib/ip-rate-limit";
 import { NextResponse } from "next/server";
 import { z } from "zod";
 

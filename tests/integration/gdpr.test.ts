@@ -11,8 +11,8 @@ import {
   purgeExpiredAccounts,
   scheduleAccountDeletion,
 } from "@/lib/account/gdpr";
-import { db } from "@/lib/db";
-import { courses, userCourses, users } from "@/lib/db/schema";
+import { db } from "@/lib/data/db";
+import { courses, userCourses, users } from "@/lib/data/schema";
 import { eq, inArray } from "drizzle-orm";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 

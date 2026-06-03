@@ -1,6 +1,6 @@
-import { db } from "@/lib/db";
-import { profiles, users } from "@/lib/db/schema";
-import { getSession } from "@/lib/get-session";
+import { getSession } from "@/lib/auth/get-session";
+import { db } from "@/lib/data/db";
+import { profiles, users } from "@/lib/data/schema";
 import { eq } from "drizzle-orm";
 import { redirect } from "next/navigation";
 import { OnboardingWizard } from "./wizard";

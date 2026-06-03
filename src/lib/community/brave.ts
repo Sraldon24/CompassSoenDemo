@@ -11,8 +11,8 @@
  * set it, we cannot bill the card.
  */
 
-import { db } from "@/lib/db";
-import { braveUsage } from "@/lib/db/schema";
+import { db } from "@/lib/data/db";
+import { braveUsage } from "@/lib/data/schema";
 import { eq, sql } from "drizzle-orm";
 import type { CommunityPost, CommunitySource } from "./source";
 

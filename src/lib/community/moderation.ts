@@ -16,8 +16,8 @@
  * text). entityType is kept generic so we can extend later.
  */
 
-import { db } from "@/lib/db";
-import { moderationFlags, professorReviews } from "@/lib/db/schema";
+import { db } from "@/lib/data/db";
+import { moderationFlags, professorReviews } from "@/lib/data/schema";
 import { and, desc, eq, sql } from "drizzle-orm";
 
 export type FlaggableEntity = "professor_review";

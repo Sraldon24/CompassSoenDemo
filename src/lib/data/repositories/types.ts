@@ -12,7 +12,7 @@
  * adopt these across actions/routes/graphs.
  */
 
-import type { db } from "@/lib/db";
+import type { db } from "@/lib/data/db";
 
 /** The pooled connection (or any Drizzle handle with the same surface). */
 export type DbHandle = typeof db;

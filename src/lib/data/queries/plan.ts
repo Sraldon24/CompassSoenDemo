@@ -2,14 +2,14 @@
  * Plan-related DB queries.
  *
  * Server Component-safe. This module is now a thin shim over the repositories
- * in `@/lib/repositories` (Phase 1 of the repository migration — see
+ * in `@/lib/data/repositories` (Phase 1 of the repository migration — see
  * docs/REFACTOR.md). The historical function names + import path are preserved
  * so existing consumers and `tests/integration/db-queries.test.ts` are unchanged.
  */
 
-import { courseCatalogRepo } from "@/lib/repositories/course-catalog-repo";
-import { planRepo } from "@/lib/repositories/plan-repo";
-import type { UserPlanRow, UserPlanSnapshotWithIds } from "@/lib/repositories/plan-repo";
+import { courseCatalogRepo } from "@/lib/data/repositories/course-catalog-repo";
+import { planRepo } from "@/lib/data/repositories/plan-repo";
+import type { UserPlanRow, UserPlanSnapshotWithIds } from "@/lib/data/repositories/plan-repo";
 import type { CourseCatalogEntry, PlannedCourse } from "@/lib/validation/plan";
 
 export type { UserPlanRow, UserPlanSnapshotWithIds };
@@ -34,5 +34,5 @@ export function getAllCourses(): Promise<CourseCatalogEntry[]> {
 }
 
 // `termRange` lives in `@/lib/term` (single source of truth); re-exported here
-// so the existing `@/lib/db/queries/plan` import path stays stable.
-export { termRange } from "@/lib/term";
+// so the existing `@/lib/data/queries/plan` import path stays stable.
+export { termRange } from "@/lib/domain/term";

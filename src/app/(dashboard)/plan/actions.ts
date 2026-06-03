@@ -1,9 +1,9 @@
 "use server";
 
-import { db } from "@/lib/db";
-import { courses, userCourses } from "@/lib/db/schema";
-import { getSession } from "@/lib/get-session";
-import { TERM_REGEX, termYear } from "@/lib/term";
+import { getSession } from "@/lib/auth/get-session";
+import { db } from "@/lib/data/db";
+import { courses, userCourses } from "@/lib/data/schema";
+import { TERM_REGEX, termYear } from "@/lib/domain/term";
 import { and, eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";

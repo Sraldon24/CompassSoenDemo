@@ -1,11 +1,11 @@
-import { CommandPalette } from "@/components/command-palette";
-import { KeyboardShortcuts } from "@/components/keyboard-shortcuts";
+import { CommandPalette } from "@/components/common/command-palette";
+import { KeyboardShortcuts } from "@/components/common/keyboard-shortcuts";
 import { Sidebar } from "@/components/nav/sidebar";
 import { Topbar } from "@/components/nav/topbar";
-import { db } from "@/lib/db";
-import { profiles, users } from "@/lib/db/schema";
-import { getSession } from "@/lib/get-session";
-import { isAdmin } from "@/lib/is-admin";
+import { getSession } from "@/lib/auth/get-session";
+import { isAdmin } from "@/lib/auth/is-admin";
+import { db } from "@/lib/data/db";
+import { profiles, users } from "@/lib/data/schema";
 import { eq } from "drizzle-orm";
 import { redirect } from "next/navigation";
 

@@ -10,7 +10,7 @@
  * or fan-out to additional sources (Reddit, RateMyProfessors search URL, etc.).
  */
 
-import { db } from "@/lib/db";
+import { db } from "@/lib/data/db";
 import { END, START, StateGraph } from "@langchain/langgraph";
 import { sql } from "drizzle-orm";
 import { embed } from "../embeddings";

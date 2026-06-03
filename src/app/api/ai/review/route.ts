@@ -12,10 +12,10 @@
 
 import { createHash } from "node:crypto";
 import { generateResponse } from "@/lib/ai/provider";
-import { db } from "@/lib/db";
-import { getAllCourses, getUserPlanSnapshot } from "@/lib/db/queries/plan";
-import { aiReviewCache } from "@/lib/db/schema";
-import { getSession } from "@/lib/get-session";
+import { getSession } from "@/lib/auth/get-session";
+import { db } from "@/lib/data/db";
+import { getAllCourses, getUserPlanSnapshot } from "@/lib/data/queries/plan";
+import { aiReviewCache } from "@/lib/data/schema";
 import { denyResponse, guardAiCall, runAiUsage } from "@/lib/limits";
 import { buildPlan, validatePlan } from "@/lib/validation/plan";
 import { eq } from "drizzle-orm";

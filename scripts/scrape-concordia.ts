@@ -16,8 +16,8 @@
  * On Railway: wire as a weekly cron via `railway run npm run scrape:courses`.
  */
 
-import { db } from "../src/lib/db";
-import { courses, scrapedChanges } from "../src/lib/db/schema";
+import { db } from "../src/lib/data/db";
+import { courses, scrapedChanges } from "../src/lib/data/schema";
 import {
   type CatalogCourse,
   type CourseChange,

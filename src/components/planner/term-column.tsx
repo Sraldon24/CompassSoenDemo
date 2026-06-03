@@ -2,8 +2,8 @@
 
 import { CourseCard } from "@/components/planner/course-card";
 import { WorkloadBadge } from "@/components/planner/workload-badge";
+import { calculateTermWorkload } from "@/lib/domain/workload";
 import type { CourseCatalogEntry, PlannedCourse } from "@/lib/validation/plan";
-import { calculateTermWorkload } from "@/lib/workload";
 import { Plus } from "lucide-react";
 
 interface TermColumnProps {

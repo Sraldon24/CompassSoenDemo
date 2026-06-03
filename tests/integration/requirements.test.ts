@@ -6,15 +6,15 @@
  * Postgres data.
  */
 
-import { db } from "@/lib/db";
-import { getUserPlanSnapshot } from "@/lib/db/queries/plan";
-import { profiles, userCourses, users } from "@/lib/db/schema";
+import { db } from "@/lib/data/db";
+import { getUserPlanSnapshot } from "@/lib/data/queries/plan";
+import { profiles, userCourses, users } from "@/lib/data/schema";
 import {
   CATEGORIES,
   TOTAL_DEGREE_CREDITS,
   computeCategoryProgress,
   totalDegreeProgress,
-} from "@/lib/requirements";
+} from "@/lib/domain/requirements";
 import { eq } from "drizzle-orm";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 

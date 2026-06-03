@@ -8,7 +8,7 @@
  * term header.
  */
 
-import type { CourseCatalogEntry, PlannedCourse } from "./validation/plan";
+import type { CourseCatalogEntry, PlannedCourse } from "@/lib/validation/plan";
 
 export type WorkloadLevel = "light" | "moderate" | "heavy" | "burnout";
 
