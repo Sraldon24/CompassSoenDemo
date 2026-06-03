@@ -345,6 +345,23 @@ export interface StreamWithFallback {
 }
 
 /**
+ * Pure routing decision for the chat stream: should we attempt the deep model
+ * (Groq 70B, with the latency race) or go straight to the fast model?
+ *
+ * Extracted from streamChatWithFallback so the branch logic is unit-testable
+ * without a live LLM/stream. Skip the deep model when the caller asked for fast
+ * (simple query) OR the 70B daily quota is already throttled.
+ */
+export function shouldAttemptDeepModel(input: {
+  preferFast?: boolean;
+  quotaThrottled: boolean;
+}): boolean {
+  if (input.preferFast) return false;
+  if (input.quotaThrottled) return false;
+  return true;
+}
+
+/**
  * Stream the answer with QUALITY FIRST but a hard latency ceiling:
  *   1. Start Groq 70B (best quality). Race its first token against an ~8s timeout.
  *   2. If 70B produces a token in time → stream it fully (quality path).
@@ -382,17 +399,12 @@ export function streamChatWithFallback(opts: CallOptions): StreamWithFallback {
   };
 
   async function* generate(): AsyncIterable<string> {
-    // Balanced router: simple questions skip the deep model entirely for speed.
-    // Deep ones still try 70B (with the latency race below).
-    if (opts.preferFast) {
-      yield* fastStream();
-      return;
-    }
-
+    // Balanced router (pure decision): simple queries and a throttled 70B quota
+    // both skip the deep model and stream from the fast path immediately.
     const quota = checkQuota(primary);
-
-    // If the 70B quota is already throttled, skip straight to the fast path.
-    if (quota.shouldThrottle) {
+    if (
+      !shouldAttemptDeepModel({ preferFast: opts.preferFast, quotaThrottled: quota.shouldThrottle })
+    ) {
       yield* fastStream();
       return;
     }

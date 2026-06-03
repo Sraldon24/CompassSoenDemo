@@ -14,9 +14,17 @@
  * with zero observable change. The /ai/* routes keep using `denyResponse`.
  */
 
+import type { GroqModel } from "@/lib/ai/types";
 import { getSession } from "@/lib/get-session";
-import { type Feature, type Identity, guardAiCall } from "@/lib/limits";
+import {
+  type Feature,
+  type GuardDecision,
+  type Identity,
+  denyResponse,
+  guardAiCall,
+} from "@/lib/limits";
 import { NextResponse } from "next/server";
+import type { z } from "zod";
 import { normalizeCourseCode } from "./course-code";
 
 type Session = NonNullable<Awaited<ReturnType<typeof getSession>>>;
@@ -108,4 +116,59 @@ export async function courseThenLimitGuard(
   const decision = guardAiCall({ feature, identity });
   if (!decision.allowed) return communityDeny(decision);
   return { ok: true, session, code };
+}
+
+// ── /ai/* routes ────────────────────────────────────────────────────────────
+// The AI routes (chat/recommend/review/draft-email) share a different preamble
+// than the community routes above: auth → parse+validate a JSON body (Zod) →
+// rate-limit, and they use the `denyResponse` envelope ("Rate limit reached." /
+// quota 503) — NOT the community `{error:"rate_limited"}` shape. aiGuard mirrors
+// the route-guard discriminated-result style so routes stay flat + testable.
+
+export type AiGuardOk<T> = { ok: true; session: Session; body: T; decision: GuardDecision };
+
+/** Bad-request envelope used by /ai/* routes (matches their historical shape). */
+function badRequest(message: string): GuardDenied {
+  return { ok: false, response: NextResponse.json({ error: message }, { status: 400 }) };
+}
+
+/**
+ * /ai/* preamble: session → 401, then parse+validate the JSON body against
+ * `schema` → 400, then rate-limit/quota guard → denyResponse (429/503).
+ * Returns the validated body + the (allowed) decision so the route can read
+ * `decision.remaining` etc. Pass `model` so the quota check targets the model
+ * the route will actually call.
+ */
+export async function aiGuard<T>(
+  req: Request,
+  schema: z.ZodType<T>,
+  feature: Feature,
+  model?: GroqModel,
+): Promise<GuardDenied | AiGuardOk<T>> {
+  const session = await getSession();
+  // /ai/* routes historically emit `{error:"Not authenticated"}`, NOT the
+  // community `{error:"unauthorized"}` — preserve it (zero observable change).
+  if (!session) {
+    return {
+      ok: false,
+      response: NextResponse.json({ error: "Not authenticated" }, { status: 401 }),
+    };
+  }
+
+  let body: T;
+  try {
+    body = schema.parse(await req.json());
+  } catch (err) {
+    const zerr = err as { issues?: Array<{ message?: string }> };
+    return badRequest(zerr?.issues?.[0]?.message ?? "Bad request");
+  }
+
+  const decision = guardAiCall({
+    feature,
+    identity: { kind: "user", id: session.user.id },
+    ...(model ? { model } : {}),
+  });
+  if (!decision.allowed) return { ok: false, response: denyResponse(decision) };
+
+  return { ok: true, session, body, decision };
 }

@@ -1,6 +1,6 @@
 import { runRecommendationGraph } from "@/lib/ai/graphs/recommend-graph";
-import { getSession } from "@/lib/get-session";
-import { denyResponse, guardAiCall, withUsage } from "@/lib/limits";
+import { aiGuard } from "@/lib/api/route-guard";
+import { runAiUsage } from "@/lib/limits";
 import { NextResponse } from "next/server";
 import { z } from "zod";
 
@@ -25,49 +25,28 @@ const requestSchema = z.object({
 });
 
 export async function POST(req: Request): Promise<Response> {
-  const session = await getSession();
-  if (!session) return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
+  const guard = await aiGuard(req, requestSchema, "aiRecommend", "llama-3.3-70b-versatile");
+  if (!guard.ok) return guard.response;
+  const { session, body } = guard;
 
-  let parsed: z.infer<typeof requestSchema>;
-  try {
-    parsed = requestSchema.parse(await req.json());
-  } catch (err) {
-    return NextResponse.json(
-      { error: err instanceof z.ZodError ? err.issues[0]?.message : "Bad request" },
-      { status: 400 },
-    );
-  }
-
-  const decision = guardAiCall({
-    feature: "aiRecommend",
-    identity: { kind: "user", id: session.user.id },
-    model: "llama-3.3-70b-versatile",
-  });
-  if (!decision.allowed) return denyResponse(decision);
-
-  try {
-    const recs = await withUsage(
-      {
+  const run = await runAiUsage(
+    {
+      userId: session.user.id,
+      feature: "recommend",
+      model: "llama-3.3-70b-versatile",
+      // Estimate from actual response sizes (one token ≈ 4 chars). The "why"
+      // strings are the only LLM-generated output; the rest is deterministic.
+      estimateTokens: (r) => (r ?? []).reduce((sum, x) => sum + Math.ceil(x.why.length / 4), 0),
+    },
+    "Recommendation failed",
+    () =>
+      runRecommendationGraph({
         userId: session.user.id,
-        feature: "recommend",
-        model: "llama-3.3-70b-versatile",
-        // Estimate from actual response sizes (one token ≈ 4 chars). The "why"
-        // strings are the only LLM-generated output; the rest is deterministic.
-        estimateTokens: (r) => (r ?? []).reduce((sum, x) => sum + Math.ceil(x.why.length / 4), 0),
-      },
-      () =>
-        runRecommendationGraph({
-          userId: session.user.id,
-          interests: parsed.interests,
-          categoryFilter: parsed.categoryFilter,
-        }),
-    );
-    return NextResponse.json({ recommendations: recs });
-  } catch (err) {
-    console.error("[ai] recommend failed:", err);
-    return NextResponse.json(
-      { error: err instanceof Error ? err.message : "Recommendation failed" },
-      { status: 503 },
-    );
-  }
+        interests: body.interests,
+        categoryFilter: body.categoryFilter,
+      }),
+  );
+  if (!run.ok) return run.response;
+
+  return NextResponse.json({ recommendations: run.data });
 }

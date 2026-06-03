@@ -16,7 +16,7 @@ import { db } from "@/lib/db";
 import { getAllCourses, getUserPlanSnapshot } from "@/lib/db/queries/plan";
 import { aiReviewCache } from "@/lib/db/schema";
 import { getSession } from "@/lib/get-session";
-import { denyResponse, guardAiCall, withUsage } from "@/lib/limits";
+import { denyResponse, guardAiCall, runAiUsage } from "@/lib/limits";
 import { buildPlan, validatePlan } from "@/lib/validation/plan";
 import { eq } from "drizzle-orm";
 import type { NextRequest } from "next/server";
@@ -113,47 +113,41 @@ export async function GET(req: NextRequest): Promise<Response> {
   });
   if (!decision.allowed) return denyResponse(decision);
 
-  try {
-    const result = await withUsage(
-      {
-        userId: session.user.id,
-        feature: "recommend",
-        model: "llama-3.3-70b-versatile",
-        estimateTokens: (r) =>
-          (r ?? []).reduce(
-            (sum, s) => sum + Math.ceil((s.title.length + (s.detail?.length ?? 0)) / 4),
-            0,
-          ),
-      },
-      async () => {
-        const res = await generateResponse({
-          task: "recommend",
-          system: SYSTEM,
-          messages: [{ role: "user", content: userPrompt }],
-          temperature: 0.3,
-          maxTokens: 600,
-        });
-        return parseSuggestions(res.text);
-      },
-    );
-
-    // Store for next time (one row per user; upsert on the plan hash).
-    await db
-      .insert(aiReviewCache)
-      .values({ userId: session.user.id, planHash, suggestions: result })
-      .onConflictDoUpdate({
-        target: aiReviewCache.userId,
-        set: { planHash, suggestions: result, generatedAt: new Date() },
+  const run = await runAiUsage(
+    {
+      userId: session.user.id,
+      feature: "recommend",
+      model: "llama-3.3-70b-versatile",
+      estimateTokens: (r) =>
+        (r ?? []).reduce(
+          (sum, s) => sum + Math.ceil((s.title.length + (s.detail?.length ?? 0)) / 4),
+          0,
+        ),
+    },
+    "AI Review unavailable",
+    async () => {
+      const res = await generateResponse({
+        task: "recommend",
+        system: SYSTEM,
+        messages: [{ role: "user", content: userPrompt }],
+        temperature: 0.3,
+        maxTokens: 600,
       });
+      return parseSuggestions(res.text);
+    },
+  );
+  if (!run.ok) return run.response;
 
-    return NextResponse.json({ suggestions: result, remaining: decision.remaining, cached: false });
-  } catch (err) {
-    console.error("[ai] review failed:", err);
-    return NextResponse.json(
-      { error: err instanceof Error ? err.message : "AI Review unavailable" },
-      { status: 503 },
-    );
-  }
+  // Store for next time (one row per user; upsert on the plan hash).
+  await db
+    .insert(aiReviewCache)
+    .values({ userId: session.user.id, planHash, suggestions: run.data })
+    .onConflictDoUpdate({
+      target: aiReviewCache.userId,
+      set: { planHash, suggestions: run.data, generatedAt: new Date() },
+    });
+
+  return NextResponse.json({ suggestions: run.data, remaining: decision.remaining, cached: false });
 }
 
 /** Extract the JSON array from the model output, tolerating stray prose/fences. */

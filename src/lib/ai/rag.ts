@@ -18,7 +18,8 @@ import type { RAGContext, RAGSource } from "./types";
 
 const COURSE_CODE_RE = /\b([A-Z]{3,4})\s*(\d{3})\b/g;
 
-function extractCodesFromQuery(query: string): string[] {
+/** Pure: pull "COMP 472"-style codes out of a question (deduped, normalized). */
+export function extractCodesFromQuery(query: string): string[] {
   const out = new Set<string>();
   for (const m of query.matchAll(COURSE_CODE_RE)) {
     out.add(`${m[1]} ${m[2]}`);
@@ -29,6 +30,125 @@ function extractCodesFromQuery(query: string): string[] {
 const COURSE_TOP_K = 5;
 const REDDIT_TOP_K = 5;
 const MAX_CONTEXT_CHARS = 4_500;
+
+// ── Pure assembly layer ──────────────────────────────────────────────────────
+// Row shapes the assembler consumes. Kept structural (not DB-tied) so the
+// assembly logic — section ordering, scoring (1 - distance), force-include,
+// truncation — is unit-testable with canned hits, no DB or pgvector.
+
+export interface PlanRow {
+  courseCode: string;
+  term: string | null;
+  status: string;
+}
+export interface ExplicitHit {
+  code: string;
+  title: string;
+  description: string | null;
+  category: string | null;
+  credits: number;
+  prereqs: { all?: string[]; any?: string[]; concurrent?: string[] } | null;
+}
+export interface CourseHit {
+  code: string;
+  title: string;
+  description: string | null;
+  category: string | null;
+  credits: number;
+  distance: number;
+}
+export interface RedditHit {
+  id: string;
+  title: string;
+  body: string | null;
+  url: string | null;
+  distance: number;
+}
+
+export interface RAGAssemblyInput {
+  explicitHits: ExplicitHit[];
+  courseHits: CourseHit[];
+  redditHits: RedditHit[];
+  planByCode: Map<string, PlanRow>;
+}
+
+/**
+ * Pure: turn fetched hits into the { text, sources } RAG context. No I/O.
+ * - explicit-mention courses come FIRST (force-included, score 1.0)
+ * - semantic course matches scored as max(0, 1 - cosine distance)
+ * - reddit discussion last
+ * - final text capped at MAX_CONTEXT_CHARS
+ */
+export function assembleRAGContext(input: RAGAssemblyInput): RAGContext {
+  const { explicitHits, courseHits, redditHits, planByCode } = input;
+  const sources: RAGSource[] = [];
+  const sections: string[] = [];
+
+  if (explicitHits.length > 0) {
+    sections.push("## Courses you explicitly mentioned");
+    explicitHits.forEach((c, i) => {
+      const plan = planByCode.get(c.code);
+      const planLine = plan
+        ? `Your plan: ${plan.status} in ${plan.term ?? "no term"}.`
+        : "Not in your plan yet.";
+      const prereqs = c.prereqs;
+      const prereqLine = prereqs
+        ? `Prereqs: all=${(prereqs.all ?? []).join(", ") || "none"}; any=${(prereqs.any ?? []).join(", ") || "none"}; concurrent=${(prereqs.concurrent ?? []).join(", ") || "none"}.`
+        : "Prereqs: none recorded.";
+      sources.push({
+        id: `course:${c.code}`,
+        label: `${c.code} catalog`,
+        snippet: (c.description ?? "").slice(0, 240),
+        score: 1.0,
+        kind: "course",
+      });
+      sections.push(
+        `[E${i + 1}] ${c.code} — ${c.title} (${c.credits} cr, ${c.category ?? "uncategorized"})\n${prereqLine}\n${c.description ? `${c.description.slice(0, 600)}\n` : ""}${planLine}\n`,
+      );
+    });
+  }
+
+  if (courseHits.length > 0) {
+    sections.push("## Course catalog matches");
+    courseHits.forEach((c, i) => {
+      const plan = planByCode.get(c.code);
+      const planLine = plan ? `Student's plan: ${plan.status} in ${plan.term ?? "no term"}.` : "";
+      sources.push({
+        id: `course:${c.code}`,
+        label: `${c.code} catalog`,
+        snippet: (c.description ?? "").slice(0, 240),
+        score: Math.max(0, 1 - c.distance),
+        kind: "course",
+      });
+      sections.push(
+        `[${i + 1}] ${c.code} — ${c.title} (${c.credits} cr, ${c.category ?? "uncategorized"})\n${c.description ? `${c.description.slice(0, 600)}\n` : ""}${planLine ? `${planLine}\n` : ""}`,
+      );
+    });
+  }
+
+  if (redditHits.length > 0) {
+    sections.push("## Recent Reddit discussion");
+    redditHits.forEach((r, i) => {
+      sources.push({
+        id: `reddit:${r.id}`,
+        label: `r/Concordia: ${r.title.slice(0, 60)}`,
+        url: r.url ?? undefined,
+        snippet: (r.body ?? r.title).slice(0, 240),
+        score: Math.max(0, 1 - r.distance),
+        kind: "reddit",
+      });
+      sections.push(
+        `[${courseHits.length + i + 1}] r/Concordia "${r.title}"\n${(r.body ?? "").slice(0, 400)}\n`,
+      );
+    });
+  }
+
+  let text = sections.join("\n\n");
+  if (text.length > MAX_CONTEXT_CHARS) {
+    text = `${text.slice(0, MAX_CONTEXT_CHARS)}\n…(context truncated)`;
+  }
+  return { text, sources };
+}
 
 interface BuildRAGOptions {
   query: string;
@@ -112,84 +232,22 @@ export async function buildRAGContext({ query, userId }: BuildRAGOptions): Promi
     : [];
   const planByCode = new Map(planRows.map((r) => [r.courseCode, r]));
 
-  const sources: RAGSource[] = [];
-  const sections: string[] = [];
-
-  // Explicit-mention block first (highest priority for the LLM).
-  if (explicitHits.length > 0) {
-    sections.push("## Courses you explicitly mentioned");
-    for (let i = 0; i < explicitHits.length; i++) {
-      const c = explicitHits[i];
-      if (!c) continue;
-      const plan = planByCode.get(c.code);
-      const planLine = plan
-        ? `Your plan: ${plan.status} in ${plan.term ?? "no term"}.`
-        : "Not in your plan yet.";
-      const prereqs = c.prereqs as { all?: string[]; any?: string[]; concurrent?: string[] } | null;
-      const prereqLine = prereqs
-        ? `Prereqs: all=${(prereqs.all ?? []).join(", ") || "none"}; any=${(prereqs.any ?? []).join(", ") || "none"}; concurrent=${(prereqs.concurrent ?? []).join(", ") || "none"}.`
-        : "Prereqs: none recorded.";
-      sources.push({
-        id: `course:${c.code}`,
-        label: `${c.code} catalog`,
-        snippet: (c.description ?? "").slice(0, 240),
-        score: 1.0,
-        kind: "course",
-      });
-      sections.push(
-        `[E${i + 1}] ${c.code} — ${c.title} (${c.credits} cr, ${c.category ?? "uncategorized"})\n${prereqLine}\n${c.description ? `${c.description.slice(0, 600)}\n` : ""}${planLine}\n`,
-      );
-    }
-  }
-
-  if (courseHits.length > 0) {
-    sections.push("## Course catalog matches");
-    for (let i = 0; i < courseHits.length; i++) {
-      const c = courseHits[i];
-      if (!c) continue;
-      const plan = planByCode.get(c.code);
-      const planLine = plan ? `Student's plan: ${plan.status} in ${plan.term ?? "no term"}.` : "";
-      const id = `course:${c.code}`;
-      sources.push({
-        id,
-        label: `${c.code} catalog`,
-        snippet: (c.description ?? "").slice(0, 240),
-        score: Math.max(0, 1 - c.distance),
-        kind: "course",
-      });
-      sections.push(
-        `[${i + 1}] ${c.code} — ${c.title} (${c.credits} cr, ${c.category ?? "uncategorized"})\n${c.description ? `${c.description.slice(0, 600)}\n` : ""}${planLine ? `${planLine}\n` : ""}`,
-      );
-    }
-  }
-
-  if (redditHits.length > 0) {
-    sections.push("## Recent Reddit discussion");
-    for (let i = 0; i < redditHits.length; i++) {
-      const r = redditHits[i];
-      if (!r) continue;
-      const id = `reddit:${r.id}`;
-      sources.push({
-        id,
-        label: `r/Concordia: ${r.title.slice(0, 60)}`,
-        url: r.url ?? undefined,
-        snippet: (r.body ?? r.title).slice(0, 240),
-        score: Math.max(0, 1 - r.distance),
-        kind: "reddit",
-      });
-      sections.push(
-        `[${courseHits.length + i + 1}] r/Concordia "${r.title}"\n` +
-          `${(r.body ?? "").slice(0, 400)}\n`,
-      );
-    }
-  }
-
-  let text = sections.join("\n\n");
-  if (text.length > MAX_CONTEXT_CHARS) {
-    text = `${text.slice(0, MAX_CONTEXT_CHARS)}\n…(context truncated)`;
-  }
-
-  return { text, sources };
+  // Pure assembly — testable in isolation (see assembleRAGContext above).
+  return assembleRAGContext({
+    explicitHits: explicitHits.map((c) => ({
+      ...c,
+      prereqs: c.prereqs as ExplicitHit["prereqs"],
+    })),
+    courseHits,
+    redditHits: redditHits.map((r) => ({
+      id: r.id,
+      title: r.title,
+      body: r.body,
+      url: r.url,
+      distance: r.distance,
+    })),
+    planByCode,
+  });
 }
 
 /** Cheap helper for the UI: how many sources are good enough to surface? */

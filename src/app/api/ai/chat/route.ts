@@ -2,10 +2,9 @@ import { COMPASS_SYSTEM } from "@/lib/ai/prompts";
 import { isComplexQuery, streamChatWithFallback } from "@/lib/ai/provider";
 import { buildRAGContext } from "@/lib/ai/rag";
 import { recordAIUsage } from "@/lib/ai/usage";
+import { aiGuard } from "@/lib/api/route-guard";
 import { db } from "@/lib/db";
 import { aiConversations, aiMessages } from "@/lib/db/schema";
-import { getSession } from "@/lib/get-session";
-import { denyResponse, guardAiCall } from "@/lib/limits";
 import { eq } from "drizzle-orm";
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
@@ -22,32 +21,13 @@ const requestSchema = z.object({
 });
 
 export async function POST(req: NextRequest): Promise<Response> {
-  const session = await getSession();
-  if (!session) {
-    return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
-  }
-
-  let parsed: z.infer<typeof requestSchema>;
-  try {
-    parsed = requestSchema.parse(await req.json());
-  } catch (err) {
-    return NextResponse.json(
-      { error: err instanceof z.ZodError ? err.issues[0]?.message : "Bad request" },
-      { status: 400 },
-    );
-  }
-
-  // Rate limit + system-quota check BEFORE the LLM call (per ADR + audit guidance).
-  // Chat uses the 8B "instant" model: answers are grounded in RAG context, so the
-  // smaller model is plenty capable and reaches first-token far faster than 70B
-  // (70B free-tier could take ~40s to start streaming). 70B stays for recommend /
-  // summarize / email where reasoning depth matters more than latency.
-  const limit = guardAiCall({
-    feature: "aiChat",
-    identity: { kind: "user", id: session.user.id },
-    model: "llama-3.1-8b-instant",
-  });
-  if (!limit.allowed) return denyResponse(limit);
+  // Auth → validate body → rate-limit/quota. The quota check targets the 8B
+  // "instant" model: chat answers are RAG-grounded so the small model is plenty
+  // capable and reaches first-token far faster than 70B. (70B stays for
+  // recommend/summarize/email where reasoning depth matters more than latency.)
+  const guard = await aiGuard(req, requestSchema, "aiChat", "llama-3.1-8b-instant");
+  if (!guard.ok) return guard.response;
+  const { session, body: parsed, decision: limit } = guard;
 
   // Get or create the conversation.
   let conversationId = parsed.conversationId;

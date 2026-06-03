@@ -7,7 +7,9 @@ import {
   _setFallbackProviderForTesting,
   _setLlmProviderForTesting,
   generateResponse,
+  isComplexQuery,
   selectModel,
+  shouldAttemptDeepModel,
 } from "@/lib/ai/provider";
 import { makeFakeProvider } from "@/lib/ai/providers/fake-provider";
 import { afterEach, describe, expect, it } from "vitest";
@@ -26,6 +28,32 @@ afterEach(() => {
   _resetLlmProviderForTesting();
   _resetFallbackProviderForTesting();
   _resetGroqQuotaForTesting();
+});
+
+describe("isComplexQuery (chat router heuristic)", () => {
+  it("treats quick lookups as simple", () => {
+    expect(isComplexQuery("prereq for COMP 352?")).toBe(false);
+    expect(isComplexQuery("is ENCS 282 easy")).toBe(false);
+  });
+  it("treats long / strategic / multi-course questions as complex", () => {
+    expect(isComplexQuery("help me plan my whole degree sequence")).toBe(true);
+    expect(isComplexQuery("which should i take, and is winter too heavy?")).toBe(true);
+    // 3+ distinct course codes → comparison/sequencing → deep
+    expect(isComplexQuery("compare COMP 248 COMP 249 COMP 352")).toBe(true);
+    expect(isComplexQuery("x".repeat(300))).toBe(true);
+  });
+});
+
+describe("shouldAttemptDeepModel (pure stream-routing decision)", () => {
+  it("skips the deep model when caller prefers fast (simple query)", () => {
+    expect(shouldAttemptDeepModel({ preferFast: true, quotaThrottled: false })).toBe(false);
+  });
+  it("skips the deep model when 70B quota is throttled", () => {
+    expect(shouldAttemptDeepModel({ preferFast: false, quotaThrottled: true })).toBe(false);
+  });
+  it("attempts the deep model otherwise", () => {
+    expect(shouldAttemptDeepModel({ preferFast: false, quotaThrottled: false })).toBe(true);
+  });
 });
 
 describe("selectModel routing", () => {
