@@ -10,7 +10,7 @@ This file tells Claude Code how to work in the SOEN Compass codebase. **Always r
 
 **SOEN Compass** is an AI-powered degree planner for Concordia BEng Software Engineering students.
 
-- **Stack:** Next.js 15 + TypeScript + Tailwind v4 + Drizzle + Postgres + pgvector + Better Auth + Groq + Gemini
+- **Stack:** Next.js 16 + TypeScript + Tailwind v4 + Drizzle + Postgres + pgvector + Better Auth + Groq + Gemini
 - **Hosting:** Railway (Hobby plan, $0/mo within credit)
 - **Repo:** Open source, MIT license
 - **Solo developer:** Amir Ghadimi (learning while shipping)
@@ -23,13 +23,15 @@ This file tells Claude Code how to work in the SOEN Compass codebase. **Always r
 | Coding conventions (this file) | `CLAUDE.md` |
 | System design decisions | `ARCHITECTURE.md` |
 | Onboarding for visitors | `README.md` |
-| Database schema | `lib/db/schema.ts` (or PRD §3) |
+| Database schema | `src/lib/data/schema.ts` (or PRD §3) |
 | Claude Code prompts | PRD §11 |
 | **Design tokens, fonts, components (source of truth)** | **`docs/design/HANDOFF.md`** |
 | **Visual mockups (all screens, 16 phases)** | **`docs/design/Phase *.html`** |
 | **Brand assets (logos, favicons)** | **`docs/design/brand/`** |
 
 > **Design conflict note:** `docs/design/HANDOFF.md` (Claude Designs handoff) is the canonical source for colors, type, spacing, and component conventions. The earlier `PRD.md` §8 design system (brand-500 blue palette) is superseded by the **Graphite Greens** palette in `HANDOFF.md`. When implementing, paste the tokens from §1 of `HANDOFF.md` into `app/globals.css` — do not use PRD §8 OKLCH values.
+
+> **Directory layout note (post-reorg):** `src/lib/` is organized by domain — `auth/` (auth, get-session, is-admin, access-control), `data/` (db, schema, repositories, queries — one layer), `domain/` (prereq-graph, requirements, term, workload), `ai/`, `community/`, `limits/`, `api/` (route-guard), `validation/`. The IP limiter is `src/lib/ip-rate-limit.ts`; the user/quota limiter is `src/lib/limits/`. All `/ai/*` routes share `aiGuard` + `runAiUsage`. Older refs in this file to `lib/db/*`, `lib/rate-limit.ts`, `lib/auth-client.ts` now live under those folders.
 
 ---
 

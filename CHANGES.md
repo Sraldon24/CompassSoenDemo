@@ -6,6 +6,28 @@
 
 ---
 
+## Phase 5 — Post-launch (live on Railway)
+
+### 2026-06-03 — `src/lib/` reorganized by domain; dead code removed
+Structure grew flat (11 loose root files, `validation/` + `validations/` dup, `db/` + `repositories/` + `db/queries/` as three overlapping data layers). Reworked **by domain** (the CLAUDE.md rule): `auth/`, `domain/`, `data/` (the three data dirs folded into one), `validation/` (merged). `rate-limit.ts` → `ip-rate-limit.ts` to disambiguate from the user/quota `limits/` package. Components → `common/` + `providers/`. **Kept** `src/app/` route folders (Next.js convention). 110 files, 23 renames, behavior-preserving (prod E2E identical). Then a knip-driven dead-code pass: removed `streamResponse`, `filterUsefulSources`, `calculateWorkload` (dup), `REDDIT_SUMMARIZE_SYSTEM`, `term-column.tsx` + 3 unused deps. Deliberately **kept** "unused" infra that's actually useful — cron scripts (summarize-reddit, purge-deleted), `ensure-pgvector` (Railway start), the shadcn ui/* kit, `BraveSearchError` (thrown), `termOrdinal` (tested). Judged usefulness, didn't pad the deletion count.
+
+### 2026-06-03 — Deep-module architecture pass on the AI hot paths
+Extended the existing house patterns rather than inventing new ones: added `aiGuard` (auth → Zod body → rate-limit) to `route-guard.ts` so all 4 `/ai/*` routes share one preamble (preserving their exact 401/400/429/503 envelopes — verified identical in prod), and `runAiUsage` to collapse the repeated `withUsage + try/catch→503` frame. Extracted pure, now-unit-tested seams: `shouldAttemptDeepModel` + `isComplexQuery` (provider) and `assembleRAGContext` + `extractCodesFromQuery` (rag). Re-evaluated the "community routes should use fetch-posts" suggestion as a **false positive** — that read path correctly goes through the cached `summaries` layer (which already has a tested `SummaryDeps` seam); fetch-posts is the *scrape-write* path.
+
+### 2026-06-03 — concordia.courses added as the primary community source
+Researched non-Reddit sources; concordia.courses won (dense Concordia-specific reviews with rating/difficulty/instructor, public JSON API, no key — same gray-area legality we already accepted for Reddit). RateMyProfessors deferred (ToS-hostile, professor-keyed). Implemented as a third `CommunitySource` (concordia.courses → reddit → brave). Scraped ~1,960 reviews / 105 courses; hand-wrote 42 grounded summaries for the core SOEN/COMP/ENGR/MATH courses with Claude (free, `model='cached'`, no Groq spend) rather than burning quota; restored to prod (84 courses landed — the rest reference codes not in the prod catalog).
+
+### 2026-06-03 — Chat speed: balanced router + Gemini (reverses ADR-012's deferral)
+70B on the free tier could take ~40s to first token. Added a balanced router: quick lookups go to a fast model immediately; strategic questions try 70B with an 8s first-token race, then fall back Gemini 2.5 Flash → Groq 8B. Verified the Gemini key live first (gemini-2.0-flash had free-tier quota 0 on our key; 2.5-flash works). Also parallelized the summarize graph (1×70B + 4×8B per course instead of 5×70B) to spare the scarce 70B daily cap. Supersedes ADR-012 ("Gemini deferred").
+
+### 2026-06-03 — Invite-only access (allowlist + admin approval)
+App is now for the owner + approved friends, so signup is gated two ways: an `ALLOWED_EMAILS` env allowlist at the Better Auth `databaseHooks.user.create.before` (fail-OPEN only when unset, so local dev isn't bricked), and a `users.status` (pending/approved/rejected) admin-approval flow — new accounts land on `/pending` until approved at `/admin/users`. Migration defaults all existing users to `approved`.
+
+### 2026-06-03 — Prod-only auth bugs fixed after first live login
+Live login surfaced three layered failures the local build never showed: (1) CORS — `BETTER_AUTH_URL`/`NEXT_PUBLIC_SITE_URL` pointed at the old Railway slug; (2) soft-nav — `router.push` after login didn't let middleware see the fresh cookie; (3) the real culprit — over HTTPS Better Auth names the cookie `__Secure-compass.session_token`, but the middleware only checked the unprefixed name, so every authed request bounced to `/login`. Fixed all three; added AI Review, the transfer-credit lane, EWT/milestone deadlines, and a light-mode contrast fix along the way.
+
+---
+
 ## Phase 3 — AI + Polish
 
 ### 2026-05-28 — Smart-recommendation tests strengthened, not bent to pass
