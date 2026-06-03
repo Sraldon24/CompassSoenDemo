@@ -1,3 +1,4 @@
+import { AIReview } from "@/components/planner/ai-review";
 import { PlannerBoard } from "@/components/planner/planner-board";
 import { getAllCourses, getUserPlanSnapshot, termRange } from "@/lib/db/queries/plan";
 import { getSession } from "@/lib/get-session";
@@ -60,6 +61,8 @@ export default async function PlanPage(): Promise<React.ReactElement> {
           </a>
         </div>
       </header>
+
+      <AIReview />
 
       <PlannerBoard initialCourses={userPlan} catalogList={fullCatalog} visibleTerms={allTerms} />
     </div>

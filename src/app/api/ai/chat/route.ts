@@ -1,5 +1,5 @@
 import { COMPASS_SYSTEM } from "@/lib/ai/prompts";
-import { streamResponse } from "@/lib/ai/provider";
+import { isComplexQuery, streamChatWithFallback } from "@/lib/ai/provider";
 import { buildRAGContext } from "@/lib/ai/rag";
 import { recordAIUsage } from "@/lib/ai/usage";
 import { db } from "@/lib/db";
@@ -38,10 +38,14 @@ export async function POST(req: NextRequest): Promise<Response> {
   }
 
   // Rate limit + system-quota check BEFORE the LLM call (per ADR + audit guidance).
+  // Chat uses the 8B "instant" model: answers are grounded in RAG context, so the
+  // smaller model is plenty capable and reaches first-token far faster than 70B
+  // (70B free-tier could take ~40s to start streaming). 70B stays for recommend /
+  // summarize / email where reasoning depth matters more than latency.
   const limit = guardAiCall({
     feature: "aiChat",
     identity: { kind: "user", id: session.user.id },
-    model: "llama-3.3-70b-versatile",
+    model: "llama-3.1-8b-instant",
   });
   if (!limit.allowed) return denyResponse(limit);
 
@@ -81,21 +85,24 @@ export async function POST(req: NextRequest): Promise<Response> {
   // Build RAG context from the user's query.
   const rag = await buildRAGContext({ query: parsed.message, userId: session.user.id });
 
-  // Stream from Groq. Save the assistant message + sources when streaming finishes.
+  // Stream the answer. Quality-first: try Groq 70B, but if it hasn't produced a
+  // first token within ~8s, fall back to the fastest available model (Gemini
+  // Flash if configured, else Groq 8B). The client shows a "thinking…" status
+  // for the brief race window.
   const sourcesPayload = rag.sources.map((s) => ({ id: s.id, label: s.label, url: s.url }));
 
-  const stream = streamResponse({
+  // Balanced router: quick lookups go to the fast model (Gemini); strategic
+  // questions try Groq 70B first (with an 8s latency fallback).
+  const chat = streamChatWithFallback({
     task: "chat-complex",
     system: `${COMPASS_SYSTEM}\n\n## Context\n${rag.text || "(no relevant context found)"}`,
     messages: [{ role: "user", content: parsed.message }],
     temperature: 0.4,
+    preferFast: !isComplexQuery(parsed.message),
   });
 
-  // Persist assistant text once streaming finishes.
+  // Accumulate tokens for persistence while forwarding them to the client.
   let assistantText = "";
-  const _reader = (await stream.textStream).getReader?.();
-
-  // Use TransformStream so we can both forward tokens to the client and accumulate.
   const ts = new TransformStream<string, string>({
     transform(chunk, controller) {
       assistantText += chunk;
@@ -107,13 +114,13 @@ export async function POST(req: NextRequest): Promise<Response> {
           conversationId,
           role: "assistant",
           content: assistantText,
-          model: "groq-llama-3.3-70b",
+          model: chat.servedBy(),
           contextSources: sourcesPayload.map((s) => s.id),
         });
         await recordAIUsage({
           userId: session.user.id,
           feature: "chat",
-          model: "llama-3.3-70b-versatile",
+          model: "llama-3.1-8b-instant",
           tokensUsed: Math.ceil(assistantText.length / 4),
         });
       } catch (err) {
@@ -122,12 +129,10 @@ export async function POST(req: NextRequest): Promise<Response> {
     },
   });
 
-  // Pipe the text stream through our transform.
-  const textStream = stream.textStream;
   const sourceStream = new ReadableStream<string>({
     async start(controller) {
       try {
-        for await (const chunk of textStream) {
+        for await (const chunk of chat.textStream) {
           controller.enqueue(chunk);
         }
         controller.close();

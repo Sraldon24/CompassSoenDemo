@@ -10,6 +10,7 @@
  *     the Groq SDK directly.
  */
 
+import { createGoogleGenerativeAI } from "@ai-sdk/google";
 import { groq } from "@ai-sdk/groq";
 import { streamText } from "ai";
 import { checkQuota, recordGroqUsage } from "./groq-quota";
@@ -86,6 +87,8 @@ interface CallOptions {
   maxTokens?: number;
   /** Override for tests. Defaults to 3. */
   maxAttempts?: number;
+  /** Chat router: skip the deep (70B) model and go straight to the fast model. */
+  preferFast?: boolean;
 }
 
 async function sleep(ms: number): Promise<void> {
@@ -274,4 +277,160 @@ export function streamResponse(opts: CallOptions): ReturnType<typeof streamText>
       recordGroqUsage(model, usage?.totalTokens ?? 0);
     },
   });
+}
+
+// ── Speed upgrade: quality-first streaming with a latency fallback ───────────
+// Gemini Flash (Google AI Studio free tier) is fast + free. Configured only if a
+// key is present, so the app still runs Groq-only without it.
+// NOTE: gemini-2.0-flash has free-tier quota 0 on our key; gemini-2.5-flash works
+// (verified ~1.2s, gemini-2.5-flash-lite ~0.4s). Use 2.5-flash for the best
+// quality/speed balance on the free tier.
+// Accept either env var name: GEMINI_API_KEY (what we set) or the SDK's default.
+const GEMINI_MODEL = "gemini-2.5-flash";
+const geminiKey = process.env.GEMINI_API_KEY ?? process.env.GOOGLE_GENERATIVE_AI_API_KEY ?? null;
+const gemini = geminiKey ? createGoogleGenerativeAI({ apiKey: geminiKey }) : null;
+
+/** How long we wait for the primary (70B) to emit its first token before
+ * abandoning it for a faster model. Groq free-tier 70B can take ~40s to start. */
+const FIRST_TOKEN_TIMEOUT_MS = 8_000;
+
+/** Matches the `ai_model` DB enum so it can be persisted directly. */
+export type ServedModel = "groq-llama-3.3-70b" | "groq-llama-3.1-8b" | "gemini-2.0-flash";
+
+/**
+ * Balanced router: decide if a chat message warrants the deep model (70B) or
+ * the fast model (Gemini). No extra LLM call — a cheap heuristic on the text.
+ * Deep when the question is long or strategic (multi-course sequencing, "plan
+ * my degree", comparisons); fast for quick lookups ("prereq for COMP 352?").
+ */
+export function isComplexQuery(message: string): boolean {
+  const m = message.toLowerCase();
+  if (message.length > 280) return true;
+  // Count distinct course-code mentions — comparing/sequencing many courses is deep.
+  const codes = new Set(m.match(/[a-z]{3,4}\s?\d{3}/g) ?? []);
+  if (codes.size >= 3) return true;
+  const deepSignals = [
+    "plan my",
+    "whole degree",
+    "four year",
+    "4 year",
+    "4-year",
+    "sequence",
+    "schedule my",
+    "which should i",
+    "compare",
+    "vs ",
+    "trade-off",
+    "tradeoff",
+    "best order",
+    "what if i",
+    "graduate early",
+    "minor in",
+    "too heavy",
+    "balance my",
+    "strategy",
+  ];
+  return deepSignals.some((s) => m.includes(s));
+}
+
+export interface StreamWithFallback {
+  /** Async iterable of text chunks, first-token-fast. */
+  textStream: AsyncIterable<string>;
+  /** Which backend ultimately served the stream (known after first token). */
+  servedBy: () => ServedModel;
+}
+
+/**
+ * Stream the answer with QUALITY FIRST but a hard latency ceiling:
+ *   1. Start Groq 70B (best quality). Race its first token against an ~8s timeout.
+ *   2. If 70B produces a token in time → stream it fully (quality path).
+ *   3. If 70B is too slow OR errors → abandon it and restream on the fastest
+ *      available model: Gemini 2.0 Flash if configured, else Groq 8B-instant.
+ *
+ * Token usage is recorded via onFinish on whichever Groq stream actually runs.
+ */
+export function streamChatWithFallback(opts: CallOptions): StreamWithFallback {
+  // Circuit breaker still applies to the 70B primary.
+  const primary: GroqModel = "llama-3.3-70b-versatile";
+  let served: ServedModel = "groq-llama-3.3-70b";
+
+  const fastStream = () => {
+    if (gemini) {
+      served = "gemini-2.0-flash"; // DB enum label (closest available value)
+      // Fast, free, no Groq quota impact.
+      return streamText({
+        model: gemini(GEMINI_MODEL),
+        system: opts.system,
+        messages: opts.messages,
+        temperature: opts.temperature ?? 0.4,
+        maxRetries: 1,
+      }).textStream;
+    }
+    served = "groq-llama-3.1-8b";
+    return streamText({
+      model: groq("llama-3.1-8b-instant"),
+      system: opts.system,
+      messages: opts.messages,
+      temperature: opts.temperature ?? 0.4,
+      maxRetries: 1,
+      onFinish: ({ usage }) => recordGroqUsage("llama-3.1-8b-instant", usage?.totalTokens ?? 0),
+    }).textStream;
+  };
+
+  async function* generate(): AsyncIterable<string> {
+    // Balanced router: simple questions skip the deep model entirely for speed.
+    // Deep ones still try 70B (with the latency race below).
+    if (opts.preferFast) {
+      yield* fastStream();
+      return;
+    }
+
+    const quota = checkQuota(primary);
+
+    // If the 70B quota is already throttled, skip straight to the fast path.
+    if (quota.shouldThrottle) {
+      yield* fastStream();
+      return;
+    }
+
+    const primaryResult = streamText({
+      model: groq(primary),
+      system: opts.system,
+      messages: opts.messages,
+      temperature: opts.temperature ?? 0.4,
+      maxRetries: 1,
+      onFinish: ({ usage }) => recordGroqUsage(primary, usage?.totalTokens ?? 0),
+    });
+
+    const iterator = primaryResult.textStream[Symbol.asyncIterator]();
+
+    // Race the FIRST chunk against the timeout.
+    let first: IteratorResult<string>;
+    try {
+      first = await Promise.race([
+        iterator.next(),
+        new Promise<never>((_, reject) =>
+          setTimeout(
+            () => reject(new Error("primary-first-token-timeout")),
+            FIRST_TOKEN_TIMEOUT_MS,
+          ),
+        ),
+      ]);
+    } catch {
+      // 70B too slow or errored before first token — drop it, use the fast model.
+      iterator.return?.().catch(() => {});
+      yield* fastStream();
+      return;
+    }
+
+    // 70B answered in time — stream it fully (quality path).
+    if (!first.done && first.value) yield first.value;
+    while (true) {
+      const next = await iterator.next();
+      if (next.done) break;
+      if (next.value) yield next.value;
+    }
+  }
+
+  return { textStream: generate(), servedBy: () => served };
 }
