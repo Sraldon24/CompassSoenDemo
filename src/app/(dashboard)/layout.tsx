@@ -5,6 +5,7 @@ import { Topbar } from "@/components/nav/topbar";
 import { db } from "@/lib/db";
 import { profiles, users } from "@/lib/db/schema";
 import { getSession } from "@/lib/get-session";
+import { isAdmin } from "@/lib/is-admin";
 import { eq } from "drizzle-orm";
 import { redirect } from "next/navigation";
 
@@ -39,7 +40,7 @@ export default async function DashboardLayout({
 
   return (
     <div className="flex min-h-screen" style={{ background: "var(--color-bg)" }}>
-      <Sidebar />
+      <Sidebar isAdmin={isAdmin(session)} />
       <div className="flex-1 flex flex-col min-w-0">
         <Topbar userName={session.user.name ?? null} userEmail={session.user.email} />
         <main className="flex-1 overflow-y-auto">{children}</main>

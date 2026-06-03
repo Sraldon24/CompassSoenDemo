@@ -29,7 +29,7 @@ export default async function AdminLayout({
 
   return (
     <div className="flex min-h-screen" style={{ background: "var(--color-bg)" }}>
-      <Sidebar />
+      <Sidebar isAdmin />
       <div className="flex-1 flex flex-col min-w-0">
         <Topbar userName={session.user.name ?? null} userEmail={session.user.email} />
         <main className="flex-1 overflow-y-auto">{children}</main>

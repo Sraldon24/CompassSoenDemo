@@ -10,6 +10,7 @@ import {
   MessageSquare,
   Network,
   Settings,
+  Shield,
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -25,7 +26,7 @@ const NAV_ITEMS = [
   { href: "/emails", label: "Emails", icon: Mail },
 ] as const;
 
-export function Sidebar(): React.ReactElement {
+export function Sidebar({ isAdmin = false }: { isAdmin?: boolean }): React.ReactElement {
   const pathname = usePathname();
   return (
     <aside
@@ -83,7 +84,27 @@ export function Sidebar(): React.ReactElement {
         })}
       </nav>
 
-      <div className="px-3 py-4 border-t" style={{ borderColor: "var(--color-border)" }}>
+      <div
+        className="px-3 py-4 border-t space-y-0.5"
+        style={{ borderColor: "var(--color-border)" }}
+      >
+        {isAdmin && (
+          <Link
+            href="/admin/users"
+            className={cn(
+              "flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium transition-colors",
+              pathname.startsWith("/admin")
+                ? "text-foreground"
+                : "text-muted-foreground hover:text-foreground hover:bg-secondary",
+            )}
+            style={
+              pathname.startsWith("/admin") ? { background: "var(--color-accent-soft)" } : undefined
+            }
+          >
+            <Shield className="h-4 w-4 shrink-0" aria-hidden="true" />
+            <span>Admin</span>
+          </Link>
+        )}
         <Link
           href="/settings"
           className={cn(
