@@ -249,8 +249,3 @@ export async function buildRAGContext({ query, userId }: BuildRAGOptions): Promi
     planByCode,
   });
 }
-
-/** Cheap helper for the UI: how many sources are good enough to surface? */
-export function filterUsefulSources(sources: RAGSource[], minScore = 0.2): RAGSource[] {
-  return sources.filter((s) => s.score >= minScore);
-}

@@ -88,16 +88,6 @@ export function workloadDescription(level: WorkloadLevel): string {
   }
 }
 
-interface CalculateTermWorkloadInput {
-  termCourses: PlannedCourse[];
-  catalog: Map<string, CourseCatalogEntry>;
-}
-
-/** Same calc, named for callers that prefer a single-arg object. */
-export function calculateWorkload(input: CalculateTermWorkloadInput): TermWorkload {
-  return calculateTermWorkload(input.termCourses, input.catalog);
-}
-
 interface InternalThresholds {
   light: number;
   moderate: number;

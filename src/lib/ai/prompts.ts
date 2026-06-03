@@ -63,19 +63,6 @@ advice. If no plan exists yet, suggest a clear first step.
 
 Don't include a header, just the paragraph.`;
 
-export const REDDIT_SUMMARIZE_SYSTEM = `You are summarizing what Reddit users on
-r/Concordia have said about a specific course.
-
-Input: 3–8 Reddit posts/comments mentioning the course.
-
-Output:
-- 2–4 sentence summary
-- One line "Sentiment: positive | mixed | negative"
-- Up to 3 specific advice points (bullets)
-
-Be honest. If posts contradict, say so. Do not invent details not in the
-provided posts.`;
-
 export const SUGGESTED_QUESTIONS: string[] = [
   "When can I take COMP 472?",
   "What AI electives should I take after COMP 432?",

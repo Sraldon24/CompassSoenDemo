@@ -6,8 +6,8 @@
  *     complex/recommend/summarize/email → 70B versatile.
  *   - callGroqWithBackoff retries on 429 / 5xx with exponential backoff
  *     (1s, 2s, 4s). Throws AIError after the final attempt.
- *   - All callers use generateResponse() OR streamResponse() — never call
- *     the Groq SDK directly.
+ *   - All callers use generateResponse() OR streamChatWithFallback() — never
+ *     call the Groq SDK directly.
  */
 
 import { createGoogleGenerativeAI } from "@ai-sdk/google";
@@ -247,40 +247,6 @@ async function tryGroq(model: GroqModel, opts: CallOptions): Promise<TryResult> 
     }
   }
   return { ok: false, err: lastErr };
-}
-
-/**
- * Stream tokens via the Vercel AI SDK. Caller receives a `streamText` result
- * that can be returned directly from a Next.js route handler with
- * `.toAIStreamResponse()` / `.toTextStreamResponse()`.
- *
- * Per ADR-011 + ADR-012: this MUST honor the system-wide Groq quota. We
- * (1) check the circuit breaker before invoking, and (2) call `onFinish` to
- * record actual token usage when the stream completes — so subsequent
- * `checkQuota()` calls see accurate numbers.
- */
-export function streamResponse(opts: CallOptions): ReturnType<typeof streamText> {
-  const model = selectModel(opts.task);
-
-  // Circuit breaker — refuse to hit Groq if we're already at 85%+ of daily cap.
-  const quota = checkQuota(model);
-  if (quota.shouldThrottle) {
-    throw new AIError(
-      `Daily AI quota nearly exhausted (${quota.reason}). Try again after UTC midnight.`,
-      { status: 503, retryable: false },
-    );
-  }
-
-  return streamText({
-    model: groq(model),
-    system: opts.system,
-    messages: opts.messages,
-    temperature: opts.temperature ?? 0.4,
-    maxRetries: opts.maxAttempts ?? 2,
-    onFinish: ({ usage }) => {
-      recordGroqUsage(model, usage?.totalTokens ?? 0);
-    },
-  });
 }
 
 // ── Speed upgrade: quality-first streaming with a latency fallback ───────────
