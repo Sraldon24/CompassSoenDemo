@@ -119,12 +119,20 @@ export function ChatUI(): React.ReactElement {
   return (
     <div className="flex flex-col h-[calc(100vh-4rem)]">
       <div
-        className="flex items-center justify-between px-6 py-4 border-b"
-        style={{ borderColor: "var(--color-border)" }}
+        className="flex items-center justify-between px-6 py-4 border-b backdrop-blur-md"
+        style={{
+          borderColor: "var(--color-border)",
+          background: "color-mix(in oklch, var(--color-bg) 80%, transparent)",
+        }}
       >
         <div>
           <h1 className="text-lg font-semibold flex items-center gap-2">
-            <Sparkles className="h-4 w-4" style={{ color: "var(--color-accent)" }} />
+            <span
+              className="inline-flex h-6 w-6 items-center justify-center rounded-lg text-white"
+              style={{ backgroundImage: "var(--gradient-accent)" }}
+            >
+              <Sparkles className="h-3.5 w-3.5" />
+            </span>
             Ask Compass
           </h1>
           <p className="text-xs" style={{ color: "var(--color-text-muted)" }}>
@@ -148,27 +156,28 @@ export function ChatUI(): React.ReactElement {
       {/* Messages */}
       <div className="flex-1 overflow-y-auto px-6 py-6 space-y-6">
         {messages.length === 0 ? (
-          <div className="max-w-2xl mx-auto space-y-4">
+          <div className="max-w-2xl mx-auto space-y-4 animate-rise">
             <h2 className="text-2xl font-semibold tracking-tight">
-              Hi — what would you like to plan?
+              Hi — what would you like to <span className="text-gradient">plan?</span>
             </h2>
             <p style={{ color: "var(--color-text-muted)" }}>
               Try asking about prereqs, electives, or your current plan. I'll cite where each answer
               comes from.
             </p>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-4">
-              {SUGGESTED_QUESTIONS.map((q) => (
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-4 stagger">
+              {SUGGESTED_QUESTIONS.map((q, i) => (
                 <button
                   key={q}
                   type="button"
                   onClick={() => send(q)}
-                  className="text-left rounded-md border px-3 py-2.5 text-sm transition-colors hover:bg-accent/10 focus-visible:outline-none"
-                  style={{
-                    borderColor: "var(--color-border)",
-                    color: "var(--color-text)",
-                  }}
+                  style={{ ["--i" as string]: i, background: "var(--gradient-surface)" }}
+                  className="lift group flex items-center justify-between gap-2 text-left rounded-xl border px-4 py-3 text-sm hover:border-accent/40 focus-visible:outline-none"
                 >
-                  {q}
+                  <span style={{ color: "var(--color-text)" }}>{q}</span>
+                  <Send
+                    className="h-3.5 w-3.5 shrink-0 opacity-0 transition-opacity group-hover:opacity-100"
+                    style={{ color: "var(--color-accent)" }}
+                  />
                 </button>
               ))}
             </div>
@@ -176,88 +185,122 @@ export function ChatUI(): React.ReactElement {
         ) : (
           <div className="max-w-3xl mx-auto space-y-6">
             {messages.map((m) => (
-              <article key={m.id} className="space-y-2">
+              <article key={m.id} className="flex gap-3 animate-rise" data-role={m.role}>
+                {/* Avatar */}
                 <div
-                  className="text-[11px] uppercase tracking-wide font-medium"
-                  style={{
-                    color: m.role === "user" ? "var(--color-text-subtle)" : "var(--color-accent)",
-                  }}
+                  className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-[11px] font-semibold"
+                  style={
+                    m.role === "assistant"
+                      ? { backgroundImage: "var(--gradient-accent)", color: "white" }
+                      : { background: "var(--color-surface-2)", color: "var(--color-text-muted)" }
+                  }
+                  aria-hidden
                 >
-                  {m.role === "user" ? "You" : "Compass"}
+                  {m.role === "assistant" ? <Sparkles className="h-4 w-4" /> : "You"}
                 </div>
-                {m.content === "" && m.role === "assistant" ? (
-                  <div className="space-y-2">
-                    <div
-                      className="flex items-center gap-2 text-sm"
-                      style={{ color: "var(--color-text-muted)" }}
-                      aria-live="polite"
-                    >
-                      <span className="flex gap-1" aria-hidden>
-                        <span
-                          className="h-1.5 w-1.5 rounded-full animate-bounce [animation-delay:-0.3s]"
-                          style={{ background: "var(--color-accent)" }}
-                        />
-                        <span
-                          className="h-1.5 w-1.5 rounded-full animate-bounce [animation-delay:-0.15s]"
-                          style={{ background: "var(--color-accent)" }}
-                        />
-                        <span
-                          className="h-1.5 w-1.5 rounded-full animate-bounce"
-                          style={{ background: "var(--color-accent)" }}
-                        />
-                      </span>
-                      Compass is thinking… this can take a few seconds.
-                    </div>
-                    <Skeleton className="h-3 w-3/4" />
-                    <Skeleton className="h-3 w-1/2" />
-                  </div>
-                ) : (
+
+                <div className="flex-1 min-w-0 space-y-2">
                   <div
-                    className="prose-sm whitespace-pre-wrap text-[15px] leading-relaxed"
-                    style={{ color: "var(--color-text)" }}
+                    className="text-[11px] uppercase tracking-wide font-medium"
+                    style={{
+                      color: m.role === "user" ? "var(--color-text-subtle)" : "var(--color-accent)",
+                    }}
                   >
-                    {m.content}
+                    {m.role === "user" ? "You" : "Compass"}
                   </div>
-                )}
-                {m.sources && m.sources.length > 0 && (
-                  <div className="flex flex-wrap gap-1.5 pt-1">
-                    {m.sources.map((s) => (
-                      <a
-                        key={s.id}
-                        href={s.url ?? "#"}
-                        target={s.url ? "_blank" : undefined}
-                        rel="noopener noreferrer"
-                        className="inline-flex items-center text-[11px] px-2 py-0.5 rounded-full border transition-colors hover:bg-accent/10"
-                        style={{
-                          borderColor: "var(--color-border)",
-                          color: "var(--color-text-muted)",
-                        }}
+                  {m.content === "" && m.role === "assistant" ? (
+                    <div
+                      className="space-y-2 rounded-xl rounded-tl-sm border p-3.5"
+                      style={{
+                        background: "var(--color-surface)",
+                        borderColor: "var(--color-border)",
+                      }}
+                    >
+                      <div
+                        className="flex items-center gap-2 text-sm"
+                        style={{ color: "var(--color-text-muted)" }}
+                        aria-live="polite"
                       >
-                        {s.label}
-                      </a>
-                    ))}
-                  </div>
-                )}
-                {m.role === "assistant" && m.content !== "" && (
-                  <div className="flex items-center gap-1 pt-1">
-                    <button
-                      type="button"
-                      aria-label="Helpful"
-                      className="p-1 rounded hover:bg-accent/10 transition-colors"
-                      style={{ color: "var(--color-text-subtle)" }}
+                        <span className="flex gap-1" aria-hidden>
+                          <span
+                            className="h-1.5 w-1.5 rounded-full animate-bounce [animation-delay:-0.3s]"
+                            style={{ background: "var(--color-accent)" }}
+                          />
+                          <span
+                            className="h-1.5 w-1.5 rounded-full animate-bounce [animation-delay:-0.15s]"
+                            style={{ background: "var(--color-accent)" }}
+                          />
+                          <span
+                            className="h-1.5 w-1.5 rounded-full animate-bounce"
+                            style={{ background: "var(--color-accent)" }}
+                          />
+                        </span>
+                        Compass is thinking… this can take a few seconds.
+                      </div>
+                      <Skeleton className="h-3 w-3/4" />
+                      <Skeleton className="h-3 w-1/2" />
+                    </div>
+                  ) : (
+                    <div
+                      className="prose-sm whitespace-pre-wrap rounded-xl border p-3.5 text-[15px] leading-relaxed"
+                      style={
+                        m.role === "user"
+                          ? {
+                              background: "var(--gradient-accent-soft)",
+                              borderColor:
+                                "color-mix(in oklch, var(--color-accent) 20%, transparent)",
+                              color: "var(--color-text)",
+                            }
+                          : {
+                              background: "var(--color-surface)",
+                              borderColor: "var(--color-border)",
+                              color: "var(--color-text)",
+                            }
+                      }
                     >
-                      <ThumbsUp className="h-3.5 w-3.5" />
-                    </button>
-                    <button
-                      type="button"
-                      aria-label="Not helpful"
-                      className="p-1 rounded hover:bg-accent/10 transition-colors"
-                      style={{ color: "var(--color-text-subtle)" }}
-                    >
-                      <ThumbsDown className="h-3.5 w-3.5" />
-                    </button>
-                  </div>
-                )}
+                      {m.content}
+                    </div>
+                  )}
+                  {m.sources && m.sources.length > 0 && (
+                    <div className="flex flex-wrap gap-1.5 pt-1">
+                      {m.sources.map((s) => (
+                        <a
+                          key={s.id}
+                          href={s.url ?? "#"}
+                          target={s.url ? "_blank" : undefined}
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center text-[11px] px-2 py-0.5 rounded-full border transition-colors hover:bg-accent/10"
+                          style={{
+                            borderColor: "var(--color-border)",
+                            color: "var(--color-text-muted)",
+                          }}
+                        >
+                          {s.label}
+                        </a>
+                      ))}
+                    </div>
+                  )}
+                  {m.role === "assistant" && m.content !== "" && (
+                    <div className="flex items-center gap-1 pt-1">
+                      <button
+                        type="button"
+                        aria-label="Helpful"
+                        className="p-1 rounded hover:bg-accent/10 transition-colors"
+                        style={{ color: "var(--color-text-subtle)" }}
+                      >
+                        <ThumbsUp className="h-3.5 w-3.5" />
+                      </button>
+                      <button
+                        type="button"
+                        aria-label="Not helpful"
+                        className="p-1 rounded hover:bg-accent/10 transition-colors"
+                        style={{ color: "var(--color-text-subtle)" }}
+                      >
+                        <ThumbsDown className="h-3.5 w-3.5" />
+                      </button>
+                    </div>
+                  )}
+                </div>
               </article>
             ))}
             <div ref={bottomRef} />
@@ -291,7 +334,12 @@ export function ChatUI(): React.ReactElement {
             }}
             disabled={pending}
           />
-          <Button type="submit" disabled={pending || !input.trim()} className="shrink-0 self-end">
+          <Button
+            type="submit"
+            variant="accent"
+            disabled={pending || !input.trim()}
+            className="shrink-0 self-end"
+          >
             <Send className="h-4 w-4 mr-1.5" />
             Send
           </Button>

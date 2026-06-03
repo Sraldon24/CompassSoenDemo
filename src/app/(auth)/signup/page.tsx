@@ -41,7 +41,7 @@ export default function SignUpPage(): React.ReactElement {
   };
 
   return (
-    <Card>
+    <Card featured>
       <CardHeader className="space-y-1">
         <CardTitle className="text-2xl">Create your account</CardTitle>
         <CardDescription>It takes about a minute. No credit card required.</CardDescription>
@@ -120,7 +120,7 @@ export default function SignUpPage(): React.ReactElement {
             )}
           </div>
 
-          <Button type="submit" className="w-full" disabled={isSubmitting}>
+          <Button type="submit" variant="accent" className="w-full" disabled={isSubmitting}>
             {isSubmitting ? "Creating account..." : "Create account"}
           </Button>
         </form>

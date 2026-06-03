@@ -33,28 +33,33 @@ export default async function SettingsPage(): Promise<React.ReactElement> {
 
   return (
     <div className="px-4 md:px-8 py-6 md:py-10 max-w-[960px] mx-auto space-y-8">
-      <header className="space-y-2">
+      <header className="space-y-2 animate-rise">
         <h1 className="text-3xl font-semibold tracking-tight">Settings</h1>
         <p className="text-sm" style={{ color: "var(--color-text-muted)" }}>
           Signed in as {session.user.email}.
         </p>
       </header>
 
-      <div className="grid gap-3 sm:grid-cols-2">
-        {SECTIONS.map((s) => {
+      <div className="grid gap-3 sm:grid-cols-2 stagger">
+        {SECTIONS.map((s, i) => {
           const Icon = s.icon;
           return (
             <Link
               key={s.href}
               href={s.href}
-              className="group flex flex-col gap-2 rounded-lg border p-4 transition-colors hover:bg-accent/5"
-              style={{ borderColor: "var(--color-border)", background: "var(--color-surface)" }}
+              style={{ ["--i" as string]: i, background: "var(--gradient-surface)" }}
+              className="lift group flex flex-col gap-2 rounded-xl border p-5 hover:border-accent/40"
             >
-              <Icon
-                className="h-5 w-5"
-                style={{ color: "var(--color-accent)" }}
-                aria-hidden="true"
-              />
+              <span
+                className="inline-flex h-10 w-10 items-center justify-center rounded-lg"
+                style={{ background: "var(--gradient-accent-soft)" }}
+              >
+                <Icon
+                  className="h-5 w-5"
+                  style={{ color: "var(--color-accent)" }}
+                  aria-hidden="true"
+                />
+              </span>
               <span className="text-sm font-semibold">{s.title}</span>
               <span className="text-xs" style={{ color: "var(--color-text-muted)" }}>
                 {s.description}

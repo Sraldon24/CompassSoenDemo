@@ -40,7 +40,7 @@ export function PrereqMapClient({
 
   return (
     <div className="px-4 md:px-8 py-6 md:py-10 max-w-[1600px] mx-auto space-y-4">
-      <header className="space-y-2">
+      <header className="space-y-2 animate-rise">
         <h1 className="text-3xl font-semibold tracking-tight">Prereq Map</h1>
         <p className="text-sm" style={{ color: "var(--color-text-muted)" }}>
           Hover a course to highlight everything connected to it. Solid arrows = hard prereqs;
@@ -49,21 +49,27 @@ export function PrereqMapClient({
       </header>
 
       <div className="flex flex-wrap gap-2">
-        {FILTERS.map((f) => (
-          <button
-            key={f.value}
-            type="button"
-            onClick={() => setFilter(f.value)}
-            className="text-xs px-3 py-1.5 rounded-full border transition-colors"
-            style={{
-              borderColor: filter === f.value ? "var(--color-accent)" : "var(--color-border)",
-              background: filter === f.value ? "var(--color-accent-soft)" : "var(--color-surface)",
-              color: filter === f.value ? "var(--color-accent)" : "var(--color-text-muted)",
-            }}
-          >
-            {f.label}
-          </button>
-        ))}
+        {FILTERS.map((f) => {
+          const active = filter === f.value;
+          return (
+            <button
+              key={f.value}
+              type="button"
+              onClick={() => setFilter(f.value)}
+              className="text-xs px-3 py-1.5 rounded-full border transition-all duration-200 hover:border-accent/40"
+              style={{
+                borderColor: active
+                  ? "color-mix(in oklch, var(--color-accent) 35%, transparent)"
+                  : "var(--color-border)",
+                background: active ? "var(--gradient-accent-soft)" : "var(--color-surface)",
+                color: active ? "var(--color-accent)" : "var(--color-text-muted)",
+                fontWeight: active ? 600 : 400,
+              }}
+            >
+              {f.label}
+            </button>
+          );
+        })}
       </div>
 
       <PrereqMapSVG

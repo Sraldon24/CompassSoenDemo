@@ -26,68 +26,75 @@ export default async function RequirementsPage(): Promise<React.ReactElement> {
 
   return (
     <div className="px-4 md:px-8 py-6 md:py-10 max-w-[1280px] mx-auto space-y-8">
-      <header className="space-y-3">
-        <h1 className="text-3xl font-semibold tracking-tight">Requirements</h1>
-        <p className="text-sm" style={{ color: "var(--color-text-muted)" }}>
-          BEng Software Engineering — {TOTAL_DEGREE_CREDITS} credits required. Track your progress
-          per category.
-        </p>
+      <header
+        className="relative overflow-hidden rounded-2xl border p-6 sm:p-8 space-y-3 animate-rise"
+        style={{ background: "var(--gradient-surface)", borderColor: "var(--color-border)" }}
+      >
+        <div className="glow-accent absolute inset-0" aria-hidden />
+        <div className="relative space-y-3">
+          <h1 className="text-3xl font-semibold tracking-tight">Requirements</h1>
+          <p className="text-sm" style={{ color: "var(--color-text-muted)" }}>
+            BEng Software Engineering — {TOTAL_DEGREE_CREDITS} credits required. Track your progress
+            per category.
+          </p>
 
-        <div className="space-y-2">
-          <div className="flex items-baseline justify-between gap-3">
-            <span
-              className="text-xs font-medium uppercase tracking-wide"
+          <div className="space-y-2 pt-1">
+            <div className="flex items-baseline justify-between gap-3">
+              <span
+                className="text-xs font-medium uppercase tracking-wide"
+                style={{ color: "var(--color-text-muted)" }}
+              >
+                Overall degree progress
+              </span>
+              <span className="mono tnum text-sm">
+                {overall.done + overall.inProgress} / {overall.total} credits{" "}
+                <span style={{ color: "var(--color-accent)" }}>({overallPct}%)</span>
+              </span>
+            </div>
+            <div
+              className="h-2.5 w-full rounded-full overflow-hidden"
+              style={{ background: "var(--color-surface-2)" }}
+            >
+              <div
+                className="h-full rounded-full transition-[width] duration-700 [transition-timing-function:var(--ease-out-soft)]"
+                style={{
+                  background: "var(--gradient-accent)",
+                  width: `${overallPct}%`,
+                }}
+              />
+            </div>
+            <div
+              className="flex flex-wrap gap-4 text-xs"
               style={{ color: "var(--color-text-muted)" }}
             >
-              Overall degree progress
-            </span>
-            <span className="mono tnum text-sm">
-              {overall.done + overall.inProgress} / {overall.total} credits ({overallPct}%)
-            </span>
-          </div>
-          <div
-            className="h-2 w-full rounded-full overflow-hidden"
-            style={{ background: "var(--color-surface-2)" }}
-          >
-            <div
-              className="h-full rounded-full transition-[width] duration-300"
-              style={{
-                background: "var(--color-accent)",
-                width: `${overallPct}%`,
-              }}
-            />
-          </div>
-          <div
-            className="flex flex-wrap gap-4 text-xs"
-            style={{ color: "var(--color-text-muted)" }}
-          >
-            <span>
-              <span
-                className="inline-block w-2 h-2 rounded-full mr-1 align-middle"
-                style={{ background: "var(--color-success)" }}
-              />
-              Done: <span className="mono tnum">{overall.done}</span>
-            </span>
-            <span>
-              <span
-                className="inline-block w-2 h-2 rounded-full mr-1 align-middle"
-                style={{ background: "var(--color-accent)" }}
-              />
-              In progress: <span className="mono tnum">{overall.inProgress}</span>
-            </span>
-            <span>
-              <span
-                className="inline-block w-2 h-2 rounded-full mr-1 align-middle"
-                style={{ background: "var(--color-text-subtle)" }}
-              />
-              Planned: <span className="mono tnum">{overall.planned}</span>
-            </span>
-            <span>
-              Remaining:{" "}
-              <span className="mono tnum">
-                {Math.max(0, overall.total - overall.done - overall.inProgress - overall.planned)}
+              <span>
+                <span
+                  className="inline-block w-2 h-2 rounded-full mr-1 align-middle"
+                  style={{ background: "var(--color-success)" }}
+                />
+                Done: <span className="mono tnum">{overall.done}</span>
               </span>
-            </span>
+              <span>
+                <span
+                  className="inline-block w-2 h-2 rounded-full mr-1 align-middle"
+                  style={{ background: "var(--color-accent)" }}
+                />
+                In progress: <span className="mono tnum">{overall.inProgress}</span>
+              </span>
+              <span>
+                <span
+                  className="inline-block w-2 h-2 rounded-full mr-1 align-middle"
+                  style={{ background: "var(--color-text-subtle)" }}
+                />
+                Planned: <span className="mono tnum">{overall.planned}</span>
+              </span>
+              <span>
+                Remaining:{" "}
+                <span className="mono tnum">
+                  {Math.max(0, overall.total - overall.done - overall.inProgress - overall.planned)}
+                </span>
+              </span>
+            </div>
           </div>
         </div>
       </header>
@@ -100,7 +107,7 @@ export default async function RequirementsPage(): Promise<React.ReactElement> {
         );
 
         return (
-          <Card key={cp.spec.key}>
+          <Card key={cp.spec.key} interactive>
             <CardHeader className="space-y-1">
               <div className="flex items-baseline justify-between flex-wrap gap-2">
                 <CardTitle className="text-base">{cp.spec.label}</CardTitle>
@@ -117,14 +124,16 @@ export default async function RequirementsPage(): Promise<React.ReactElement> {
             </CardHeader>
             <CardContent className="space-y-3">
               <div
-                className="h-1.5 w-full rounded-full overflow-hidden"
+                className="h-2 w-full rounded-full overflow-hidden"
                 style={{ background: "var(--color-surface-2)" }}
               >
                 <div
-                  className="h-full rounded-full transition-[width] duration-300"
+                  className="h-full rounded-full transition-[width] duration-700 [transition-timing-function:var(--ease-out-soft)]"
                   style={{
                     background:
-                      cp.spec.key === "deficiency" ? "var(--color-warning)" : "var(--color-accent)",
+                      cp.spec.key === "deficiency"
+                        ? "var(--color-warning)"
+                        : "var(--gradient-accent)",
                     width: `${pct}%`,
                   }}
                 />

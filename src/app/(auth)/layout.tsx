@@ -6,10 +6,11 @@ export default function AuthLayout({
 }: { children: React.ReactNode }): React.ReactElement {
   return (
     <div
-      className="min-h-screen flex flex-col items-center justify-center px-4 py-12"
+      className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden px-4 py-12"
       style={{ background: "var(--color-bg)" }}
     >
-      <Link href="/" className="mb-8" aria-label="SOEN Compass home">
+      <div className="aurora-bg" aria-hidden />
+      <Link href="/" className="relative z-10 mb-8 animate-rise" aria-label="SOEN Compass home">
         <Image
           src="/brand/lockup.svg"
           alt="SOEN Compass"
@@ -27,7 +28,12 @@ export default function AuthLayout({
           className="hidden dark:block"
         />
       </Link>
-      <div className="w-full max-w-sm">{children}</div>
+      <div
+        className="relative z-10 w-full max-w-sm animate-rise"
+        style={{ animationDelay: "80ms" }}
+      >
+        {children}
+      </div>
     </div>
   );
 }

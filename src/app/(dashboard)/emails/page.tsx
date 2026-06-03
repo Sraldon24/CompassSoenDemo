@@ -34,9 +34,14 @@ export default async function EmailsPage(): Promise<React.ReactElement> {
 
   return (
     <div className="px-4 md:px-8 py-6 md:py-10 max-w-[1280px] mx-auto space-y-8">
-      <header className="space-y-2">
-        <h1 className="text-3xl font-semibold tracking-tight flex items-center gap-2">
-          <Mail className="h-6 w-6" style={{ color: "var(--color-accent)" }} />
+      <header className="space-y-2 animate-rise">
+        <h1 className="text-3xl font-semibold tracking-tight flex items-center gap-2.5">
+          <span
+            className="inline-flex h-9 w-9 items-center justify-center rounded-xl text-white shadow-sm"
+            style={{ backgroundImage: "var(--gradient-accent)" }}
+          >
+            <Mail className="h-5 w-5" />
+          </span>
           Email Templates
         </h1>
         <p className="text-sm" style={{ color: "var(--color-text-muted)" }}>

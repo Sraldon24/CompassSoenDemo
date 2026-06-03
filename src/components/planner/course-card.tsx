@@ -33,11 +33,11 @@ export function CourseCard({
       data-violation={hasViolation || undefined}
       data-status={planned.status}
       className={cn(
-        "group relative flex items-start gap-2 rounded-md border bg-surface p-2.5 transition-colors",
-        dragging && "opacity-40",
+        "lift group relative flex items-start gap-2 rounded-lg border p-2.5 hover:border-accent/40",
+        dragging && "opacity-40 rotate-1 shadow-lg",
       )}
       style={{
-        background: "var(--color-surface)",
+        background: "var(--gradient-surface)",
         borderColor: hasViolation
           ? "color-mix(in oklch, var(--color-danger) 40%, var(--color-border))"
           : "var(--color-border)",

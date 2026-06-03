@@ -26,7 +26,7 @@ export default async function PlanPage(): Promise<React.ReactElement> {
 
   return (
     <div className="px-4 md:px-8 py-6 md:py-10 max-w-[1600px] mx-auto space-y-6">
-      <header className="flex flex-wrap items-end justify-between gap-4">
+      <header className="flex flex-wrap items-end justify-between gap-4 animate-rise">
         <div className="space-y-1">
           <h1 className="text-3xl font-semibold tracking-tight">My Plan</h1>
           <p className="text-sm" style={{ color: "var(--color-text-muted)" }}>

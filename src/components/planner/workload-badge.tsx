@@ -21,6 +21,13 @@ const COLOR_VAR: Record<WorkloadLevel, string> = {
   burnout: "var(--color-danger)",
 };
 
+const SOFT_VAR: Record<WorkloadLevel, string> = {
+  light: "var(--color-success-soft)",
+  moderate: "var(--color-accent-soft)",
+  heavy: "var(--color-warning-soft)",
+  burnout: "var(--color-danger-soft)",
+};
+
 const FILL_BARS: Record<WorkloadLevel, number> = {
   light: 1,
   moderate: 2,
@@ -33,8 +40,8 @@ export function WorkloadBadge({ level, hoursPerWeek }: WorkloadBadgeProps): Reac
   const filled = FILL_BARS[level];
   return (
     <span
-      className="inline-flex items-center gap-2 rounded-full border px-2.5 py-1 text-[11px] font-medium"
-      style={{ borderColor: "var(--color-border)", color: accent }}
+      className="inline-flex items-center gap-2 rounded-full px-2.5 py-1 text-[11px] font-medium"
+      style={{ background: SOFT_VAR[level], color: accent }}
       title={`${hoursPerWeek} hrs/week estimated`}
     >
       {/* 4-bar meter */}

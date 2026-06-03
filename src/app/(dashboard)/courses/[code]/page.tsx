@@ -60,20 +60,28 @@ export default async function CourseDetailPage({ params }: PageProps): Promise<R
 
   return (
     <div className="px-4 md:px-8 py-6 md:py-10 max-w-[1100px] mx-auto space-y-8">
-      <header className="space-y-2">
-        <div
-          className="text-xs font-medium uppercase tracking-wide"
-          style={{ color: "var(--color-text-muted)" }}
-        >
-          {courseRow.category ?? "Course"}
-        </div>
-        <h1 className="text-3xl font-semibold tracking-tight font-mono">{courseRow.code}</h1>
-        <p className="text-xl" style={{ color: "var(--color-text)" }}>
-          {courseRow.title}
-        </p>
-        <div className="flex gap-3 text-sm" style={{ color: "var(--color-text-muted)" }}>
-          <span>{courseRow.credits} credits</span>
-          {courseRow.avgHoursPerWeek ? <span>· ~{courseRow.avgHoursPerWeek}h/week</span> : null}
+      <header
+        className="relative overflow-hidden rounded-2xl border p-6 sm:p-8 space-y-2 animate-rise"
+        style={{ background: "var(--gradient-surface)", borderColor: "var(--color-border)" }}
+      >
+        <div className="glow-accent absolute inset-0" aria-hidden />
+        <div className="relative space-y-2">
+          <span
+            className="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium uppercase tracking-wide"
+            style={{ background: "var(--gradient-accent-soft)", color: "var(--color-accent)" }}
+          >
+            {courseRow.category ?? "Course"}
+          </span>
+          <h1 className="text-3xl font-semibold tracking-tight font-mono pt-1">{courseRow.code}</h1>
+          <p className="text-xl" style={{ color: "var(--color-text)" }}>
+            {courseRow.title}
+          </p>
+          <div className="flex gap-3 text-sm" style={{ color: "var(--color-text-muted)" }}>
+            <span className="mono tnum">{courseRow.credits} credits</span>
+            {courseRow.avgHoursPerWeek ? (
+              <span className="mono tnum">· ~{courseRow.avgHoursPerWeek}h/week</span>
+            ) : null}
+          </div>
         </div>
       </header>
 
