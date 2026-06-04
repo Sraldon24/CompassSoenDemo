@@ -47,29 +47,28 @@ export function EmailTemplateList({ templates, userName }: Props): React.ReactEl
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
       {[...groups.entries()].map(([category, items]) => (
-        <section key={category} className="space-y-3">
-          <h2
-            className="text-xs font-semibold uppercase tracking-wide"
-            style={{ color: "var(--color-text-muted)" }}
-          >
-            {category}
-          </h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-            {items.map((t) => {
+        <section key={category} className="space-y-3 animate-rise">
+          <h2 className="eyebrow">{category}</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3 stagger">
+            {items.map((t, index) => {
               const isExpanded = expandedId === t.id;
               const body = applyVariables(t.body, userName);
               return (
-                <Card key={t.id}>
+                <Card
+                  key={t.id}
+                  className="lift ring-hairline shadow-[var(--shadow-sm)] hover:shadow-[var(--shadow-glow)]"
+                  style={{ ["--i" as string]: index }}
+                >
                   <CardHeader>
                     <CardTitle className="text-base flex items-baseline gap-2">
                       <span>{t.title}</span>
                       <span
-                        className="text-[10px] px-1.5 py-0.5 rounded uppercase tracking-wide"
+                        className="text-[10px] px-1.5 py-0.5 rounded-md ring-hairline uppercase tracking-wide"
                         style={{
-                          background: "var(--color-surface-2)",
-                          color: "var(--color-text-muted)",
+                          background: "var(--color-accent-soft)",
+                          color: "var(--color-accent)",
                         }}
                       >
                         to: {t.to}
@@ -82,10 +81,9 @@ export function EmailTemplateList({ templates, userName }: Props): React.ReactEl
                   <CardContent className="space-y-3">
                     {isExpanded && (
                       <pre
-                        className="text-xs whitespace-pre-wrap rounded-md border p-3 max-h-72 overflow-y-auto"
+                        className="text-xs whitespace-pre-wrap rounded-xl ring-hairline shadow-[var(--shadow-sm)] p-3.5 max-h-72 overflow-y-auto scroll-slim"
                         style={{
                           background: "var(--color-surface-2)",
-                          borderColor: "var(--color-border)",
                         }}
                       >
                         {body}

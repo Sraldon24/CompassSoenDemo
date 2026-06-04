@@ -1,6 +1,5 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
 import type { DifficultySummary, DifficultyVote as Vote } from "@/lib/community/difficulty";
 import { useState, useTransition } from "react";
 
@@ -35,43 +34,62 @@ export function DifficultyVote({
         setError(data.error ?? `Request failed (${res.status})`);
         return;
       }
-      const data: { summary: DifficultySummary; yourVote: Vote } = await res.json();
-      setSummary(data.summary);
-      setYourVote(data.yourVote);
+      const data: { payload: { summary: DifficultySummary; yourVote: Vote } } = await res.json();
+      setSummary(data.payload.summary);
+      setYourVote(data.payload.yourVote);
     });
   };
 
   return (
     <div className="space-y-3">
-      <div className="flex flex-wrap gap-2">
+      <div
+        className="inline-flex flex-wrap items-center gap-1 rounded-xl p-1 ring-hairline"
+        style={{ background: "var(--color-surface-2)" }}
+      >
         {OPTIONS.map((vote) => {
           const isMine = yourVote === vote;
           return (
-            <Button
+            <button
               key={vote}
-              size="sm"
-              variant={isMine ? "default" : "outline"}
+              type="button"
               disabled={pending}
               onClick={() => submit(vote)}
               aria-pressed={isMine}
-              className="capitalize"
+              className="pressable rounded-lg px-3.5 py-1.5 text-sm font-medium capitalize transition-all disabled:opacity-60"
+              style={
+                isMine
+                  ? {
+                      backgroundImage: "var(--gradient-accent)",
+                      color: "#fff",
+                      boxShadow: "0 0 14px var(--color-accent-ring)",
+                    }
+                  : { color: "var(--color-text-muted)" }
+              }
             >
               {vote}
-            </Button>
+            </button>
           );
         })}
       </div>
       <div className="text-xs" style={{ color: "var(--color-text-muted)" }}>
-        {summary.count === 0
-          ? "Be the first to rate."
-          : `${summary.count} vote${summary.count === 1 ? "" : "s"} · class avg ${describeAverage(summary)}`}
+        {summary.count === 0 ? (
+          "Be the first to rate."
+        ) : (
+          <>
+            <span className="mono tnum">{summary.count}</span> vote
+            {summary.count === 1 ? "" : "s"} · class avg{" "}
+            <span style={{ color: "var(--color-accent)" }}>{describeAverage(summary)}</span>
+          </>
+        )}
         {yourVote && summary.count > 0 ? " · you voted " : ""}
         {yourVote && summary.count > 0 ? (
-          <span className="font-medium capitalize">{yourVote}</span>
+          <span className="font-medium capitalize" style={{ color: "var(--color-text)" }}>
+            {yourVote}
+          </span>
         ) : null}
       </div>
       {error && (
-        <div className="text-xs" style={{ color: "var(--color-error, #c43d3d)" }}>
+        <div className="text-xs" style={{ color: "var(--color-danger)" }}>
           {error}
         </div>
       )}

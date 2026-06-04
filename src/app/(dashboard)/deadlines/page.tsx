@@ -40,21 +40,28 @@ export default async function DeadlinesPage(): Promise<React.ReactElement> {
 
   return (
     <div className="px-4 md:px-8 py-6 md:py-10 max-w-[960px] mx-auto space-y-8">
-      <header className="flex flex-wrap items-end justify-between gap-3 animate-rise">
-        <div className="space-y-2">
-          <h1 className="text-3xl font-semibold tracking-tight">Deadlines</h1>
-          <p className="text-sm" style={{ color: "var(--color-text-muted)" }}>
-            Key academic dates and the start of each term in your plan.
-          </p>
+      <header
+        className="relative overflow-hidden rounded-2xl ring-hairline shadow-[var(--shadow-md)] p-6 sm:p-8 animate-rise"
+        style={{ background: "var(--gradient-surface)" }}
+      >
+        <div className="absolute inset-0 bg-gradient-hero" aria-hidden />
+        <div className="relative flex flex-wrap items-end justify-between gap-3">
+          <div className="space-y-2">
+            <p className="eyebrow">Academic calendar</p>
+            <h1 className="text-2xl sm:text-3xl font-semibold tracking-[-0.02em]">Deadlines</h1>
+            <p className="text-sm" style={{ color: "var(--color-text-muted)" }}>
+              Key academic dates and the start of each term in your plan.
+            </p>
+          </div>
+          <a
+            href="/api/export/ics"
+            className="pressable inline-flex items-center gap-2 rounded-xl ring-hairline px-3.5 py-2 text-sm font-medium shadow-[var(--shadow-sm)] transition-colors hover:bg-[var(--color-surface-2)]"
+            style={{ background: "var(--color-surface)" }}
+          >
+            <Download className="h-4 w-4" aria-hidden="true" />
+            Add my plan to calendar (.ics)
+          </a>
         </div>
-        <a
-          href="/api/export/ics"
-          className="inline-flex items-center gap-2 rounded-md border px-3 py-2 text-sm font-medium transition-colors hover:bg-accent/10"
-          style={{ borderColor: "var(--color-border)" }}
-        >
-          <Download className="h-4 w-4" aria-hidden="true" />
-          Add my plan to calendar (.ics)
-        </a>
       </header>
 
       <Checklist initial={checklist} />
@@ -102,10 +109,10 @@ function DeadlineSection({
           <li
             key={r.id}
             style={{ ["--i" as string]: i, background: "var(--gradient-surface)" }}
-            className="lift flex items-start gap-3 rounded-xl border p-3 hover:border-accent/40"
+            className="lift flex items-start gap-3 rounded-xl ring-hairline shadow-[var(--shadow-sm)] p-3.5 hover:shadow-[var(--shadow-glow)]"
           >
             <span
-              className="mt-0.5 inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-lg"
+              className="mt-0.5 inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-xl ring-hairline"
               style={{ background: "var(--gradient-accent-soft)" }}
             >
               <CalendarClock
@@ -148,14 +155,19 @@ function DeadlineSection({
 function EmptyState(): React.ReactElement {
   return (
     <div
-      className="flex flex-col items-center gap-3 rounded-lg border border-dashed py-16 text-center"
+      className="flex flex-col items-center gap-4 rounded-xl border border-dashed px-6 py-16 text-center"
       style={{ borderColor: "var(--color-border)" }}
     >
-      <CalendarClock
-        className="h-8 w-8"
-        style={{ color: "var(--color-text-muted)" }}
-        aria-hidden="true"
-      />
+      <span
+        className="inline-flex h-12 w-12 items-center justify-center rounded-xl ring-hairline"
+        style={{ background: "var(--gradient-accent-soft)" }}
+      >
+        <CalendarClock
+          className="h-6 w-6"
+          style={{ color: "var(--color-accent)" }}
+          aria-hidden="true"
+        />
+      </span>
       <h2 className="text-sm font-semibold">No deadlines yet</h2>
       <p className="max-w-sm text-xs" style={{ color: "var(--color-text-muted)" }}>
         Concordia key dates will appear here once the academic calendar is published. In the
@@ -163,8 +175,8 @@ function EmptyState(): React.ReactElement {
       </p>
       <a
         href="/api/export/ics"
-        className="mt-2 inline-flex items-center gap-2 rounded-md border px-3 py-2 text-sm font-medium transition-colors hover:bg-accent/10"
-        style={{ borderColor: "var(--color-border)" }}
+        className="pressable mt-1 inline-flex items-center gap-2 rounded-xl ring-hairline px-3.5 py-2 text-sm font-medium shadow-[var(--shadow-sm)] transition-colors hover:bg-[var(--color-surface-2)]"
+        style={{ background: "var(--color-surface)" }}
       >
         <Download className="h-4 w-4" aria-hidden="true" />
         Export plan (.ics)

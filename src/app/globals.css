@@ -5,45 +5,62 @@
 @custom-variant dark (&:is(.dark *));
 
 /* =============================================================================
- * Design tokens — Graphite Greens palette
- * Source of truth: docs/design/HANDOFF.md §1
- * Do NOT regenerate from PRD §8 (which is superseded).
+ * LUMEN design system  —  full visual rework (v2)
+ * -----------------------------------------------------------------------------
+ * A refined, premium, content-first language: a calm neutral canvas with real
+ * layered depth, a confident emerald→teal signature, sharp typography, and
+ * restrained motion. Linear/Vercel-grade polish.
  *
- * shadcn semantic variables (background, foreground, primary, etc.) are mapped
- * to these tokens via the @theme inline block below. Adjust mappings there,
- * not the shadcn names directly.
+ * Every legacy token NAME is preserved (so existing markup keeps working); only
+ * the VALUES were upgraded, and a handful of new tokens/utilities were added.
+ * shadcn semantic vars are mapped from these tokens in the :root block below —
+ * adjust mappings there, not the shadcn names directly.
  * ============================================================================= */
 
 @theme {
-  /* ---- COLOR (light) — apply on :root ----
-     Page bg is a soft grey; cards are pure white and sit clearly on top.
-     (Previously bg 0.99 / surface 0.98 were ~indistinguishable, so cards
-     looked like blank white space — the onboarding "empty page" bug.) */
-  --color-bg: oklch(0.955 0.003 240);
+  /* ---- COLOR (light) — apply on :root --------------------------------------
+     Canvas carries a faint cool cast. Three clearly separated surface tiers so
+     elevation reads without heavy shadow. Borders are crisper than before. */
+  --color-bg: oklch(0.985 0.0015 250);
   --color-surface: oklch(1 0 0);
-  --color-surface-2: oklch(0.975 0.003 240);
-  --color-border: oklch(0.88 0.005 240);
-  --color-border-strong: oklch(0.8 0.006 240);
-  --color-text: oklch(0.18 0.005 240);
-  --color-text-muted: oklch(0.5 0.005 240);
-  --color-text-subtle: oklch(0.63 0.005 240);
-  --color-primary: oklch(0.22 0.01 240);
-  --color-primary-hover: oklch(0.15 0.01 240);
-  --color-primary-fg: oklch(0.985 0.002 240);
-  --color-accent: oklch(0.58 0.15 155);
-  --color-accent-hover: oklch(0.51 0.16 155);
-  --color-accent-soft: oklch(0.957 0.035 155);
-  --color-success: oklch(0.595 0.13 158);
-  --color-success-soft: oklch(0.955 0.025 158);
-  --color-warning: oklch(0.72 0.14 75);
-  --color-warning-soft: oklch(0.965 0.03 80);
-  --color-danger: oklch(0.58 0.195 25);
-  --color-danger-soft: oklch(0.96 0.025 25);
+  --color-surface-2: oklch(0.972 0.002 250);
+  --color-surface-3: oklch(0.955 0.0025 250);
+  --color-border: oklch(0.916 0.003 250);
+  --color-border-strong: oklch(0.85 0.004 250);
+  --color-text: oklch(0.205 0.012 255);
+  --color-text-muted: oklch(0.48 0.01 255);
+  --color-text-subtle: oklch(0.62 0.008 255);
+  --color-primary: oklch(0.235 0.014 258);
+  --color-primary-hover: oklch(0.17 0.014 258);
+  --color-primary-fg: oklch(0.99 0.002 250);
 
-  /* ---- TYPE ---- */
+  /* Signature: a slightly cooler, richer emerald that leans teal. */
+  --color-accent: oklch(0.62 0.135 168);
+  --color-accent-hover: oklch(0.555 0.14 168);
+  --color-accent-2: oklch(0.66 0.115 192);
+  --color-accent-soft: oklch(0.965 0.028 172);
+  --color-accent-ring: oklch(0.62 0.135 168 / 0.4);
+
+  /* Brand iris — used for links, selection, secondary focus accents. */
+  --color-iris: oklch(0.56 0.14 264);
+  --color-iris-soft: oklch(0.96 0.025 264);
+
+  --color-success: oklch(0.62 0.12 162);
+  --color-success-soft: oklch(0.96 0.025 162);
+  --color-warning: oklch(0.74 0.13 72);
+  --color-warning-soft: oklch(0.97 0.035 80);
+  --color-danger: oklch(0.585 0.2 22);
+  --color-danger-soft: oklch(0.965 0.022 22);
+  --color-info: oklch(0.62 0.12 232);
+  --color-info-soft: oklch(0.96 0.025 232);
+
+  /* ---- TYPE ----------------------------------------------------------------
+     Fluid display sizes (clamp) for headings + a fixed step scale for UI. */
   --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
   --font-mono: var(--font-geist-mono), ui-monospace, "SF Mono", Menlo, monospace;
+  --text-11: 11px;
   --text-12: 12px;
+  --text-13: 13px;
   --text-14: 14px;
   --text-16: 16px;
   --text-18: 18px;
@@ -51,6 +68,10 @@
   --text-24: 24px;
   --text-30: 30px;
   --text-36: 36px;
+  --text-display: clamp(2.4rem, 1.6rem + 3.4vw, 4.25rem);
+  --text-display-sm: clamp(1.85rem, 1.4rem + 2vw, 3rem);
+  --tracking-tight: -0.018em;
+  --tracking-tighter: -0.03em;
 
   /* ---- SPACING (4px base) ---- */
   --spacing-1: 4px;
@@ -63,45 +84,70 @@
   --spacing-10: 40px;
   --spacing-12: 48px;
   --spacing-16: 64px;
+  --spacing-20: 80px;
 
-  /* ---- RADIUS ---- */
-  --radius-sm: 6px;
-  --radius-md: 8px;
-  --radius-lg: 12px;
-  --radius-xl: 16px;
+  /* ---- RADIUS — a touch larger / softer than before ---- */
+  --radius-sm: 8px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  --radius-xl: 20px;
+  --radius-2xl: 28px;
   --radius-full: 9999px;
 
-  /* ---- ELEVATION ---- */
-  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.06), 0 1px 1px rgba(0, 0, 0, 0.04);
-  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.06), 0 2px 4px rgba(0, 0, 0, 0.04);
-  --shadow-lg: 0 12px 32px rgba(0, 0, 0, 0.08), 0 4px 8px rgba(0, 0, 0, 0.05);
-  --shadow-glow: 0 0 0 1px oklch(0.58 0.15 155 / 0.12), 0 8px 24px oklch(0.58 0.15 155 / 0.14);
+  /* ---- ELEVATION ------------------------------------------------------------
+     Layered, slightly cool-tinted shadows (not flat black) → expensive feel. */
+  --shadow-xs: 0 1px 2px oklch(0.2 0.02 258 / 0.05);
+  --shadow-sm: 0 1px 2px oklch(0.2 0.02 258 / 0.06), 0 1px 3px oklch(0.2 0.02 258 / 0.05);
+  --shadow-md: 0 2px 4px oklch(0.2 0.02 258 / 0.04), 0 6px 16px oklch(0.2 0.02 258 / 0.07);
+  --shadow-lg: 0 4px 8px oklch(0.2 0.02 258 / 0.05), 0 16px 36px oklch(0.2 0.02 258 / 0.1);
+  --shadow-xl: 0 8px 16px oklch(0.2 0.02 258 / 0.06), 0 28px 64px oklch(0.2 0.02 258 / 0.14);
+  --shadow-glow: 0 0 0 1px oklch(0.62 0.135 168 / 0.16), 0 10px 30px oklch(0.62 0.135 168 / 0.16);
+  --shadow-inset: inset 0 1px 0 oklch(1 0 0 / 0.6);
 
-  /* ---- GRADIENTS / GLOW (premium polish layer) ----
-     Emerald-tinted accents derived from --color-accent. Used for hero meshes,
-     primary-button sheen, stat-tile washes, active-nav pills. */
-  --gradient-accent: linear-gradient(135deg, oklch(0.62 0.16 155), oklch(0.55 0.14 168));
+  /* ---- GRADIENTS / GLOW -----------------------------------------------------
+     Signature emerald→teal sweep + a refined neutral surface gradient. */
+  --gradient-accent: linear-gradient(135deg, oklch(0.66 0.135 168), oklch(0.64 0.115 196));
+  --gradient-accent-bright: linear-gradient(135deg, oklch(0.7 0.15 165), oklch(0.66 0.13 200));
   --gradient-accent-soft: linear-gradient(
     135deg,
-    oklch(0.62 0.16 155 / 0.14),
-    oklch(0.55 0.14 168 / 0.06)
+    oklch(0.66 0.135 168 / 0.13),
+    oklch(0.62 0.12 200 / 0.05)
   );
-  --gradient-primary: linear-gradient(180deg, oklch(0.27 0.012 240), oklch(0.19 0.01 240));
-  --gradient-surface: linear-gradient(180deg, oklch(1 0 0), oklch(0.985 0.003 240));
-  --glow-accent: radial-gradient(60% 60% at 50% 0%, oklch(0.62 0.16 155 / 0.18) 0%, transparent 70%);
+  --gradient-primary: linear-gradient(180deg, oklch(0.29 0.016 258), oklch(0.2 0.014 258));
+  --gradient-surface: linear-gradient(180deg, oklch(1 0 0), oklch(0.984 0.0025 250));
+  --gradient-hero: radial-gradient(
+      120% 120% at 0% 0%,
+      oklch(0.66 0.135 168 / 0.1) 0%,
+      transparent 45%
+    ), radial-gradient(120% 120% at 100% 0%, oklch(0.56 0.14 264 / 0.08) 0%, transparent 45%);
+  --glow-accent: radial-gradient(
+    60% 60% at 50% 0%,
+    oklch(0.66 0.135 168 / 0.18) 0%,
+    transparent 72%
+  );
+  --sheen: linear-gradient(
+    100deg,
+    transparent 20%,
+    oklch(1 0 0 / 0.18) 48%,
+    oklch(1 0 0 / 0.06) 52%,
+    transparent 78%
+  );
 
   /* ---- MOTION ---- */
   --ease-out-soft: cubic-bezier(0.22, 1, 0.36, 1);
-  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
-  --duration-fast: 140ms;
-  --duration-base: 240ms;
-  --duration-slow: 420ms;
+  --ease-spring: cubic-bezier(0.34, 1.4, 0.5, 1);
+  --ease-in-out-soft: cubic-bezier(0.65, 0, 0.35, 1);
+  --duration-fast: 130ms;
+  --duration-base: 220ms;
+  --duration-slow: 400ms;
 
   /* ---- KEYFRAMES ---- */
   --animate-fade-in: fade-in var(--duration-base) var(--ease-out-soft) both;
   --animate-rise: rise var(--duration-slow) var(--ease-out-soft) both;
-  --animate-shimmer: shimmer 2.2s linear infinite;
-  --animate-aurora: aurora 18s ease-in-out infinite alternate;
+  --animate-shimmer: shimmer 2.4s linear infinite;
+  --animate-aurora: aurora 22s ease-in-out infinite alternate;
+  --animate-sheen: sheen 2.8s var(--ease-out-soft) infinite;
+  --animate-pulse-ring: pulse-ring 2.4s var(--ease-out-soft) infinite;
 
   @keyframes fade-in {
     from {
@@ -114,7 +160,7 @@
   @keyframes rise {
     from {
       opacity: 0;
-      transform: translateY(10px);
+      transform: translateY(12px);
     }
     to {
       opacity: 1;
@@ -131,17 +177,39 @@
   }
   @keyframes aurora {
     0% {
-      transform: translate3d(-4%, -2%, 0) scale(1);
+      transform: translate3d(-4%, -2%, 0) scale(1) rotate(0deg);
     }
     100% {
-      transform: translate3d(4%, 3%, 0) scale(1.08);
+      transform: translate3d(5%, 4%, 0) scale(1.12) rotate(8deg);
+    }
+  }
+  @keyframes sheen {
+    0% {
+      background-position: -150% 0;
+    }
+    60%,
+    100% {
+      background-position: 250% 0;
+    }
+  }
+  @keyframes pulse-ring {
+    0% {
+      box-shadow: 0 0 0 0 oklch(0.62 0.135 168 / 0.35);
+    }
+    70%,
+    100% {
+      box-shadow: 0 0 0 10px oklch(0.62 0.135 168 / 0);
+    }
+  }
+  @keyframes skeleton-sweep {
+    100% {
+      transform: translateX(100%);
     }
   }
 }
 
 /* =============================================================================
- * shadcn semantic variable mappings.
- * These keep shadcn primitives (Button, Dialog, etc.) styled by our tokens.
+ * shadcn semantic variable mappings (light).
  * ============================================================================= */
 
 :root {
@@ -163,7 +231,7 @@
   --border: var(--color-border);
   --input: var(--color-border);
   --ring: var(--color-accent);
-  --radius: 0.5rem;
+  --radius: 0.625rem;
   --sidebar: var(--color-surface);
   --sidebar-foreground: var(--color-text);
   --sidebar-primary: var(--color-primary);
@@ -175,43 +243,75 @@
 }
 
 .dark {
-  /* Graphite Greens dark overrides — HANDOFF.md §1 */
-  --color-bg: oklch(0.15 0.004 240);
-  --color-surface: oklch(0.19 0.005 240);
-  --color-surface-2: oklch(0.225 0.005 240);
-  --color-border: oklch(0.28 0.006 240);
-  --color-border-strong: oklch(0.36 0.007 240);
-  --color-text: oklch(0.975 0.003 240);
-  --color-text-muted: oklch(0.7 0.005 240);
-  --color-text-subtle: oklch(0.57 0.005 240);
-  --color-primary: oklch(0.975 0.003 240);
-  --color-primary-hover: oklch(0.9 0.004 240);
-  --color-primary-fg: oklch(0.15 0.004 240);
-  --color-accent: oklch(0.725 0.15 155);
-  --color-accent-hover: oklch(0.78 0.145 155);
-  --color-accent-soft: oklch(0.278 0.06 155);
-  --color-success: oklch(0.72 0.135 158);
-  --color-success-soft: oklch(0.265 0.05 158);
-  --color-warning: oklch(0.8 0.135 75);
-  --color-warning-soft: oklch(0.29 0.055 80);
-  --color-danger: oklch(0.7 0.175 25);
-  --color-danger-soft: oklch(0.29 0.07 25);
+  /* ---- COLOR (dark) ---------------------------------------------------------
+     Deep cool-charcoal canvas with lifted surface tiers; brighter emerald so
+     the accent still pops against the dark ground. */
+  --color-bg: oklch(0.165 0.008 260);
+  --color-surface: oklch(0.205 0.009 260);
+  --color-surface-2: oklch(0.238 0.01 260);
+  --color-surface-3: oklch(0.272 0.011 260);
+  --color-border: oklch(0.3 0.012 260);
+  --color-border-strong: oklch(0.4 0.014 260);
+  --color-text: oklch(0.97 0.003 250);
+  --color-text-muted: oklch(0.72 0.008 255);
+  --color-text-subtle: oklch(0.58 0.008 255);
+  --color-primary: oklch(0.97 0.003 250);
+  --color-primary-hover: oklch(0.9 0.004 250);
+  --color-primary-fg: oklch(0.18 0.008 260);
 
-  /* Premium-layer dark overrides — brighter emerald, darker surface gradient. */
-  --gradient-accent: linear-gradient(135deg, oklch(0.74 0.15 155), oklch(0.66 0.13 168));
+  --color-accent: oklch(0.76 0.135 168);
+  --color-accent-hover: oklch(0.81 0.13 168);
+  --color-accent-2: oklch(0.78 0.115 196);
+  --color-accent-soft: oklch(0.3 0.06 170);
+  --color-accent-ring: oklch(0.76 0.135 168 / 0.45);
+
+  --color-iris: oklch(0.72 0.13 268);
+  --color-iris-soft: oklch(0.3 0.06 266);
+
+  --color-success: oklch(0.74 0.12 162);
+  --color-success-soft: oklch(0.3 0.05 162);
+  --color-warning: oklch(0.81 0.13 75);
+  --color-warning-soft: oklch(0.32 0.06 80);
+  --color-danger: oklch(0.7 0.18 22);
+  --color-danger-soft: oklch(0.32 0.07 22);
+  --color-info: oklch(0.72 0.12 232);
+  --color-info-soft: oklch(0.3 0.05 232);
+
+  /* Elevation tuned for dark — shadows lean black, glow leans bright. */
+  --shadow-xs: 0 1px 2px oklch(0 0 0 / 0.4);
+  --shadow-sm: 0 1px 2px oklch(0 0 0 / 0.4), 0 1px 3px oklch(0 0 0 / 0.36);
+  --shadow-md: 0 2px 4px oklch(0 0 0 / 0.36), 0 6px 16px oklch(0 0 0 / 0.44);
+  --shadow-lg: 0 4px 8px oklch(0 0 0 / 0.4), 0 16px 36px oklch(0 0 0 / 0.52);
+  --shadow-xl: 0 8px 16px oklch(0 0 0 / 0.44), 0 28px 64px oklch(0 0 0 / 0.6);
+  --shadow-glow: 0 0 0 1px oklch(0.76 0.135 168 / 0.22), 0 10px 32px oklch(0.76 0.135 168 / 0.18);
+  --shadow-inset: inset 0 1px 0 oklch(1 0 0 / 0.05);
+
+  --gradient-accent: linear-gradient(135deg, oklch(0.78 0.14 168), oklch(0.74 0.12 198));
+  --gradient-accent-bright: linear-gradient(135deg, oklch(0.82 0.15 165), oklch(0.78 0.13 200));
   --gradient-accent-soft: linear-gradient(
     135deg,
-    oklch(0.74 0.15 155 / 0.2),
-    oklch(0.66 0.13 168 / 0.06)
+    oklch(0.76 0.135 168 / 0.18),
+    oklch(0.7 0.12 200 / 0.06)
   );
-  --gradient-primary: linear-gradient(180deg, oklch(0.985 0.002 240), oklch(0.9 0.004 240));
-  --gradient-surface: linear-gradient(180deg, oklch(0.205 0.005 240), oklch(0.18 0.005 240));
+  --gradient-primary: linear-gradient(180deg, oklch(0.99 0.002 250), oklch(0.9 0.004 250));
+  --gradient-surface: linear-gradient(180deg, oklch(0.222 0.01 260), oklch(0.196 0.009 260));
+  --gradient-hero: radial-gradient(
+      120% 120% at 0% 0%,
+      oklch(0.76 0.135 168 / 0.14) 0%,
+      transparent 45%
+    ), radial-gradient(120% 120% at 100% 0%, oklch(0.72 0.13 268 / 0.1) 0%, transparent 45%);
   --glow-accent: radial-gradient(
     60% 60% at 50% 0%,
-    oklch(0.725 0.15 155 / 0.22) 0%,
-    transparent 70%
+    oklch(0.76 0.135 168 / 0.22) 0%,
+    transparent 72%
   );
-  --shadow-glow: 0 0 0 1px oklch(0.725 0.15 155 / 0.18), 0 8px 28px oklch(0.725 0.15 155 / 0.12);
+  --sheen: linear-gradient(
+    100deg,
+    transparent 20%,
+    oklch(1 0 0 / 0.08) 48%,
+    oklch(1 0 0 / 0.03) 52%,
+    transparent 78%
+  );
 
   /* shadcn semantic vars re-resolve through the updated --color-* above. */
   --background: var(--color-bg);
@@ -273,15 +373,15 @@
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
-  --radius-sm: calc(var(--radius) * 0.6);
-  --radius-md: calc(var(--radius) * 0.8);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
-  --radius-xl: calc(var(--radius) * 1.4);
+  --radius-xl: calc(var(--radius) + 6px);
   --font-heading: var(--font-sans);
 }
 
 /* =============================================================================
- * Numeric utilities (HANDOFF.md §5)
+ * Numeric / type utilities
  * ============================================================================= */
 
 .tnum {
@@ -291,6 +391,26 @@
 .mono {
   font-family: var(--font-mono);
   font-feature-settings: "ss01", "cv01";
+}
+
+.text-display {
+  font-size: var(--text-display);
+  line-height: 1;
+  letter-spacing: var(--tracking-tighter);
+}
+.text-display-sm {
+  font-size: var(--text-display-sm);
+  line-height: 1.04;
+  letter-spacing: var(--tracking-tighter);
+}
+
+/* Eyebrow / kicker label above headings. */
+.eyebrow {
+  font-size: var(--text-12);
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-text-subtle);
 }
 
 /* =============================================================================
@@ -303,13 +423,26 @@
   }
   html {
     color-scheme: light dark;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
   }
   body {
     @apply bg-background text-foreground font-sans;
+    letter-spacing: -0.006em;
+  }
+  ::selection {
+    background: var(--color-accent-soft);
+    color: var(--color-text);
+  }
+  /* Tighten heading rhythm globally. */
+  h1,
+  h2,
+  h3 {
+    letter-spacing: var(--tracking-tight);
   }
 }
 
-/* Focus ring — emerald 2px outline, 2px offset, :focus-visible only. */
+/* Focus ring — emerald 2px outline, :focus-visible only. */
 :where(button, a, input, select, textarea, [role="button"], [tabindex]):focus-visible {
   outline: 2px solid var(--color-accent);
   outline-offset: 2px;
@@ -317,12 +450,11 @@
 }
 
 /* =============================================================================
- * Premium-polish utilities (HANDOFF.md §1 extension)
- * Decorative, opt-in classes used across pages. All motion degrades gracefully
- * under prefers-reduced-motion (see block at the very bottom).
+ * LUMEN utility layer — decorative, opt-in classes used across pages.
+ * All motion degrades gracefully under prefers-reduced-motion (block at end).
  * ============================================================================= */
 
-/* Entrance animations — add to any block to fade/rise it in on mount. */
+/* Entrance animations. */
 .animate-fade-in {
   animation: var(--animate-fade-in);
 }
@@ -332,10 +464,10 @@
 /* Stagger children: set --i on each child (inline) to offset its delay. */
 .stagger > * {
   animation: var(--animate-rise);
-  animation-delay: calc(var(--i, 0) * 60ms);
+  animation-delay: calc(var(--i, 0) * 55ms);
 }
 
-/* Gradient text — emerald wash on headings/numbers. */
+/* Gradient text — emerald→teal wash on headings/numbers. */
 .text-gradient {
   background: var(--gradient-accent);
   -webkit-background-clip: text;
@@ -348,18 +480,37 @@
   background: var(--gradient-accent-soft);
 }
 
-/* Explicit gradient-background utilities.
-   (Tailwind v4 doesn't reliably emit `bg-[image:var(--…)]` for gradient vars,
-   so we provide named classes instead. Used by Button accent/default variants,
-   icon badges, CTAs.) */
+/* Explicit gradient-background utilities (Tailwind v4 won't emit
+   bg-[image:var(--…)] reliably for gradient vars, so we name them). */
 .bg-gradient-accent {
   background-image: var(--gradient-accent);
+}
+.bg-gradient-accent-bright {
+  background-image: var(--gradient-accent-bright);
 }
 .bg-gradient-primary {
   background-image: var(--gradient-primary);
 }
 .bg-gradient-surface {
   background-image: var(--gradient-surface);
+}
+.bg-gradient-hero {
+  background-image: var(--gradient-hero);
+}
+
+/* Hairline ring — the signature 1px separator used on every card/panel. */
+.ring-hairline {
+  box-shadow: inset 0 0 0 1px oklch(0.5 0.01 258 / 0.1);
+}
+.dark .ring-hairline {
+  box-shadow: inset 0 0 0 1px oklch(1 0 0 / 0.06);
+}
+
+/* Frosted glass panel — for topbars, popovers, floating bars. */
+.glass {
+  background: color-mix(in oklch, var(--color-surface) 72%, transparent);
+  backdrop-filter: blur(16px) saturate(180%);
+  -webkit-backdrop-filter: blur(16px) saturate(180%);
 }
 
 /* Glow halo behind hero art / featured cards. */
@@ -370,13 +521,13 @@
   content: "";
   position: absolute;
   inset: -40% 0 auto 0;
-  height: 220px;
+  height: 240px;
   background: var(--glow-accent);
   pointer-events: none;
   z-index: 0;
 }
 
-/* Animated aurora mesh — large soft emerald blobs for hero/auth backgrounds. */
+/* Animated aurora mesh — large soft emerald/iris blobs for hero/auth bg. */
 .aurora-bg {
   position: absolute;
   inset: 0;
@@ -388,33 +539,57 @@
 .aurora-bg::after {
   content: "";
   position: absolute;
-  width: 60vw;
-  height: 60vw;
+  width: 62vw;
+  height: 62vw;
   border-radius: 9999px;
-  filter: blur(80px);
-  opacity: 0.5;
+  filter: blur(90px);
+  opacity: 0.55;
   animation: var(--animate-aurora);
 }
 .aurora-bg::before {
-  top: -20%;
-  left: -10%;
-  background: radial-gradient(circle, oklch(0.62 0.16 155 / 0.5), transparent 60%);
+  top: -22%;
+  left: -12%;
+  background: radial-gradient(circle, oklch(0.66 0.135 168 / 0.55), transparent 62%);
 }
 .aurora-bg::after {
-  bottom: -25%;
-  right: -10%;
-  background: radial-gradient(circle, oklch(0.55 0.14 200 / 0.4), transparent 60%);
-  animation-delay: -9s;
+  bottom: -28%;
+  right: -12%;
+  background: radial-gradient(circle, oklch(0.56 0.14 264 / 0.42), transparent 62%);
+  animation-delay: -11s;
 }
 
-/* Card hover lift — depth + accent ring on hover. Pair with .transition-* via Card. */
+/* Card hover lift — depth + accent ring on hover. */
 .lift {
   transition: transform var(--duration-base) var(--ease-out-soft), box-shadow var(--duration-base)
     var(--ease-out-soft), border-color var(--duration-base) var(--ease-out-soft);
+  will-change: transform;
 }
 .lift:hover {
-  transform: translateY(-2px);
+  transform: translateY(-3px);
   box-shadow: var(--shadow-lg);
+}
+
+/* Pressable — subtle scale-down on active for tactile buttons/tiles. */
+.pressable {
+  transition: transform var(--duration-fast) var(--ease-out-soft);
+}
+.pressable:active {
+  transform: scale(0.97);
+}
+
+/* Moving sheen highlight (run over a primary button / featured chip). */
+.sheen {
+  position: relative;
+  overflow: hidden;
+}
+.sheen::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: var(--sheen);
+  background-size: 250% 100%;
+  pointer-events: none;
+  animation: var(--animate-sheen);
 }
 
 /* Shimmer sheen for loading / "thinking" affordances. */
@@ -424,21 +599,54 @@
   animation: var(--animate-shimmer);
 }
 
-/* Grid backdrop — faint dotted/line grid for empty states & heroes. */
-.grid-backdrop {
-  background-image: radial-gradient(var(--color-border) 1px, transparent 1px);
-  background-size: 22px 22px;
-  mask-image: radial-gradient(ellipse 80% 60% at 50% 0%, #000 30%, transparent 75%);
+/* Pulsing ring for "live"/streaming indicators. */
+.pulse-ring {
+  animation: var(--animate-pulse-ring);
 }
 
-/* Respect reduced-motion: kill all decorative animation + hover transforms. */
+/* Grid + dot backdrops — faint texture for empty states & heroes. */
+.grid-backdrop {
+  background-image: radial-gradient(var(--color-border) 1px, transparent 1px);
+  background-size: 24px 24px;
+  mask-image: radial-gradient(ellipse 80% 60% at 50% 0%, #000 30%, transparent 75%);
+}
+.lines-backdrop {
+  background-image: linear-gradient(var(--color-border) 1px, transparent 1px),
+    linear-gradient(90deg, var(--color-border) 1px, transparent 1px);
+  background-size: 56px 56px;
+  mask-image: radial-gradient(ellipse 70% 60% at 50% 0%, #000 20%, transparent 70%);
+}
+
+/* Custom scrollbar — slim, theme-aware. */
+.scroll-slim {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-border-strong) transparent;
+}
+.scroll-slim::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+.scroll-slim::-webkit-scrollbar-thumb {
+  background: var(--color-border-strong);
+  border-radius: 9999px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+.scroll-slim::-webkit-scrollbar-thumb:hover {
+  background: var(--color-text-subtle);
+  background-clip: padding-box;
+}
+
+/* Respect reduced-motion: kill decorative animation + hover transforms. */
 @media (prefers-reduced-motion: reduce) {
   .animate-fade-in,
   .animate-rise,
   .stagger > *,
   .aurora-bg::before,
   .aurora-bg::after,
-  .shimmer {
+  .shimmer,
+  .sheen::after,
+  .pulse-ring {
     animation: none !important;
   }
   .stagger > *,
@@ -446,7 +654,8 @@
     opacity: 1;
     transform: none;
   }
-  .lift:hover {
+  .lift:hover,
+  .pressable:active {
     transform: none;
   }
 }

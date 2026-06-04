@@ -29,7 +29,8 @@ export default function AdminIndexPage(): React.ReactElement {
   return (
     <div className="px-4 md:px-8 py-6 md:py-10 max-w-2xl mx-auto space-y-6">
       <header className="space-y-1 animate-rise">
-        <h1 className="text-3xl font-semibold tracking-tight">Admin</h1>
+        <p className="eyebrow">Owner tools</p>
+        <h1 className="text-2xl sm:text-3xl font-semibold tracking-[-0.02em]">Admin</h1>
         <p className="text-sm" style={{ color: "var(--color-text-muted)" }}>
           Owner tools for Compass.
         </p>
@@ -40,10 +41,10 @@ export default function AdminIndexPage(): React.ReactElement {
             <Link
               href={href}
               style={{ background: "var(--gradient-surface)" }}
-              className="lift flex h-full flex-col gap-2 rounded-xl border p-5 hover:border-accent/40"
+              className="lift ring-hairline shadow-[var(--shadow-sm)] hover:shadow-[var(--shadow-glow)] flex h-full flex-col gap-2 rounded-xl p-5"
             >
               <span
-                className="inline-flex h-9 w-9 items-center justify-center rounded-lg"
+                className="inline-flex h-9 w-9 items-center justify-center rounded-xl ring-hairline"
                 style={{ background: "var(--gradient-accent-soft)" }}
               >
                 <Icon className="h-4 w-4" style={{ color: "var(--color-accent)" }} aria-hidden />

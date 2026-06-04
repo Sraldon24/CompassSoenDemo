@@ -64,15 +64,26 @@ async function getOrGenerateInsight(userId: string): Promise<string> {
 export async function AIInsightWidget({ userId }: { userId: string }): Promise<React.ReactElement> {
   const insight = await getOrGenerateInsight(userId);
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2 text-base">
-          <Sparkles className="h-4 w-4" style={{ color: "var(--color-accent)" }} />
+    <Card featured className="animate-rise relative overflow-hidden">
+      <div
+        className="pointer-events-none absolute inset-0 bg-gradient-hero opacity-60"
+        aria-hidden
+      />
+      <CardHeader className="relative">
+        <CardTitle className="flex items-center gap-2.5 text-base">
+          <span
+            className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-xl ring-hairline shadow-[var(--shadow-xs)]"
+            style={{ background: "var(--gradient-accent-soft)" }}
+          >
+            <Sparkles className="h-4 w-4" style={{ color: "var(--color-accent)" }} aria-hidden />
+          </span>
           AI Insight of the Day
         </CardTitle>
-        <CardDescription>Refreshes daily. Powered by Groq Llama 3.3 70B.</CardDescription>
+        <CardDescription className="pl-[2.625rem]">
+          Refreshes daily. Powered by Groq Llama 3.3 70B.
+        </CardDescription>
       </CardHeader>
-      <CardContent>
+      <CardContent className="relative">
         <p className="text-sm leading-relaxed" style={{ color: "var(--color-text)" }}>
           {insight}
         </p>

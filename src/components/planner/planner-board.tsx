@@ -230,11 +230,12 @@ export function PlannerBoard({
         moveBackTerm={firstTerm}
       />
 
-      <div className="flex gap-3 overflow-x-auto pb-4 -mx-4 px-4 md:-mx-8 md:px-8">
-        {renderTerms.map((term) => (
+      <div className="flex gap-3 overflow-x-auto scroll-slim pb-4 -mx-4 px-4 md:-mx-8 md:px-8 stagger">
+        {renderTerms.map((term, index) => (
           <DroppableTerm
             key={term}
             term={term}
+            index={index}
             courses={byTerm.get(term) ?? []}
             catalog={catalog}
             violationsByCourse={violationCodes}
@@ -311,12 +312,12 @@ function TransferLane({
   const credits = courses.reduce((sum, c) => sum + (catalog.get(c.courseCode)?.credits ?? 0), 0);
   return (
     <section
-      className="rounded-xl border p-3 mb-1"
-      style={{ borderColor: "var(--color-border)", background: "var(--gradient-surface)" }}
+      className="animate-rise rounded-2xl ring-hairline shadow-[var(--shadow-sm)] p-4 mb-1"
+      style={{ background: "var(--gradient-surface)" }}
       aria-label="Transferred credits"
     >
-      <header className="flex items-baseline justify-between gap-2 pb-2">
-        <h3 className="text-sm font-semibold">Transfer credits</h3>
+      <header className="flex items-baseline justify-between gap-2 pb-3">
+        <h3 className="text-sm font-semibold tracking-[-0.01em]">Transfer credits</h3>
         <span className="mono tnum text-xs" style={{ color: "var(--color-text-muted)" }}>
           {credits} cr · CEGEP / transferred
         </span>
@@ -331,8 +332,8 @@ function TransferLane({
                 aria-label={`Move ${c.courseCode} back to ${moveBackTerm}`}
                 title={`Move back to ${moveBackTerm}`}
                 onClick={() => onMoveBack(c.id)}
-                className="h-5 w-5 items-center justify-center rounded text-xs transition-colors flex hover:bg-accent/15 focus-visible:outline-none"
-                style={{ color: "var(--color-text-muted)" }}
+                className="h-6 w-6 items-center justify-center rounded-lg ring-hairline text-xs transition-colors flex hover:bg-[var(--color-accent-soft)] focus-visible:outline-none"
+                style={{ background: "var(--color-surface)", color: "var(--color-text-muted)" }}
               >
                 <Undo2 className="h-3.5 w-3.5" />
               </button>
@@ -341,8 +342,8 @@ function TransferLane({
                 aria-label={`Remove ${c.courseCode} from plan`}
                 title="Remove course"
                 onClick={() => onRemove(c.id)}
-                className="h-5 w-5 items-center justify-center rounded text-xs transition-colors flex hover:bg-danger/15 focus-visible:outline-none"
-                style={{ color: "var(--color-text-muted)" }}
+                className="h-6 w-6 items-center justify-center rounded-lg ring-hairline text-xs transition-colors flex hover:bg-[var(--color-danger-soft)] focus-visible:outline-none"
+                style={{ background: "var(--color-surface)", color: "var(--color-text-muted)" }}
               >
                 <X className="h-3.5 w-3.5" />
               </button>
@@ -353,7 +354,7 @@ function TransferLane({
           type="button"
           onClick={onAddClick}
           aria-label="Add a transfer credit"
-          className="flex w-[220px] items-center justify-center gap-1.5 rounded-md border border-dashed py-2 text-xs transition-colors hover:bg-accent/10 focus-visible:outline-none"
+          className="pressable flex w-[220px] items-center justify-center gap-1.5 rounded-xl border border-dashed py-2.5 text-xs transition-colors hover:bg-[var(--color-surface-2)] hover:border-[var(--color-border-strong)] focus-visible:outline-none"
           style={{ borderColor: "var(--color-border)", color: "var(--color-text-muted)" }}
         >
           <Plus className="h-3.5 w-3.5" />
@@ -361,7 +362,7 @@ function TransferLane({
         </button>
       </div>
       {courses.length === 0 && (
-        <p className="mt-2 text-xs" style={{ color: "var(--color-text-subtle)" }}>
+        <p className="mt-3 text-xs" style={{ color: "var(--color-text-subtle)" }}>
           CEGEP / advanced-standing credits (e.g. MATH 204). Add them here, or hover a course in a
           term and click ⇄ to move it here.
         </p>
@@ -372,6 +373,7 @@ function TransferLane({
 
 interface DroppableTermProps {
   term: string;
+  index: number;
   courses: PlannerCourse[];
   catalog: Map<string, CourseCatalogEntry>;
   violationsByCourse: Set<string>;
@@ -382,6 +384,7 @@ interface DroppableTermProps {
 
 function DroppableTerm({
   term,
+  index,
   courses,
   catalog,
   violationsByCourse,
@@ -397,22 +400,22 @@ function DroppableTerm({
   return (
     <section
       ref={setNodeRef}
-      className="flex w-[280px] shrink-0 flex-col gap-2 rounded-xl border p-3 transition-all duration-200"
+      className="flex w-[280px] shrink-0 flex-col gap-2 rounded-2xl ring-hairline p-3.5 transition-all duration-200"
       style={{
+        ["--i" as string]: index,
         background: isOver
           ? "color-mix(in oklch, var(--color-accent-soft) 60%, var(--color-surface-2))"
           : "var(--gradient-surface)",
-        borderColor: isOver ? "var(--color-accent)" : "var(--color-border)",
-        boxShadow: isOver ? "var(--shadow-glow)" : "none",
+        boxShadow: isOver ? "var(--shadow-glow)" : "var(--shadow-sm)",
       }}
       aria-label={`${term} courses`}
     >
       <header
-        className="flex flex-col gap-2 pb-2 border-b"
+        className="flex flex-col gap-2 pb-2.5 border-b"
         style={{ borderColor: "var(--color-border)" }}
       >
         <div className="flex items-baseline justify-between gap-2">
-          <h3 className="text-sm font-semibold">{term}</h3>
+          <h3 className="text-sm font-semibold tracking-[-0.01em]">{term}</h3>
           <span
             className="mono tnum text-xs"
             style={{ color: "var(--color-text-muted)" }}
@@ -434,9 +437,16 @@ function DroppableTerm({
       <div className="flex flex-col gap-2 min-h-[80px]">
         {courses.length === 0 ? (
           <div
-            className="rounded-md border border-dashed py-6 text-center text-xs"
+            className="flex flex-col items-center gap-2 rounded-xl border border-dashed py-8 text-center text-xs"
             style={{ borderColor: "var(--color-border)", color: "var(--color-text-muted)" }}
           >
+            <span
+              className="inline-flex h-8 w-8 items-center justify-center rounded-xl ring-hairline"
+              style={{ background: "var(--gradient-accent-soft)", color: "var(--color-accent)" }}
+              aria-hidden
+            >
+              <Plus className="h-4 w-4" />
+            </span>
             Drop a course here
           </div>
         ) : (
@@ -456,7 +466,7 @@ function DroppableTerm({
           type="button"
           onClick={onAddClick}
           aria-label={`Add a course to ${term}`}
-          className="flex items-center justify-center gap-1.5 rounded-md border border-dashed py-2 text-xs transition-colors hover:bg-accent/10 focus-visible:outline-none"
+          className="pressable flex items-center justify-center gap-1.5 rounded-xl border border-dashed py-2.5 text-xs transition-colors hover:bg-[var(--color-surface-2)] hover:border-[var(--color-border-strong)] focus-visible:outline-none"
           style={{
             borderColor: "var(--color-border)",
             color: "var(--color-text-muted)",
@@ -508,8 +518,8 @@ function DraggableCourse({
             onMarkTransfer(course.id);
           }}
           onPointerDown={(e) => e.stopPropagation()}
-          className="h-5 w-5 items-center justify-center rounded text-xs transition-colors flex hover:bg-accent/15 focus-visible:outline-none"
-          style={{ color: "var(--color-text-muted)" }}
+          className="h-6 w-6 items-center justify-center rounded-lg ring-hairline text-xs transition-colors flex hover:bg-[var(--color-accent-soft)] focus-visible:outline-none"
+          style={{ background: "var(--color-surface)", color: "var(--color-text-muted)" }}
         >
           <ArrowRightLeft className="h-3.5 w-3.5" />
         </button>
@@ -522,8 +532,8 @@ function DraggableCourse({
             onRemove(course.id);
           }}
           onPointerDown={(e) => e.stopPropagation()}
-          className="h-5 w-5 items-center justify-center rounded text-xs transition-colors flex hover:bg-danger/15 focus-visible:outline-none"
-          style={{ color: "var(--color-text-muted)" }}
+          className="h-6 w-6 items-center justify-center rounded-lg ring-hairline text-xs transition-colors flex hover:bg-[var(--color-danger-soft)] focus-visible:outline-none"
+          style={{ background: "var(--color-surface)", color: "var(--color-text-muted)" }}
         >
           <X className="h-3.5 w-3.5" />
         </button>
@@ -535,25 +545,17 @@ function DraggableCourse({
 function IssueList({ issues }: { issues: ValidationIssue[] }): React.ReactElement | null {
   if (issues.length === 0) return null;
   return (
-    <section className="space-y-2 mt-4">
-      <h2
-        className="text-sm font-semibold uppercase tracking-wide"
-        style={{ color: "var(--color-text-muted)" }}
-      >
-        Issues ({issues.length})
-      </h2>
-      <ul className="space-y-1.5">
+    <section className="animate-rise space-y-2.5 mt-5">
+      <p className="eyebrow">ISSUES ({issues.length})</p>
+      <ul className="space-y-2 stagger">
         {issues.slice(0, 20).map((i, idx) => (
           <li
             key={`${i.rule}-${i.courseCode}-${i.term}-${idx}`}
-            className="text-sm flex items-start gap-2 rounded-md border px-3 py-2"
-            style={{
-              background: "var(--color-surface)",
-              borderColor: "var(--color-border)",
-            }}
+            style={{ ["--i" as string]: idx, background: "var(--color-surface)" }}
+            className="text-sm flex items-start gap-2.5 rounded-xl ring-hairline shadow-[var(--shadow-sm)] px-3.5 py-2.5"
           >
             <span
-              className="inline-block w-1.5 h-1.5 rounded-full mt-1.5 shrink-0"
+              className="inline-block w-1.5 h-1.5 rounded-full mt-2 shrink-0"
               style={{
                 background:
                   i.severity === "error"

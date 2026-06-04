@@ -62,13 +62,13 @@ export function ImportClient(): React.ReactElement {
         throw new Error(body.error ?? "Import failed");
       }
       if (mode === "preview") {
-        const data = (await res.json()) as Preview;
-        setPreview(data);
+        const { payload } = (await res.json()) as { payload: Preview };
+        setPreview(payload);
         // Default to every valid row selected.
-        setSelected(new Set(data.rows.filter((r) => r.errors.length === 0).map((r) => r.index)));
+        setSelected(new Set(payload.rows.filter((r) => r.errors.length === 0).map((r) => r.index)));
       } else {
-        const data = (await res.json()) as { imported: number };
-        toast.success(`Imported ${data.imported} courses into your plan.`);
+        const { payload } = (await res.json()) as { payload: { imported: number } };
+        toast.success(`Imported ${payload.imported} courses into your plan.`);
         router.push("/plan");
       }
     } catch (err) {
@@ -89,16 +89,28 @@ export function ImportClient(): React.ReactElement {
 
   return (
     <div className="px-4 md:px-8 py-6 md:py-10 max-w-3xl mx-auto space-y-6">
-      <header className="space-y-2">
-        <h1 className="text-3xl font-semibold tracking-tight flex items-center gap-2">
-          <FileSpreadsheet className="h-6 w-6" style={{ color: "var(--color-accent)" }} />
-          Import plan from Excel
-        </h1>
-        <p className="text-sm" style={{ color: "var(--color-text-muted)" }}>
-          Upload a .xlsx file with a &quot;Term Plan&quot; sheet (Term, Course, Title, Cr, Type,
-          Status, Notes columns). Preview the parsed rows, then confirm to replace your current
-          plan.
-        </p>
+      <header
+        className="relative overflow-hidden rounded-2xl ring-hairline shadow-[var(--shadow-md)] p-6 sm:p-8 animate-rise"
+        style={{ background: "var(--gradient-surface)" }}
+      >
+        <div className="absolute inset-0 bg-gradient-hero" aria-hidden />
+        <div className="relative space-y-3">
+          <p className="eyebrow">Settings</p>
+          <h1 className="text-2xl sm:text-3xl font-semibold tracking-[-0.02em] flex items-center gap-3">
+            <span
+              className="inline-flex h-10 w-10 items-center justify-center rounded-xl ring-hairline shrink-0"
+              style={{ background: "var(--gradient-accent-soft)" }}
+            >
+              <FileSpreadsheet className="h-5 w-5" style={{ color: "var(--color-accent)" }} />
+            </span>
+            Import plan from Excel
+          </h1>
+          <p className="text-sm" style={{ color: "var(--color-text-muted)" }}>
+            Upload a .xlsx file with a &quot;Term Plan&quot; sheet (Term, Course, Title, Cr, Type,
+            Status, Notes columns). Preview the parsed rows, then confirm to replace your current
+            plan.
+          </p>
+        </div>
       </header>
 
       <Card>
@@ -106,7 +118,7 @@ export function ImportClient(): React.ReactElement {
           <CardTitle className="text-base">1. Upload</CardTitle>
           <CardDescription>Only the Term Plan sheet is parsed in this version.</CardDescription>
         </CardHeader>
-        <CardContent className="space-y-3">
+        <CardContent className="space-y-4">
           <input
             type="file"
             accept=".xlsx,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
@@ -117,19 +129,33 @@ export function ImportClient(): React.ReactElement {
             className="sr-only"
             id="xlsx-upload"
           />
-          <div className="flex flex-wrap items-center gap-3">
-            <label
-              htmlFor="xlsx-upload"
-              className="inline-flex cursor-pointer items-center gap-2 rounded-md border px-3 py-2 text-sm font-medium transition-colors hover:bg-accent/10"
-              style={{ borderColor: "var(--color-border)" }}
+          <label
+            htmlFor="xlsx-upload"
+            className="flex cursor-pointer flex-col items-center justify-center gap-3 rounded-xl border border-dashed border-border px-6 py-10 text-center transition-colors hover:bg-[var(--color-surface-2)]"
+          >
+            <span
+              className="inline-flex h-12 w-12 items-center justify-center rounded-xl ring-hairline"
+              style={{ background: "var(--gradient-accent-soft)" }}
             >
-              <FileSpreadsheet className="h-4 w-4" aria-hidden="true" />
-              Choose .xlsx file
-            </label>
-            <span className="text-sm" style={{ color: "var(--color-text-muted)" }}>
-              {file ? file.name : "No file chosen"}
+              <Upload
+                className="h-5 w-5"
+                style={{ color: "var(--color-accent)" }}
+                aria-hidden="true"
+              />
             </span>
-          </div>
+            <span className="text-sm font-medium">
+              {file ? (
+                <span className="mono" style={{ color: "var(--color-text)" }}>
+                  {file.name}
+                </span>
+              ) : (
+                "Choose a .xlsx file to upload"
+              )}
+            </span>
+            <span className="text-xs" style={{ color: "var(--color-text-muted)" }}>
+              {file ? "Tap to choose a different file" : "No file chosen yet"}
+            </span>
+          </label>
           <div className="flex gap-2">
             <Button onClick={() => upload("preview")} disabled={!file || pending}>
               <Upload className="mr-2 h-4 w-4" />
@@ -167,13 +193,13 @@ export function ImportClient(): React.ReactElement {
               />
               Skip rows with errors
             </label>
-            <div
-              className="overflow-auto max-h-96 border rounded"
-              style={{ borderColor: "var(--color-border)" }}
-            >
+            <div className="overflow-auto max-h-96 rounded-xl ring-hairline scroll-slim">
               <table className="w-full text-xs">
                 <thead style={{ background: "var(--color-surface-2)" }}>
-                  <tr>
+                  <tr
+                    className="text-[10px] uppercase tracking-wide"
+                    style={{ color: "var(--color-text-muted)" }}
+                  >
                     <th className="p-2 w-8">
                       <input
                         type="checkbox"
@@ -183,10 +209,10 @@ export function ImportClient(): React.ReactElement {
                         disabled={validRows.length === 0}
                       />
                     </th>
-                    <th className="text-left p-2">Code</th>
-                    <th className="text-left p-2">Term</th>
-                    <th className="text-left p-2">Status</th>
-                    <th className="text-left p-2">Issues</th>
+                    <th className="text-left p-2 font-medium">Code</th>
+                    <th className="text-left p-2 font-medium">Term</th>
+                    <th className="text-left p-2 font-medium">Status</th>
+                    <th className="text-left p-2 font-medium">Issues</th>
                   </tr>
                 </thead>
                 <tbody>

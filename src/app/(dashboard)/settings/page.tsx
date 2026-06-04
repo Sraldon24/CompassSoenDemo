@@ -33,11 +33,18 @@ export default async function SettingsPage(): Promise<React.ReactElement> {
 
   return (
     <div className="px-4 md:px-8 py-6 md:py-10 max-w-[960px] mx-auto space-y-8">
-      <header className="space-y-2 animate-rise">
-        <h1 className="text-3xl font-semibold tracking-tight">Settings</h1>
-        <p className="text-sm" style={{ color: "var(--color-text-muted)" }}>
-          Signed in as {session.user.email}.
-        </p>
+      <header
+        className="relative overflow-hidden rounded-2xl ring-hairline shadow-[var(--shadow-md)] p-6 sm:p-8 animate-rise"
+        style={{ background: "var(--gradient-surface)" }}
+      >
+        <div className="absolute inset-0 bg-gradient-hero" aria-hidden />
+        <div className="relative space-y-2">
+          <p className="eyebrow">Settings</p>
+          <h1 className="text-2xl sm:text-3xl font-semibold tracking-[-0.02em]">Settings</h1>
+          <p className="text-sm" style={{ color: "var(--color-text-muted)" }}>
+            Signed in as <span className="mono">{session.user.email}</span>.
+          </p>
+        </div>
       </header>
 
       <div className="grid gap-3 sm:grid-cols-2 stagger">
@@ -48,10 +55,10 @@ export default async function SettingsPage(): Promise<React.ReactElement> {
               key={s.href}
               href={s.href}
               style={{ ["--i" as string]: i, background: "var(--gradient-surface)" }}
-              className="lift group flex flex-col gap-2 rounded-xl border p-5 hover:border-accent/40"
+              className="lift group flex flex-col gap-3 rounded-xl ring-hairline shadow-[var(--shadow-sm)] p-5 transition-shadow hover:shadow-[var(--shadow-glow)]"
             >
               <span
-                className="inline-flex h-10 w-10 items-center justify-center rounded-lg"
+                className="inline-flex h-11 w-11 items-center justify-center rounded-xl ring-hairline"
                 style={{ background: "var(--gradient-accent-soft)" }}
               >
                 <Icon
@@ -60,7 +67,7 @@ export default async function SettingsPage(): Promise<React.ReactElement> {
                   aria-hidden="true"
                 />
               </span>
-              <span className="text-sm font-semibold">{s.title}</span>
+              <span className="text-sm font-semibold tracking-[-0.01em]">{s.title}</span>
               <span className="text-xs" style={{ color: "var(--color-text-muted)" }}>
                 {s.description}
               </span>

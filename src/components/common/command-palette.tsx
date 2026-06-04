@@ -58,8 +58,8 @@ export function CommandPalette(): React.ReactElement {
         const url = `/api/search?q=${encodeURIComponent(query)}&mode=${mode}`;
         const res = await fetch(url);
         if (!res.ok) return;
-        const data = (await res.json()) as { results: SearchHit[] };
-        setHits(data.results);
+        const data = (await res.json()) as { payload: { results: SearchHit[] } };
+        setHits(data.payload.results);
       } catch {
         // ignore
       }
@@ -95,14 +95,11 @@ export function CommandPalette(): React.ReactElement {
       <button
         type="button"
         aria-label="Close command palette"
-        className="absolute inset-0 cursor-default"
-        style={{ background: "rgba(0,0,0,0.4)", border: 0 }}
+        className="absolute inset-0 cursor-default backdrop-blur-sm animate-fade-in"
+        style={{ background: "oklch(0.2 0.02 258 / 0.45)", border: 0 }}
         onClick={() => setOpen(false)}
       />
-      <div
-        className="relative w-full max-w-xl rounded-lg border shadow-lg overflow-hidden"
-        style={{ background: "var(--color-surface)", borderColor: "var(--color-border)" }}
-      >
+      <div className="glass animate-rise relative w-full max-w-xl rounded-2xl ring-hairline shadow-[var(--shadow-xl)] overflow-hidden">
         <div
           className="flex items-center gap-2 px-3 border-b"
           style={{ borderColor: "var(--color-border)" }}
@@ -119,9 +116,10 @@ export function CommandPalette(): React.ReactElement {
           <button
             type="button"
             onClick={() => setMode((m) => (m === "keyword" ? "semantic" : "keyword"))}
-            className="flex items-center gap-1 text-[11px] px-2 py-1 rounded border transition-colors"
+            className="pressable flex items-center gap-1 text-[11px] px-2.5 py-1 rounded-full ring-hairline transition-colors"
             style={{
-              borderColor: mode === "semantic" ? "var(--color-accent)" : "var(--color-border)",
+              background:
+                mode === "semantic" ? "var(--color-accent-soft)" : "var(--color-surface-2)",
               color: mode === "semantic" ? "var(--color-accent)" : "var(--color-text-muted)",
             }}
             title={mode === "semantic" ? "AI semantic search" : "Keyword (exact) search"}
@@ -131,7 +129,7 @@ export function CommandPalette(): React.ReactElement {
           </button>
         </div>
         <Command.List
-          className="max-h-[60vh] overflow-y-auto p-2"
+          className="scroll-slim max-h-[60vh] overflow-y-auto p-2"
           style={{ color: "var(--color-text)" }}
         >
           <Command.Empty
@@ -149,7 +147,7 @@ export function CommandPalette(): React.ReactElement {
                   key={p.id}
                   value={p.id}
                   onSelect={() => select(p.id)}
-                  className="flex items-center gap-2 rounded-md px-3 py-2 cursor-pointer aria-selected:bg-accent/10 text-sm"
+                  className="flex items-center gap-2 rounded-lg px-3 py-2 cursor-pointer text-sm transition-colors aria-selected:bg-[var(--color-accent-soft)] aria-selected:text-[var(--color-accent)]"
                 >
                   <span>{p.label}</span>
                   <span
@@ -170,7 +168,7 @@ export function CommandPalette(): React.ReactElement {
                   key={c.code}
                   value={`course:${c.code}:${c.title}`}
                   onSelect={() => select(`/plan?course=${encodeURIComponent(c.code)}`)}
-                  className="flex flex-col items-start gap-0.5 rounded-md px-3 py-2 cursor-pointer aria-selected:bg-accent/10"
+                  className="flex flex-col items-start gap-0.5 rounded-lg px-3 py-2 cursor-pointer transition-colors aria-selected:bg-[var(--color-accent-soft)]"
                 >
                   <div className="flex items-baseline w-full gap-2">
                     <span className="mono tnum text-sm font-semibold">{c.code}</span>
@@ -197,7 +195,11 @@ export function CommandPalette(): React.ReactElement {
         </Command.List>
         <div
           className="border-t px-3 py-2 text-[10px] flex items-center justify-between"
-          style={{ borderColor: "var(--color-border)", color: "var(--color-text-muted)" }}
+          style={{
+            borderColor: "var(--color-border)",
+            color: "var(--color-text-muted)",
+            background: "var(--color-surface-2)",
+          }}
         >
           <span>↑↓ navigate · Enter select · Esc close</span>
           <span>⌘K to toggle</span>

@@ -24,13 +24,16 @@ export function ProfessorReviews({ courseCode, initial }: Props): React.ReactEle
 
   const refresh = async () => {
     const res = await fetch(`/api/courses/${encodeURIComponent(courseCode)}/reviews`);
-    if (res.ok) setSummary(await res.json());
+    if (res.ok) {
+      const data: { payload: ReviewSummary } = await res.json();
+      setSummary(data.payload);
+    }
   };
 
   return (
     <div className="space-y-4">
       {summary.count > 0 ? (
-        <div className="flex flex-wrap gap-4 text-sm">
+        <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
           <Stat label="Avg rating" value={fmt(summary.averageRating)} suffix="/5" />
           <Stat label="Avg difficulty" value={fmt(summary.averageDifficulty)} suffix="/5" />
           <Stat
@@ -44,14 +47,26 @@ export function ProfessorReviews({ courseCode, initial }: Props): React.ReactEle
           <Stat label="Reviews" value={String(summary.count)} />
         </div>
       ) : (
-        <p className="text-sm" style={{ color: "var(--color-text-muted)" }}>
-          No reviews yet. Be the first to share your experience.
-        </p>
+        <div
+          className="flex flex-col items-center gap-3 rounded-xl border border-dashed px-6 py-10 text-center"
+          style={{ borderColor: "var(--color-border)" }}
+        >
+          <span
+            className="inline-flex h-11 w-11 items-center justify-center rounded-xl ring-hairline"
+            style={{ background: "var(--gradient-accent-soft)", color: "var(--color-accent)" }}
+            aria-hidden
+          >
+            ★
+          </span>
+          <p className="text-sm" style={{ color: "var(--color-text-muted)" }}>
+            No reviews yet. Be the first to share your experience.
+          </p>
+        </div>
       )}
 
-      <ul className="space-y-3">
-        {summary.reviews.map((r) => (
-          <ReviewItem key={r.id} review={r} />
+      <ul className="space-y-2.5 stagger">
+        {summary.reviews.map((r, i) => (
+          <ReviewItem key={r.id} review={r} index={i} />
         ))}
       </ul>
 
@@ -83,19 +98,29 @@ function Stat({
   suffix?: string;
 }): React.ReactElement {
   return (
-    <div>
+    <div
+      className="rounded-xl p-3 ring-hairline shadow-[var(--shadow-sm)]"
+      style={{ background: "var(--color-surface)" }}
+    >
       <div className="text-xs uppercase tracking-wide" style={{ color: "var(--color-text-muted)" }}>
         {label}
       </div>
-      <div className="text-lg font-semibold">
+      <div className="text-lg font-semibold mono tnum mt-0.5">
         {value}
-        {suffix && value !== "—" ? <span className="text-sm font-normal">{suffix}</span> : null}
+        {suffix && value !== "—" ? (
+          <span className="text-sm font-normal" style={{ color: "var(--color-text-muted)" }}>
+            {suffix}
+          </span>
+        ) : null}
       </div>
     </div>
   );
 }
 
-function ReviewItem({ review }: { review: PublicReview }): React.ReactElement {
+function ReviewItem({
+  review,
+  index,
+}: { review: PublicReview; index: number }): React.ReactElement {
   const [flagged, setFlagged] = useState(false);
   const [flagging, setFlagging] = useState(false);
 
@@ -118,26 +143,42 @@ function ReviewItem({ review }: { review: PublicReview }): React.ReactElement {
   };
 
   return (
-    <li className="rounded border p-3 space-y-1" style={{ borderColor: "var(--color-border)" }}>
+    <li
+      className="rounded-xl p-4 space-y-2 ring-hairline shadow-[var(--shadow-sm)] transition-colors hover:bg-[var(--color-surface-2)]"
+      style={{ ["--i" as string]: index, background: "var(--color-surface)" }}
+    >
       <div className="flex items-center justify-between gap-2 text-sm">
         <span className="font-medium">{review.professorName}</span>
-        <span className="text-xs" style={{ color: "var(--color-text-muted)" }}>
-          ★ {review.rating}/5{review.difficulty ? ` · difficulty ${review.difficulty}/5` : ""}
+        <span
+          className="inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-medium ring-hairline"
+          style={{ background: "var(--gradient-accent-soft)", color: "var(--color-accent)" }}
+        >
+          <span aria-hidden>★</span>
+          <span className="mono tnum">{review.rating}/5</span>
+          {review.difficulty ? (
+            <span style={{ color: "var(--color-text-muted)" }} className="mono tnum">
+              · {review.difficulty}/5 hard
+            </span>
+          ) : null}
         </span>
       </div>
-      {review.comment && <p className="text-sm leading-relaxed">{review.comment}</p>}
+      {review.comment && (
+        <p className="text-sm leading-relaxed" style={{ color: "var(--color-text)" }}>
+          {review.comment}
+        </p>
+      )}
       <div className="flex items-center gap-2 text-xs" style={{ color: "var(--color-text-muted)" }}>
         <span>Anonymous student</span>
         {review.term && <span>· {review.term}</span>}
         {review.wouldTakeAgain != null && (
           <span>· {review.wouldTakeAgain ? "would take again" : "would not retake"}</span>
         )}
-        <span>
+        <span className="mono tnum">
           · {review.createdAt ? new Date(review.createdAt).toISOString().slice(0, 10) : ""}
         </span>
         <button
           type="button"
-          className="ml-auto underline disabled:opacity-50"
+          className="ml-auto rounded-md px-2 py-0.5 transition-colors hover:text-[var(--color-danger)] disabled:opacity-50"
           disabled={flagged || flagging}
           onClick={flag}
         >
@@ -188,8 +229,8 @@ function ReviewForm({
         }),
       });
       if (!res.ok) {
-        const data: { error?: string; detail?: string } = await res.json().catch(() => ({}));
-        setError(data.detail ?? data.error ?? `Request failed (${res.status})`);
+        const data: { error?: string } = await res.json().catch(() => ({}));
+        setError(data.error ?? `Request failed (${res.status})`);
         return;
       }
       await onDone();
@@ -197,7 +238,10 @@ function ReviewForm({
   };
 
   return (
-    <div className="rounded border p-4 space-y-3" style={{ borderColor: "var(--color-border)" }}>
+    <div
+      className="rounded-xl p-4 space-y-3 ring-hairline shadow-[var(--shadow-sm)] animate-rise"
+      style={{ background: "var(--color-surface-2)" }}
+    >
       <div className="grid gap-3 sm:grid-cols-2">
         <label className="text-sm space-y-1">
           <span
@@ -207,8 +251,8 @@ function ReviewForm({
             Professor name
           </span>
           <input
-            className="w-full rounded border px-2 py-1 text-sm"
-            style={{ borderColor: "var(--color-border)", background: "var(--color-surface)" }}
+            className="w-full rounded-lg px-2.5 py-1.5 text-sm ring-hairline transition-shadow focus:shadow-[0_0_0_3px_var(--color-accent-ring)]"
+            style={{ background: "var(--color-surface)" }}
             value={professorName}
             onChange={(e) => setProfessorName(e.target.value)}
             placeholder="e.g. Leila Kosseim"
@@ -222,8 +266,8 @@ function ReviewForm({
             Term (optional)
           </span>
           <input
-            className="w-full rounded border px-2 py-1 text-sm"
-            style={{ borderColor: "var(--color-border)", background: "var(--color-surface)" }}
+            className="w-full rounded-lg px-2.5 py-1.5 text-sm ring-hairline transition-shadow focus:shadow-[0_0_0_3px_var(--color-accent-ring)]"
+            style={{ background: "var(--color-surface)" }}
             value={term}
             onChange={(e) => setTerm(e.target.value)}
             placeholder="e.g. Fall 2025"
@@ -241,6 +285,7 @@ function ReviewForm({
           type="checkbox"
           checked={wouldTakeAgain}
           onChange={(e) => setWouldTakeAgain(e.target.checked)}
+          style={{ accentColor: "var(--color-accent)" }}
         />
         Would take this professor again
       </label>
@@ -253,8 +298,8 @@ function ReviewForm({
           Comment (min 30 chars)
         </span>
         <textarea
-          className="w-full rounded border px-2 py-1 text-sm"
-          style={{ borderColor: "var(--color-border)", background: "var(--color-surface)" }}
+          className="w-full rounded-lg px-2.5 py-1.5 text-sm ring-hairline transition-shadow focus:shadow-[0_0_0_3px_var(--color-accent-ring)]"
+          style={{ background: "var(--color-surface)" }}
           rows={3}
           value={comment}
           onChange={(e) => setComment(e.target.value)}
@@ -267,12 +312,13 @@ function ReviewForm({
           type="checkbox"
           checked={isAnonymous}
           onChange={(e) => setIsAnonymous(e.target.checked)}
+          style={{ accentColor: "var(--color-accent)" }}
         />
         Post anonymously
       </label>
 
       {error && (
-        <div className="text-xs" style={{ color: "var(--color-error, #c43d3d)" }}>
+        <div className="text-xs" style={{ color: "var(--color-danger)" }}>
           {error}
         </div>
       )}
@@ -304,7 +350,7 @@ function RangeField({
         className="block text-xs uppercase tracking-wide"
         style={{ color: "var(--color-text-muted)" }}
       >
-        {label}: {value}/5
+        {label}: <span className="mono tnum">{value}/5</span>
       </span>
       <input
         type="range"
@@ -314,6 +360,7 @@ function RangeField({
         value={value}
         onChange={(e) => onChange(Number(e.target.value))}
         className="w-full"
+        style={{ accentColor: "var(--color-accent)" }}
       />
     </label>
   );

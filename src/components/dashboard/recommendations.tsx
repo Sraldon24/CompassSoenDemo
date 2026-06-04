@@ -32,8 +32,8 @@ export function RecommendationsWidget(): React.ReactElement {
         const body = (await res.json().catch(() => ({}))) as { error?: string };
         throw new Error(body.error ?? "Failed to load recommendations");
       }
-      const data = (await res.json()) as { recommendations: Recommendation[] };
-      setRecs(data.recommendations);
+      const data = (await res.json()) as { payload: { recommendations: Recommendation[] } };
+      setRecs(data.payload.recommendations);
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Failed to load recommendations");
     } finally {
@@ -48,14 +48,23 @@ export function RecommendationsWidget(): React.ReactElement {
   }, [recs, loading, fetchRecs]);
 
   return (
-    <Card>
+    <Card className="animate-rise">
       <CardHeader className="flex flex-row items-start justify-between gap-2 space-y-0">
         <div>
-          <CardTitle className="flex items-center gap-2 text-base">
-            <GraduationCap className="h-4 w-4" style={{ color: "var(--color-accent)" }} />
+          <CardTitle className="flex items-center gap-2.5 text-base">
+            <span
+              className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-xl ring-hairline shadow-[var(--shadow-xs)]"
+              style={{ background: "var(--gradient-accent-soft)" }}
+            >
+              <GraduationCap
+                className="h-4 w-4"
+                style={{ color: "var(--color-accent)" }}
+                aria-hidden
+              />
+            </span>
             Recommended Next Courses
           </CardTitle>
-          <CardDescription className="mt-1">
+          <CardDescription className="mt-1 pl-[2.625rem]">
             Personalized by interests + prereq distance. Powered by AI.
           </CardDescription>
         </div>
@@ -71,12 +80,12 @@ export function RecommendationsWidget(): React.ReactElement {
       </CardHeader>
       <CardContent>
         {loading || recs === null ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-            {[1, 2, 3, 4, 5].map((i) => (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 stagger">
+            {[1, 2, 3, 4, 5].map((i, idx) => (
               <div
                 key={i}
-                className="rounded-md border p-3 space-y-2"
-                style={{ borderColor: "var(--color-border)" }}
+                style={{ ["--i" as string]: idx, background: "var(--color-surface-2)" }}
+                className="rounded-lg ring-hairline shadow-[var(--shadow-xs)] p-3 space-y-2 animate-rise"
               >
                 <Skeleton className="h-4 w-16" />
                 <Skeleton className="h-3 w-full" />
@@ -85,16 +94,28 @@ export function RecommendationsWidget(): React.ReactElement {
             ))}
           </div>
         ) : recs.length === 0 ? (
-          <p className="text-sm py-6 text-center" style={{ color: "var(--color-text-muted)" }}>
-            No recommendations yet — add more courses to your plan first.
-          </p>
+          <div className="flex flex-col items-center gap-3 rounded-xl border border-dashed border-border px-6 py-10 text-center">
+            <span
+              className="inline-flex h-11 w-11 items-center justify-center rounded-xl ring-hairline shadow-[var(--shadow-xs)]"
+              style={{ background: "var(--gradient-accent-soft)" }}
+            >
+              <GraduationCap
+                className="h-5 w-5"
+                style={{ color: "var(--color-accent)" }}
+                aria-hidden
+              />
+            </span>
+            <p className="text-sm" style={{ color: "var(--color-text-muted)" }}>
+              No recommendations yet — add more courses to your plan first.
+            </p>
+          </div>
         ) : (
-          <ul className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-            {recs.map((r) => (
+          <ul className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 stagger">
+            {recs.map((r, idx) => (
               <li
                 key={r.code}
-                className="rounded-md border p-3 space-y-1.5 hover:bg-accent/5 transition-colors"
-                style={{ borderColor: "var(--color-border)" }}
+                style={{ ["--i" as string]: idx, background: "var(--color-surface)" }}
+                className="lift animate-rise rounded-lg ring-hairline shadow-[var(--shadow-xs)] p-3 space-y-1.5 transition-all hover:bg-[var(--color-surface-2)] hover:shadow-[var(--shadow-glow)]"
               >
                 <div className="flex items-baseline justify-between gap-2">
                   <span className="mono tnum text-sm font-semibold">{r.code}</span>

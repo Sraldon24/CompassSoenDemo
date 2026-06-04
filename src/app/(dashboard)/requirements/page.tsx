@@ -6,6 +6,7 @@ import {
   computeCategoryProgress,
   totalDegreeProgress,
 } from "@/lib/domain/requirements";
+import { BookOpen } from "lucide-react";
 import { redirect } from "next/navigation";
 
 export const metadata = {
@@ -27,12 +28,13 @@ export default async function RequirementsPage(): Promise<React.ReactElement> {
   return (
     <div className="px-4 md:px-8 py-6 md:py-10 max-w-[1280px] mx-auto space-y-8">
       <header
-        className="relative overflow-hidden rounded-2xl border p-6 sm:p-8 space-y-3 animate-rise"
-        style={{ background: "var(--gradient-surface)", borderColor: "var(--color-border)" }}
+        className="relative overflow-hidden rounded-2xl ring-hairline shadow-[var(--shadow-md)] p-6 sm:p-8 space-y-3 animate-rise"
+        style={{ background: "var(--gradient-surface)" }}
       >
-        <div className="glow-accent absolute inset-0" aria-hidden />
+        <div className="absolute inset-0 bg-gradient-hero" aria-hidden />
         <div className="relative space-y-3">
-          <h1 className="text-3xl font-semibold tracking-tight">Requirements</h1>
+          <p className="eyebrow">Degree audit</p>
+          <h1 className="text-2xl sm:text-3xl font-semibold tracking-[-0.02em]">Requirements</h1>
           <p className="text-sm" style={{ color: "var(--color-text-muted)" }}>
             BEng Software Engineering — {TOTAL_DEGREE_CREDITS} credits required. Track your progress
             per category.
@@ -52,11 +54,11 @@ export default async function RequirementsPage(): Promise<React.ReactElement> {
               </span>
             </div>
             <div
-              className="h-2.5 w-full rounded-full overflow-hidden"
-              style={{ background: "var(--color-surface-2)" }}
+              className="h-2.5 w-full rounded-full overflow-hidden ring-hairline"
+              style={{ background: "var(--color-surface-3)" }}
             >
               <div
-                className="h-full rounded-full transition-[width] duration-700 [transition-timing-function:var(--ease-out-soft)]"
+                className="h-full rounded-full transition-[width] duration-700 [transition-timing-function:var(--ease-out-soft)] shadow-[0_0_14px_var(--color-accent-ring)]"
                 style={{
                   background: "var(--gradient-accent)",
                   width: `${overallPct}%`,
@@ -99,115 +101,129 @@ export default async function RequirementsPage(): Promise<React.ReactElement> {
         </div>
       </header>
 
-      {progress.map((cp) => {
-        const totalCreditsInCategory = cp.doneCredits + cp.inProgressCredits + cp.plannedCredits;
-        const pct = Math.min(
-          100,
-          Math.round(((cp.doneCredits + cp.inProgressCredits) / cp.spec.requiredCredits) * 100),
-        );
+      <div className="space-y-8 stagger">
+        {progress.map((cp, ci) => {
+          const totalCreditsInCategory = cp.doneCredits + cp.inProgressCredits + cp.plannedCredits;
+          const pct = Math.min(
+            100,
+            Math.round(((cp.doneCredits + cp.inProgressCredits) / cp.spec.requiredCredits) * 100),
+          );
 
-        return (
-          <Card key={cp.spec.key} interactive>
-            <CardHeader className="space-y-1">
-              <div className="flex items-baseline justify-between flex-wrap gap-2">
-                <CardTitle className="text-base">{cp.spec.label}</CardTitle>
-                <span className="mono tnum text-sm" style={{ color: "var(--color-text-muted)" }}>
-                  {totalCreditsInCategory} / {cp.spec.requiredCredits} cr
-                  <span className="ml-1.5">({pct}%)</span>
-                </span>
-              </div>
-              {cp.spec.description && (
-                <p className="text-xs" style={{ color: "var(--color-text-muted)" }}>
-                  {cp.spec.description}
-                </p>
-              )}
-            </CardHeader>
-            <CardContent className="space-y-3">
-              <div
-                className="h-2 w-full rounded-full overflow-hidden"
-                style={{ background: "var(--color-surface-2)" }}
-              >
+          return (
+            <Card key={cp.spec.key} interactive style={{ ["--i" as string]: ci }}>
+              <CardHeader className="space-y-1">
+                <div className="flex items-baseline justify-between flex-wrap gap-2">
+                  <CardTitle className="text-base">{cp.spec.label}</CardTitle>
+                  <span className="mono tnum text-sm" style={{ color: "var(--color-text-muted)" }}>
+                    {totalCreditsInCategory} / {cp.spec.requiredCredits} cr
+                    <span className="ml-1.5">({pct}%)</span>
+                  </span>
+                </div>
+                {cp.spec.description && (
+                  <p className="text-xs" style={{ color: "var(--color-text-muted)" }}>
+                    {cp.spec.description}
+                  </p>
+                )}
+              </CardHeader>
+              <CardContent className="space-y-3">
                 <div
-                  className="h-full rounded-full transition-[width] duration-700 [transition-timing-function:var(--ease-out-soft)]"
-                  style={{
-                    background:
-                      cp.spec.key === "deficiency"
-                        ? "var(--color-warning)"
-                        : "var(--gradient-accent)",
-                    width: `${pct}%`,
-                  }}
-                />
-              </div>
-
-              {cp.courses.length === 0 ? (
-                <p
-                  className="text-sm py-3 text-center rounded-md border border-dashed"
-                  style={{
-                    borderColor: "var(--color-border)",
-                    color: "var(--color-text-muted)",
-                  }}
+                  className="h-2 w-full rounded-full overflow-hidden ring-hairline"
+                  style={{ background: "var(--color-surface-3)" }}
                 >
-                  No courses planned in this category yet.
-                </p>
-              ) : (
-                <ul className="grid grid-cols-1 md:grid-cols-2 gap-1.5">
-                  {cp.courses.map(({ course, catalog: entry }) => {
-                    const statusColor =
-                      course.status === "transferred" || course.status === "completed"
-                        ? "var(--color-success)"
-                        : course.status === "enrolled"
-                          ? "var(--color-accent)"
-                          : "var(--color-text-subtle)";
-                    const statusLabel =
-                      course.status === "transferred"
-                        ? "Transferred"
-                        : course.status === "completed"
-                          ? "Done"
+                  <div
+                    className="h-full rounded-full transition-[width] duration-700 [transition-timing-function:var(--ease-out-soft)]"
+                    style={{
+                      background:
+                        cp.spec.key === "deficiency"
+                          ? "var(--color-warning)"
+                          : "var(--gradient-accent)",
+                      boxShadow:
+                        cp.spec.key === "deficiency"
+                          ? "0 0 14px var(--color-warning-soft)"
+                          : "0 0 14px var(--color-accent-ring)",
+                      width: `${pct}%`,
+                    }}
+                  />
+                </div>
+
+                {cp.courses.length === 0 ? (
+                  <div
+                    className="flex flex-col items-center gap-2 rounded-xl border border-dashed py-6 text-center"
+                    style={{ borderColor: "var(--color-border)" }}
+                  >
+                    <span
+                      className="inline-flex h-9 w-9 items-center justify-center rounded-xl ring-hairline"
+                      style={{ background: "var(--gradient-accent-soft)" }}
+                    >
+                      <BookOpen
+                        className="h-4 w-4"
+                        style={{ color: "var(--color-accent)" }}
+                        aria-hidden="true"
+                      />
+                    </span>
+                    <p className="text-sm" style={{ color: "var(--color-text-muted)" }}>
+                      No courses planned in this category yet.
+                    </p>
+                  </div>
+                ) : (
+                  <ul className="grid grid-cols-1 md:grid-cols-2 gap-1.5">
+                    {cp.courses.map(({ course, catalog: entry }) => {
+                      const statusColor =
+                        course.status === "transferred" || course.status === "completed"
+                          ? "var(--color-success)"
                           : course.status === "enrolled"
-                            ? "In progress"
-                            : "Planned";
-                    return (
-                      <li
-                        key={`${course.courseCode}-${course.term}`}
-                        className="flex items-center gap-2 rounded-md border px-3 py-2 text-sm"
-                        style={{
-                          background: "var(--color-surface)",
-                          borderColor: "var(--color-border)",
-                        }}
-                      >
-                        <span
-                          className="inline-block w-1.5 h-1.5 rounded-full shrink-0"
-                          style={{ background: statusColor }}
-                          aria-hidden
-                        />
-                        <span className="mono tnum text-xs font-semibold">{course.courseCode}</span>
-                        <span
-                          className="flex-1 min-w-0 truncate text-xs"
-                          style={{ color: "var(--color-text-muted)" }}
+                            ? "var(--color-accent)"
+                            : "var(--color-text-subtle)";
+                      const statusLabel =
+                        course.status === "transferred"
+                          ? "Transferred"
+                          : course.status === "completed"
+                            ? "Done"
+                            : course.status === "enrolled"
+                              ? "In progress"
+                              : "Planned";
+                      return (
+                        <li
+                          key={`${course.courseCode}-${course.term}`}
+                          className="flex items-center gap-2 rounded-lg ring-hairline px-3 py-2 text-sm transition-colors hover:bg-[var(--color-surface-2)]"
+                          style={{ background: "var(--color-surface)" }}
                         >
-                          {entry?.title ?? "Unknown course"}
-                        </span>
-                        <span
-                          className="mono tnum text-[10px] shrink-0"
-                          style={{ color: "var(--color-text-muted)" }}
-                        >
-                          {entry?.credits ?? "?"}cr
-                        </span>
-                        <span
-                          className="text-[10px] shrink-0"
-                          style={{ color: "var(--color-text-muted)" }}
-                        >
-                          {course.term} · {statusLabel}
-                        </span>
-                      </li>
-                    );
-                  })}
-                </ul>
-              )}
-            </CardContent>
-          </Card>
-        );
-      })}
+                          <span
+                            className="inline-block w-1.5 h-1.5 rounded-full shrink-0"
+                            style={{ background: statusColor }}
+                            aria-hidden
+                          />
+                          <span className="mono tnum text-xs font-semibold">
+                            {course.courseCode}
+                          </span>
+                          <span
+                            className="flex-1 min-w-0 truncate text-xs"
+                            style={{ color: "var(--color-text-muted)" }}
+                          >
+                            {entry?.title ?? "Unknown course"}
+                          </span>
+                          <span
+                            className="mono tnum text-[10px] shrink-0"
+                            style={{ color: "var(--color-text-muted)" }}
+                          >
+                            {entry?.credits ?? "?"}cr
+                          </span>
+                          <span
+                            className="text-[10px] shrink-0"
+                            style={{ color: "var(--color-text-muted)" }}
+                          >
+                            {course.term} · {statusLabel}
+                          </span>
+                        </li>
+                      );
+                    })}
+                  </ul>
+                )}
+              </CardContent>
+            </Card>
+          );
+        })}
+      </div>
     </div>
   );
 }

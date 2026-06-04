@@ -61,22 +61,26 @@ export default async function CourseDetailPage({ params }: PageProps): Promise<R
   return (
     <div className="px-4 md:px-8 py-6 md:py-10 max-w-[1100px] mx-auto space-y-8">
       <header
-        className="relative overflow-hidden rounded-2xl border p-6 sm:p-8 space-y-2 animate-rise"
-        style={{ background: "var(--gradient-surface)", borderColor: "var(--color-border)" }}
+        className="relative overflow-hidden rounded-2xl ring-hairline shadow-[var(--shadow-md)] p-6 sm:p-8 animate-rise"
+        style={{ background: "var(--gradient-surface)" }}
       >
+        <div className="absolute inset-0 bg-gradient-hero" aria-hidden />
         <div className="glow-accent absolute inset-0" aria-hidden />
-        <div className="relative space-y-2">
+        <div className="relative space-y-3">
+          <p className="eyebrow mono">{courseRow.code}</p>
           <span
-            className="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium uppercase tracking-wide"
+            className="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium uppercase tracking-wide ring-hairline"
             style={{ background: "var(--gradient-accent-soft)", color: "var(--color-accent)" }}
           >
             {courseRow.category ?? "Course"}
           </span>
-          <h1 className="text-3xl font-semibold tracking-tight font-mono pt-1">{courseRow.code}</h1>
-          <p className="text-xl" style={{ color: "var(--color-text)" }}>
+          <h1 className="text-2xl sm:text-3xl font-semibold tracking-[-0.02em]">
             {courseRow.title}
-          </p>
-          <div className="flex gap-3 text-sm" style={{ color: "var(--color-text-muted)" }}>
+          </h1>
+          <div
+            className="flex flex-wrap gap-3 text-sm"
+            style={{ color: "var(--color-text-muted)" }}
+          >
             <span className="mono tnum">{courseRow.credits} credits</span>
             {courseRow.avgHoursPerWeek ? (
               <span className="mono tnum">· ~{courseRow.avgHoursPerWeek}h/week</span>
@@ -130,10 +134,22 @@ export default async function CourseDetailPage({ params }: PageProps): Promise<R
 
 function NoCommunityData({ code }: { code: string }): React.ReactElement {
   return (
-    <div className="text-sm" style={{ color: "var(--color-text-muted)" }}>
+    <div className="text-sm leading-relaxed" style={{ color: "var(--color-text-muted)" }}>
       No Reddit discussion summarized yet for {code}. Admins can run{" "}
-      <code className="font-mono">npm run scrape:reddit -- --code "{code}"</code> followed by{" "}
-      <code className="font-mono">npm run summarize:reddit -- --code "{code}"</code>.
+      <code
+        className="mono rounded-md px-1.5 py-0.5 text-xs ring-hairline"
+        style={{ background: "var(--color-surface-2)", color: "var(--color-text)" }}
+      >
+        npm run scrape:reddit -- --code "{code}"
+      </code>{" "}
+      followed by{" "}
+      <code
+        className="mono rounded-md px-1.5 py-0.5 text-xs ring-hairline"
+        style={{ background: "var(--color-surface-2)", color: "var(--color-text)" }}
+      >
+        npm run summarize:reddit -- --code "{code}"
+      </code>
+      .
     </div>
   );
 }
@@ -145,26 +161,50 @@ function RedditSummaryBlock({
 }): React.ReactElement {
   const s = row.summary;
   return (
-    <div className="space-y-4">
-      <div
-        className="flex flex-wrap gap-4 text-xs uppercase tracking-wide"
-        style={{ color: "var(--color-text-muted)" }}
-      >
-        <span>Sentiment: {s.sentiment.replace(/_/g, " ")}</span>
-        <span>· Difficulty: {s.difficultyEstimate}</span>
-        <span>· {s.postsConsidered} post(s)</span>
-        {row.isStale && <span>· refresh queued</span>}
+    <div className="space-y-5">
+      <div className="flex flex-wrap gap-2 text-xs">
+        <span
+          className="inline-flex items-center rounded-full px-2.5 py-0.5 font-medium uppercase tracking-wide ring-hairline"
+          style={{ background: "var(--color-surface-2)", color: "var(--color-text-muted)" }}
+        >
+          Sentiment: {s.sentiment.replace(/_/g, " ")}
+        </span>
+        <span
+          className="inline-flex items-center rounded-full px-2.5 py-0.5 font-medium uppercase tracking-wide ring-hairline"
+          style={{ background: "var(--gradient-accent-soft)", color: "var(--color-accent)" }}
+        >
+          Difficulty: {s.difficultyEstimate}
+        </span>
+        <span
+          className="inline-flex items-center rounded-full px-2.5 py-0.5 font-medium uppercase tracking-wide ring-hairline mono tnum"
+          style={{ background: "var(--color-surface-2)", color: "var(--color-text-muted)" }}
+        >
+          {s.postsConsidered} post(s)
+        </span>
+        {row.isStale && (
+          <span
+            className="inline-flex items-center rounded-full px-2.5 py-0.5 font-medium uppercase tracking-wide ring-hairline"
+            style={{ background: "var(--color-warning-soft)", color: "var(--color-warning)" }}
+          >
+            refresh queued
+          </span>
+        )}
       </div>
 
       {s.profMentions.length > 0 && (
         <section>
-          <h3 className="text-sm font-semibold mb-1">Professors mentioned</h3>
-          <ul className="text-sm space-y-1">
+          <h3 className="text-sm font-semibold mb-2">Professors mentioned</h3>
+          <ul className="text-sm space-y-1.5">
             {s.profMentions.slice(0, 6).map((m) => (
-              <li key={m.name}>
+              <li
+                key={m.name}
+                className="flex items-center justify-between gap-2 rounded-lg px-3 py-2 ring-hairline"
+                style={{ background: "var(--color-surface)" }}
+              >
                 <span className="font-medium">{m.name}</span>
-                <span className="text-xs ml-2" style={{ color: "var(--color-text-muted)" }}>
-                  {m.count} mention{m.count === 1 ? "" : "s"} · {m.sentiment}
+                <span className="text-xs" style={{ color: "var(--color-text-muted)" }}>
+                  <span className="mono tnum">{m.count}</span> mention{m.count === 1 ? "" : "s"} ·{" "}
+                  {m.sentiment}
                 </span>
               </li>
             ))}
@@ -177,20 +217,26 @@ function RedditSummaryBlock({
 
       {s.citations.length > 0 && (
         <section>
-          <h3 className="text-sm font-semibold mb-1">From the threads</h3>
+          <h3 className="text-sm font-semibold mb-2">From the threads</h3>
           <ul className="text-sm space-y-2">
             {s.citations.map((c) => (
-              <li key={c.permalink}>
+              <li
+                key={c.permalink}
+                className="rounded-lg px-3 py-2.5 ring-hairline"
+                style={{ background: "var(--color-surface)" }}
+              >
                 <a
                   href={c.permalink}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="underline text-xs break-words"
-                  style={{ color: "var(--color-text-muted)" }}
+                  className="underline text-xs break-words transition-colors"
+                  style={{ color: "var(--color-accent)" }}
                 >
                   {c.permalink}
                 </a>
-                <p className="italic mt-1">“{c.quote}”</p>
+                <p className="italic mt-1.5" style={{ color: "var(--color-text)" }}>
+                  “{c.quote}”
+                </p>
               </li>
             ))}
           </ul>
@@ -207,10 +253,17 @@ function ListBlock({
   if (items.length === 0) return null;
   return (
     <section>
-      <h3 className="text-sm font-semibold mb-1">{title}</h3>
-      <ul className="text-sm list-disc pl-5 space-y-0.5">
+      <h3 className="text-sm font-semibold mb-2">{title}</h3>
+      <ul className="text-sm space-y-1.5">
         {items.map((p) => (
-          <li key={p}>{p}</li>
+          <li key={p} className="flex items-start gap-2">
+            <span
+              className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full"
+              style={{ background: "var(--gradient-accent)" }}
+              aria-hidden
+            />
+            <span style={{ color: "var(--color-text)" }}>{p}</span>
+          </li>
         ))}
       </ul>
     </section>

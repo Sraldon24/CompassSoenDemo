@@ -49,7 +49,8 @@ export default function LoginPage(): React.ReactElement {
 
   return (
     <Card featured>
-      <CardHeader className="space-y-1">
+      <CardHeader className="space-y-1.5">
+        <p className="eyebrow">Welcome back</p>
         <CardTitle className="text-2xl">Sign in</CardTitle>
         <CardDescription>Enter your email and password to continue.</CardDescription>
       </CardHeader>

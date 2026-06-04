@@ -74,12 +74,21 @@ export function Checklist({ initial }: { initial: ChecklistRow[] }): React.React
   };
 
   return (
-    <section className="space-y-3">
+    <section className="space-y-3 animate-rise">
       <h2
         className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wide"
         style={{ color: "var(--color-text-muted)" }}
       >
-        <ListChecks className="h-4 w-4" aria-hidden="true" />
+        <span
+          className="inline-flex h-6 w-6 items-center justify-center rounded-lg ring-hairline"
+          style={{ background: "var(--gradient-accent-soft)" }}
+        >
+          <ListChecks
+            className="h-3.5 w-3.5"
+            style={{ color: "var(--color-accent)" }}
+            aria-hidden="true"
+          />
+        </span>
         Your checklist ({items.length})
       </h2>
 
@@ -87,8 +96,8 @@ export function Checklist({ initial }: { initial: ChecklistRow[] }): React.React
         {items.map((c) => (
           <li
             key={c.id}
-            className="group flex items-start gap-3 rounded-lg border p-3"
-            style={{ borderColor: "var(--color-border)", background: "var(--color-surface)" }}
+            className="group flex items-start gap-3 rounded-lg ring-hairline shadow-[var(--shadow-xs)] p-3 transition-colors hover:bg-[var(--color-surface-2)]"
+            style={{ background: "var(--color-surface)" }}
           >
             <button
               type="button"
@@ -96,10 +105,11 @@ export function Checklist({ initial }: { initial: ChecklistRow[] }): React.React
               aria-checked={c.completed}
               aria-label={c.completed ? `Mark "${c.task}" not done` : `Mark "${c.task}" done`}
               onClick={() => toggle(c.id, !c.completed)}
-              className="mt-0.5 inline-block h-4 w-4 shrink-0 rounded border focus-visible:outline-none focus-visible:ring-2"
+              className="mt-0.5 inline-block h-4 w-4 shrink-0 rounded border transition-all focus-visible:outline-none focus-visible:ring-2"
               style={{
-                borderColor: "var(--color-border-strong)",
-                background: c.completed ? "var(--color-accent)" : "transparent",
+                borderColor: c.completed ? "transparent" : "var(--color-border-strong)",
+                background: c.completed ? "var(--gradient-accent)" : "transparent",
+                boxShadow: c.completed ? "0 0 12px var(--color-accent-ring)" : undefined,
               }}
             />
             <div className="min-w-0 flex-1">
@@ -131,8 +141,8 @@ export function Checklist({ initial }: { initial: ChecklistRow[] }): React.React
 
       {adding ? (
         <div
-          className="space-y-2 rounded-lg border p-3"
-          style={{ borderColor: "var(--color-border)", background: "var(--color-surface)" }}
+          className="space-y-2 rounded-xl ring-hairline shadow-[var(--shadow-sm)] p-3"
+          style={{ background: "var(--gradient-surface)" }}
         >
           <input
             // biome-ignore lint/a11y/noAutofocus: field in a form the user just opened
@@ -145,8 +155,8 @@ export function Checklist({ initial }: { initial: ChecklistRow[] }): React.React
             }}
             placeholder="e.g. Pass the English Writing Test (EWT)"
             maxLength={200}
-            className="w-full rounded border px-2 py-1.5 text-sm focus-visible:outline-none"
-            style={{ borderColor: "var(--color-border)", background: "var(--color-surface-2)" }}
+            className="w-full rounded-lg ring-hairline px-2.5 py-1.5 text-sm transition-shadow focus-visible:outline-none focus-visible:shadow-[0_0_0_3px_var(--color-accent-ring)]"
+            style={{ background: "var(--color-surface-2)" }}
           />
           <input
             value={notes}
@@ -157,24 +167,24 @@ export function Checklist({ initial }: { initial: ChecklistRow[] }): React.React
             }}
             placeholder="Notes (optional)"
             maxLength={500}
-            className="w-full rounded border px-2 py-1.5 text-sm focus-visible:outline-none"
-            style={{ borderColor: "var(--color-border)", background: "var(--color-surface-2)" }}
+            className="w-full rounded-lg ring-hairline px-2.5 py-1.5 text-sm transition-shadow focus-visible:outline-none focus-visible:shadow-[0_0_0_3px_var(--color-accent-ring)]"
+            style={{ background: "var(--color-surface-2)" }}
           />
           <div className="flex gap-2">
             <button
               type="button"
               onClick={add}
               disabled={!task.trim()}
-              className="rounded-md px-3 py-1.5 text-sm font-medium disabled:opacity-50"
-              style={{ background: "var(--color-accent)", color: "var(--color-primary-fg)" }}
+              className="pressable rounded-lg px-3.5 py-1.5 text-sm font-medium text-white shadow-[var(--shadow-sm)] disabled:opacity-50"
+              style={{ background: "var(--gradient-accent)" }}
             >
               Add
             </button>
             <button
               type="button"
               onClick={() => setAdding(false)}
-              className="rounded-md border px-3 py-1.5 text-sm"
-              style={{ borderColor: "var(--color-border)" }}
+              className="pressable rounded-lg ring-hairline px-3.5 py-1.5 text-sm transition-colors hover:bg-[var(--color-surface-2)]"
+              style={{ background: "var(--color-surface)" }}
             >
               Cancel
             </button>
@@ -184,7 +194,7 @@ export function Checklist({ initial }: { initial: ChecklistRow[] }): React.React
         <button
           type="button"
           onClick={() => setAdding(true)}
-          className="flex items-center gap-1.5 rounded-md border border-dashed px-3 py-2 text-xs transition-colors hover:bg-accent/10 focus-visible:outline-none"
+          className="flex items-center gap-1.5 rounded-lg border border-dashed px-3 py-2 text-xs transition-colors hover:bg-[var(--color-surface-2)] hover:text-[var(--color-accent)] focus-visible:outline-none"
           style={{ borderColor: "var(--color-border)", color: "var(--color-text-muted)" }}
         >
           <Plus className="h-3.5 w-3.5" />

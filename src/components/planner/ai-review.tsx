@@ -38,8 +38,8 @@ export function AIReview(): React.ReactElement {
         const body = (await res.json().catch(() => ({}))) as { error?: string };
         throw new Error(body.error ?? `AI Review failed (${res.status})`);
       }
-      const data = (await res.json()) as { suggestions: ReviewSuggestion[] };
-      setSuggestions(data.suggestions ?? []);
+      const data = (await res.json()) as { payload: { suggestions: ReviewSuggestion[] } };
+      setSuggestions(data.payload?.suggestions ?? []);
     } catch (err) {
       setError(err instanceof Error ? err.message : "AI Review unavailable");
     } finally {
@@ -55,21 +55,21 @@ export function AIReview(): React.ReactElement {
 
   return (
     <section
-      className="relative overflow-hidden rounded-xl border p-4 ring-1 ring-accent/20"
+      className="animate-rise relative overflow-hidden rounded-2xl ring-hairline p-5"
       style={{
-        borderColor: "var(--color-border)",
         background: "var(--gradient-surface)",
         boxShadow: "var(--shadow-glow)",
       }}
       aria-label="AI Review"
     >
-      <header className="flex items-center justify-between gap-2 pb-3">
-        <h2 className="flex items-center gap-2 text-sm font-semibold">
+      <div className="absolute inset-0 bg-gradient-hero" aria-hidden />
+      <header className="relative flex items-center justify-between gap-2 pb-4">
+        <h2 className="flex items-center gap-2.5 text-sm font-semibold">
           <span
-            className="inline-flex h-6 w-6 items-center justify-center rounded-lg text-white"
+            className="inline-flex h-7 w-7 items-center justify-center rounded-xl text-white shadow-[0_0_14px_var(--color-accent-ring)]"
             style={{ backgroundImage: "var(--gradient-accent)" }}
           >
-            <Sparkles className="h-3.5 w-3.5" aria-hidden />
+            <Sparkles className="h-4 w-4" aria-hidden />
           </span>
           AI Review
         </h2>
@@ -78,8 +78,8 @@ export function AIReview(): React.ReactElement {
           onClick={() => load(true)}
           disabled={loading}
           aria-label="Refresh AI Review"
-          className="inline-flex items-center gap-1.5 rounded-md border px-2.5 py-1 text-xs transition-colors hover:bg-accent/10 disabled:opacity-50 focus-visible:outline-none"
-          style={{ borderColor: "var(--color-border)", color: "var(--color-text-muted)" }}
+          className="pressable inline-flex items-center gap-1.5 rounded-lg ring-hairline px-2.5 py-1 text-xs transition-colors hover:bg-[var(--color-surface-2)] disabled:opacity-50 focus-visible:outline-none"
+          style={{ background: "var(--color-surface)", color: "var(--color-text-muted)" }}
         >
           <RefreshCw className={`h-3.5 w-3.5 ${loading ? "animate-spin" : ""}`} aria-hidden />
           Refresh
@@ -88,7 +88,7 @@ export function AIReview(): React.ReactElement {
 
       {loading ? (
         <div
-          className="flex items-center gap-2 text-sm"
+          className="relative flex items-center gap-2 text-sm"
           style={{ color: "var(--color-text-muted)" }}
           aria-live="polite"
         >
@@ -109,14 +109,14 @@ export function AIReview(): React.ReactElement {
           Reviewing your plan…
         </div>
       ) : error ? (
-        <p className="text-sm" style={{ color: "var(--color-text-muted)" }}>
+        <p className="relative text-sm" style={{ color: "var(--color-text-muted)" }}>
           {error}{" "}
           <button type="button" onClick={() => load(true)} className="underline">
             Try again
           </button>
         </p>
       ) : suggestions && suggestions.length > 0 ? (
-        <ul className="space-y-2 stagger">
+        <ul className="relative space-y-2 stagger">
           {suggestions.map((s, i) => {
             const meta = KIND_META[s.kind];
             const Icon = meta.Icon;
@@ -124,10 +124,10 @@ export function AIReview(): React.ReactElement {
               <li
                 key={`${s.kind}-${i}`}
                 style={{ ["--i" as string]: i, background: "var(--color-surface)" }}
-                className="lift flex items-start gap-3 rounded-lg border p-3 hover:border-accent/40"
+                className="lift flex items-start gap-3 rounded-xl ring-hairline shadow-[var(--shadow-sm)] p-3 hover:shadow-[var(--shadow-glow)]"
               >
                 <span
-                  className="mt-0.5 inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full"
+                  className="mt-0.5 inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-xl ring-hairline"
                   style={{
                     background: "var(--gradient-accent-soft)",
                     color: "var(--color-accent)",
@@ -149,7 +149,7 @@ export function AIReview(): React.ReactElement {
           })}
         </ul>
       ) : (
-        <p className="text-sm" style={{ color: "var(--color-text-muted)" }}>
+        <p className="relative text-sm" style={{ color: "var(--color-text-muted)" }}>
           No suggestions right now — your plan looks solid. 🎉
         </p>
       )}

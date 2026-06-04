@@ -31,8 +31,8 @@ export function DemoBoard(): React.ReactElement {
 
   return (
     <div className="space-y-8">
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        {DEMO_TERMS.map((term) => {
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4 stagger">
+        {DEMO_TERMS.map((term, ti) => {
           const courses = grouped.get(term) ?? [];
           const credits = courses.reduce(
             (sum, c) => sum + (catalogMap.get(c.courseCode)?.credits ?? 0),
@@ -41,12 +41,12 @@ export function DemoBoard(): React.ReactElement {
           return (
             <div
               key={term}
-              className="rounded border p-3 space-y-2"
-              style={{ borderColor: "var(--color-border)", background: "var(--color-surface)" }}
+              style={{ ["--i" as string]: ti, background: "var(--gradient-surface)" }}
+              className="rounded-xl ring-hairline shadow-[var(--shadow-sm)] p-3 space-y-2"
             >
               <div className="flex items-baseline justify-between">
                 <h3 className="text-sm font-semibold">{term}</h3>
-                <span className="text-xs" style={{ color: "var(--color-text-muted)" }}>
+                <span className="text-xs mono tnum" style={{ color: "var(--color-text-muted)" }}>
                   {credits} cr
                 </span>
               </div>
@@ -56,13 +56,15 @@ export function DemoBoard(): React.ReactElement {
                 return (
                   <div
                     key={c.courseCode}
-                    className="rounded px-2 py-1.5 text-sm"
+                    className="rounded-lg px-2 py-1.5 text-sm ring-hairline"
                     style={{
-                      background: "var(--color-surface-muted)",
-                      borderLeft: hasIssue ? "3px solid #e0a528" : "3px solid transparent",
+                      background: "var(--color-surface-2)",
+                      borderLeft: hasIssue
+                        ? "3px solid var(--color-warning)"
+                        : "3px solid transparent",
                     }}
                   >
-                    <div className="font-mono text-xs">{c.courseCode}</div>
+                    <div className="mono tnum text-xs">{c.courseCode}</div>
                     <div className="text-xs truncate" style={{ color: "var(--color-text-muted)" }}>
                       {entry?.title}
                     </div>
@@ -70,7 +72,7 @@ export function DemoBoard(): React.ReactElement {
                 );
               })}
               {(issuesByTerm.get(term) ?? 0) > 0 && (
-                <div className="text-xs" style={{ color: "#b9821a" }}>
+                <div className="text-xs" style={{ color: "var(--color-warning)" }}>
                   {issuesByTerm.get(term)} planning note{issuesByTerm.get(term) === 1 ? "" : "s"}
                 </div>
               )}
@@ -118,9 +120,11 @@ function DemoChat(): React.ReactElement {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ message: q }),
       });
-      const data: { reply?: string; error?: string } = await res.json().catch(() => ({}));
+      const data: { payload?: { reply?: string } | null; error?: string | null } = await res
+        .json()
+        .catch(() => ({}));
       const reply = res.ok
-        ? (data.reply ?? "Sorry, I couldn't answer that.")
+        ? (data.payload?.reply ?? "Sorry, I couldn't answer that.")
         : data.error === "demo_limit"
           ? "You've used all your demo questions. Sign up free for unlimited chat!"
           : "Something went wrong. Try signing up for the full experience.";
@@ -136,14 +140,17 @@ function DemoChat(): React.ReactElement {
   };
 
   return (
-    <div className="rounded border" style={{ borderColor: "var(--color-border)" }}>
+    <div
+      className="rounded-xl ring-hairline shadow-[var(--shadow-sm)] overflow-hidden"
+      style={{ background: "var(--color-surface)" }}
+    >
       <div
         className="px-4 py-2 border-b text-sm font-medium"
-        style={{ borderColor: "var(--color-border)" }}
+        style={{ borderColor: "var(--color-border)", background: "var(--color-surface-2)" }}
       >
         Ask Compass {remaining > 0 ? `(${remaining} left)` : "(limit reached)"}
       </div>
-      <div className="max-h-72 overflow-y-auto p-4 space-y-3">
+      <div className="scroll-slim max-h-72 overflow-y-auto p-4 space-y-3">
         {messages.map((m, i) => (
           <div
             key={`${m.role}-${i}`}
@@ -156,15 +163,20 @@ function DemoChat(): React.ReactElement {
       </div>
       <div className="flex gap-2 p-3 border-t" style={{ borderColor: "var(--color-border)" }}>
         <input
-          className="flex-1 rounded border px-2 py-1.5 text-sm"
-          style={{ borderColor: "var(--color-border)", background: "var(--color-surface)" }}
+          className="flex-1 rounded-lg ring-hairline px-2.5 py-1.5 text-sm outline-none focus:ring-2 focus:ring-[var(--color-accent-ring)]"
+          style={{ background: "var(--color-surface-2)" }}
           value={input}
           onChange={(e) => setInput(e.target.value)}
           onKeyDown={(e) => e.key === "Enter" && send()}
           placeholder={remaining > 0 ? "Ask about this plan…" : "Sign up for unlimited questions"}
           disabled={remaining <= 0 || pending}
         />
-        <Button size="sm" onClick={send} disabled={remaining <= 0 || pending || !input.trim()}>
+        <Button
+          size="sm"
+          className="pressable"
+          onClick={send}
+          disabled={remaining <= 0 || pending || !input.trim()}
+        >
           {pending ? "…" : "Send"}
         </Button>
       </div>

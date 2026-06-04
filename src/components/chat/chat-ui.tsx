@@ -119,23 +119,22 @@ export function ChatUI(): React.ReactElement {
   return (
     <div className="flex flex-col h-[calc(100vh-4rem)]">
       <div
-        className="flex items-center justify-between px-6 py-4 border-b backdrop-blur-md"
+        className="flex items-center justify-between px-6 py-4 ring-hairline shadow-[var(--shadow-sm)] backdrop-blur-md"
         style={{
-          borderColor: "var(--color-border)",
           background: "color-mix(in oklch, var(--color-bg) 80%, transparent)",
         }}
       >
         <div>
-          <h1 className="text-lg font-semibold flex items-center gap-2">
+          <h1 className="flex items-center gap-2.5 text-lg font-semibold tracking-[-0.01em]">
             <span
-              className="inline-flex h-6 w-6 items-center justify-center rounded-lg text-white"
+              className="inline-flex h-7 w-7 items-center justify-center rounded-xl text-white shadow-[0_0_14px_var(--color-accent-ring)]"
               style={{ backgroundImage: "var(--gradient-accent)" }}
             >
-              <Sparkles className="h-3.5 w-3.5" />
+              <Sparkles className="h-4 w-4" />
             </span>
             Ask Compass
           </h1>
-          <p className="text-xs" style={{ color: "var(--color-text-muted)" }}>
+          <p className="mt-0.5 text-xs" style={{ color: "var(--color-text-muted)" }}>
             AI assistant trained on your plan + Concordia course catalog
           </p>
         </div>
@@ -157,21 +156,22 @@ export function ChatUI(): React.ReactElement {
       <div className="flex-1 overflow-y-auto px-6 py-6 space-y-6">
         {messages.length === 0 ? (
           <div className="max-w-2xl mx-auto space-y-4 animate-rise">
-            <h2 className="text-2xl font-semibold tracking-tight">
+            <p className="eyebrow">ASK COMPASS</p>
+            <h2 className="text-2xl sm:text-3xl font-semibold tracking-[-0.02em]">
               Hi — what would you like to <span className="text-gradient">plan?</span>
             </h2>
             <p style={{ color: "var(--color-text-muted)" }}>
               Try asking about prereqs, electives, or your current plan. I'll cite where each answer
               comes from.
             </p>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-4 stagger">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-4 stagger">
               {SUGGESTED_QUESTIONS.map((q, i) => (
                 <button
                   key={q}
                   type="button"
                   onClick={() => send(q)}
                   style={{ ["--i" as string]: i, background: "var(--gradient-surface)" }}
-                  className="lift group flex items-center justify-between gap-2 text-left rounded-xl border px-4 py-3 text-sm hover:border-accent/40 focus-visible:outline-none"
+                  className="lift group flex items-center justify-between gap-2 text-left rounded-xl ring-hairline shadow-[var(--shadow-sm)] px-4 py-3.5 text-sm transition-shadow hover:shadow-[var(--shadow-glow)] focus-visible:outline-none"
                 >
                   <span style={{ color: "var(--color-text)" }}>{q}</span>
                   <Send
@@ -188,7 +188,11 @@ export function ChatUI(): React.ReactElement {
               <article key={m.id} className="flex gap-3 animate-rise" data-role={m.role}>
                 {/* Avatar */}
                 <div
-                  className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-[11px] font-semibold"
+                  className={
+                    m.role === "assistant"
+                      ? "mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-[11px] font-semibold shadow-[0_0_14px_var(--color-accent-ring)]"
+                      : "mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-[11px] font-semibold ring-hairline"
+                  }
                   style={
                     m.role === "assistant"
                       ? { backgroundImage: "var(--gradient-accent)", color: "white" }
@@ -210,10 +214,9 @@ export function ChatUI(): React.ReactElement {
                   </div>
                   {m.content === "" && m.role === "assistant" ? (
                     <div
-                      className="space-y-2 rounded-xl rounded-tl-sm border p-3.5"
+                      className="space-y-2 rounded-xl rounded-tl-sm ring-hairline shadow-[var(--shadow-sm)] p-3.5"
                       style={{
                         background: "var(--color-surface)",
-                        borderColor: "var(--color-border)",
                       }}
                     >
                       <div
@@ -242,18 +245,19 @@ export function ChatUI(): React.ReactElement {
                     </div>
                   ) : (
                     <div
-                      className="prose-sm whitespace-pre-wrap rounded-xl border p-3.5 text-[15px] leading-relaxed"
+                      className={
+                        m.role === "user"
+                          ? "prose-sm whitespace-pre-wrap rounded-xl rounded-tr-sm shadow-[var(--shadow-sm)] p-3.5 text-[15px] leading-relaxed ring-1 ring-[color-mix(in_oklch,var(--color-accent)_22%,transparent)]"
+                          : "prose-sm whitespace-pre-wrap rounded-xl rounded-tl-sm ring-hairline shadow-[var(--shadow-sm)] p-3.5 text-[15px] leading-relaxed"
+                      }
                       style={
                         m.role === "user"
                           ? {
                               background: "var(--gradient-accent-soft)",
-                              borderColor:
-                                "color-mix(in oklch, var(--color-accent) 20%, transparent)",
                               color: "var(--color-text)",
                             }
                           : {
                               background: "var(--color-surface)",
-                              borderColor: "var(--color-border)",
                               color: "var(--color-text)",
                             }
                       }
@@ -269,9 +273,9 @@ export function ChatUI(): React.ReactElement {
                           href={s.url ?? "#"}
                           target={s.url ? "_blank" : undefined}
                           rel="noopener noreferrer"
-                          className="inline-flex items-center text-[11px] px-2 py-0.5 rounded-full border transition-colors hover:bg-accent/10"
+                          className="inline-flex items-center text-[11px] px-2.5 py-0.5 rounded-full ring-hairline transition-colors hover:bg-[var(--color-surface-2)] hover:text-[var(--color-accent)]"
                           style={{
-                            borderColor: "var(--color-border)",
+                            background: "var(--color-surface)",
                             color: "var(--color-text-muted)",
                           }}
                         >
@@ -285,7 +289,7 @@ export function ChatUI(): React.ReactElement {
                       <button
                         type="button"
                         aria-label="Helpful"
-                        className="p-1 rounded hover:bg-accent/10 transition-colors"
+                        className="pressable p-1.5 rounded-lg transition-colors hover:bg-[var(--color-surface-2)] hover:text-[var(--color-accent)]"
                         style={{ color: "var(--color-text-subtle)" }}
                       >
                         <ThumbsUp className="h-3.5 w-3.5" />
@@ -293,7 +297,7 @@ export function ChatUI(): React.ReactElement {
                       <button
                         type="button"
                         aria-label="Not helpful"
-                        className="p-1 rounded hover:bg-accent/10 transition-colors"
+                        className="pressable p-1.5 rounded-lg transition-colors hover:bg-[var(--color-surface-2)] hover:text-[var(--color-accent)]"
                         style={{ color: "var(--color-text-subtle)" }}
                       >
                         <ThumbsDown className="h-3.5 w-3.5" />
@@ -311,10 +315,12 @@ export function ChatUI(): React.ReactElement {
       {/* Composer */}
       <form
         onSubmit={onSubmit}
-        className="border-t px-6 py-4"
-        style={{ borderColor: "var(--color-border)" }}
+        className="px-6 py-4 ring-hairline"
+        style={{
+          background: "color-mix(in oklch, var(--color-bg) 80%, transparent)",
+        }}
       >
-        <div className="max-w-3xl mx-auto flex gap-2">
+        <div className="max-w-3xl mx-auto glass flex gap-2 rounded-xl ring-hairline shadow-[var(--shadow-md)] p-2">
           <textarea
             value={input}
             onChange={(e) => setInput(e.target.value)}
@@ -326,10 +332,8 @@ export function ChatUI(): React.ReactElement {
             }}
             placeholder="Ask anything about your degree plan…"
             rows={2}
-            className="flex-1 resize-none rounded-md border px-3 py-2 text-sm focus-visible:outline-none"
+            className="flex-1 resize-none rounded-lg border-0 bg-transparent px-2.5 py-1.5 text-sm focus-visible:outline-none"
             style={{
-              background: "var(--color-surface)",
-              borderColor: "var(--color-border)",
               color: "var(--color-text)",
             }}
             disabled={pending}
@@ -338,7 +342,7 @@ export function ChatUI(): React.ReactElement {
             type="submit"
             variant="accent"
             disabled={pending || !input.trim()}
-            className="shrink-0 self-end"
+            className="pressable shrink-0 self-end shadow-[0_0_14px_var(--color-accent-ring)]"
           >
             <Send className="h-4 w-4 mr-1.5" />
             Send

@@ -32,8 +32,8 @@ export function EmailDraftAssistant(): React.ReactElement {
         const body = (await res.json().catch(() => ({}))) as { error?: string };
         throw new Error(body.error ?? "Failed to draft email");
       }
-      const data = (await res.json()) as { draft: string };
-      setDraft(data.draft);
+      const data = (await res.json()) as { payload: { draft: string } };
+      setDraft(data.payload.draft);
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Failed to draft email");
     } finally {
@@ -42,10 +42,19 @@ export function EmailDraftAssistant(): React.ReactElement {
   };
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2 text-base">
-          <Sparkles className="h-4 w-4" style={{ color: "var(--color-accent)" }} />
+    <Card className="relative overflow-hidden ring-hairline shadow-[var(--shadow-md)] animate-rise">
+      <div className="absolute inset-0 bg-gradient-hero" aria-hidden />
+      <CardHeader className="relative">
+        <CardTitle className="flex items-center gap-2.5 text-base">
+          <span
+            className="inline-flex h-8 w-8 items-center justify-center rounded-xl ring-hairline"
+            style={{
+              background: "var(--gradient-accent-soft)",
+              color: "var(--color-accent)",
+            }}
+          >
+            <Sparkles className="h-4 w-4" />
+          </span>
           AI Email Draft
         </CardTitle>
         <CardDescription>
@@ -53,7 +62,7 @@ export function EmailDraftAssistant(): React.ReactElement {
           bracketed placeholders before sending.
         </CardDescription>
       </CardHeader>
-      <CardContent className="space-y-4">
+      <CardContent className="relative space-y-4">
         <div className="grid grid-cols-1 sm:grid-cols-[1fr_180px] gap-3">
           <div className="space-y-1.5">
             <Label htmlFor="situation">Your situation</Label>
@@ -63,10 +72,9 @@ export function EmailDraftAssistant(): React.ReactElement {
               onChange={(e) => setSituation(e.target.value)}
               placeholder="I need to ask my COMP 352 professor for an extension on the midterm because…"
               rows={4}
-              className="w-full resize-none rounded-md border px-3 py-2 text-sm focus-visible:outline-none"
+              className="w-full resize-none rounded-xl ring-hairline px-3 py-2 text-sm transition-shadow focus-visible:outline-none focus-visible:shadow-[var(--shadow-glow)]"
               style={{
                 background: "var(--color-surface)",
-                borderColor: "var(--color-border)",
                 color: "var(--color-text)",
               }}
               disabled={pending}
@@ -78,10 +86,9 @@ export function EmailDraftAssistant(): React.ReactElement {
               id="recipient"
               value={recipient}
               onChange={(e) => setRecipient(e.target.value as Recipient)}
-              className="w-full rounded-md border px-3 py-2 text-sm focus-visible:outline-none"
+              className="w-full rounded-xl ring-hairline px-3 py-2 text-sm transition-shadow focus-visible:outline-none focus-visible:shadow-[var(--shadow-glow)]"
               style={{
                 background: "var(--color-surface)",
-                borderColor: "var(--color-border)",
                 color: "var(--color-text)",
               }}
               disabled={pending}
@@ -95,19 +102,18 @@ export function EmailDraftAssistant(): React.ReactElement {
           </div>
         </div>
 
-        <Button onClick={generate} disabled={pending} className="w-full sm:w-auto">
+        <Button onClick={generate} disabled={pending} className="w-full sm:w-auto pressable">
           <Wand2 className="mr-2 h-4 w-4" />
           {pending ? "Drafting…" : "Draft email"}
         </Button>
 
         {draft && (
-          <div className="space-y-2">
+          <div className="space-y-2 animate-rise">
             <Label>Draft (edit before sending)</Label>
             <pre
-              className="text-xs whitespace-pre-wrap rounded-md border p-3 max-h-96 overflow-y-auto"
+              className="text-xs whitespace-pre-wrap rounded-xl ring-hairline shadow-[var(--shadow-sm)] p-3.5 max-h-96 overflow-y-auto scroll-slim"
               style={{
                 background: "var(--color-surface-2)",
-                borderColor: "var(--color-border)",
               }}
             >
               {draft}

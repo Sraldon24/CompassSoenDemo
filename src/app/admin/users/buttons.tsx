@@ -23,12 +23,18 @@ export function UserStatusButtons({
   return (
     <div className="flex items-center gap-2">
       {status !== "approved" && (
-        <Button size="sm" disabled={pending} onClick={() => act("approved")}>
+        <Button size="sm" className="pressable" disabled={pending} onClick={() => act("approved")}>
           Approve
         </Button>
       )}
       {status !== "rejected" && (
-        <Button size="sm" variant="outline" disabled={pending} onClick={() => act("rejected")}>
+        <Button
+          size="sm"
+          variant="outline"
+          className="pressable"
+          disabled={pending}
+          onClick={() => act("rejected")}
+        >
           Reject
         </Button>
       )}

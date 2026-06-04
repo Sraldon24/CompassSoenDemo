@@ -46,19 +46,19 @@ export function Topbar({ userName, userEmail }: TopbarProps): React.ReactElement
 
   return (
     <header
-      className="sticky top-0 z-30 h-16 flex items-center justify-between px-4 md:px-6 border-b backdrop-blur-md supports-[backdrop-filter]:bg-[var(--color-bg)]/70"
-      style={{
-        background: "color-mix(in oklch, var(--color-bg) 85%, transparent)",
-        borderColor: "var(--color-border)",
-      }}
+      className="glass sticky top-0 z-30 h-16 flex items-center justify-between px-4 md:px-6 border-b"
+      style={{ borderColor: "var(--color-border)" }}
     >
-      <div className="flex-1" />
+      <div className="flex-1 flex items-center gap-2 text-sm text-muted-foreground md:hidden">
+        <span className="font-semibold text-foreground">Compass</span>
+      </div>
+      <div className="hidden md:block flex-1" />
       <div className="flex items-center gap-2">
         <ThemeToggle />
         <DropdownMenu>
           <DropdownMenuTrigger
             aria-label="Open user menu"
-            className="inline-flex h-9 w-9 items-center justify-center rounded-full text-xs font-semibold text-white shadow-sm ring-2 ring-[var(--color-accent)]/20 transition-all hover:ring-[var(--color-accent)]/40 hover:brightness-105 focus-visible:outline-none"
+            className="pressable inline-flex h-9 w-9 items-center justify-center rounded-full text-xs font-semibold text-white shadow-[var(--shadow-sm)] ring-2 ring-[var(--color-accent)]/25 transition-all hover:ring-[var(--color-accent)]/50 hover:brightness-105 focus-visible:outline-none"
             style={{ backgroundImage: "var(--gradient-accent)" }}
           >
             {initials(userName, userEmail)}

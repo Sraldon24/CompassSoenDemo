@@ -42,9 +42,14 @@ export default function SignUpPage(): React.ReactElement {
 
   return (
     <Card featured>
-      <CardHeader className="space-y-1">
-        <CardTitle className="text-2xl">Create your account</CardTitle>
-        <CardDescription>It takes about a minute. No credit card required.</CardDescription>
+      <CardHeader className="space-y-1.5">
+        <p className="eyebrow">Get started</p>
+        <CardTitle className="text-2xl font-semibold tracking-[-0.02em]">
+          Create your account
+        </CardTitle>
+        <CardDescription style={{ color: "var(--color-text-muted)" }}>
+          It takes about a minute. No credit card required.
+        </CardDescription>
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4" noValidate>
@@ -120,7 +125,12 @@ export default function SignUpPage(): React.ReactElement {
             )}
           </div>
 
-          <Button type="submit" variant="accent" className="w-full" disabled={isSubmitting}>
+          <Button
+            type="submit"
+            variant="accent"
+            className="w-full pressable"
+            disabled={isSubmitting}
+          >
             {isSubmitting ? "Creating account..." : "Create account"}
           </Button>
         </form>

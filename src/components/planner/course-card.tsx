@@ -33,13 +33,13 @@ export function CourseCard({
       data-violation={hasViolation || undefined}
       data-status={planned.status}
       className={cn(
-        "lift group relative flex items-start gap-2 rounded-lg border p-2.5 hover:border-accent/40",
-        dragging && "opacity-40 rotate-1 shadow-lg",
+        "lift group relative flex items-start gap-2 rounded-lg border p-2.5 shadow-[var(--shadow-xs)] hover:border-accent/40 hover:shadow-[var(--shadow-md)]",
+        dragging && "opacity-50 rotate-2 shadow-[var(--shadow-lg)] cursor-grabbing",
       )}
       style={{
         background: "var(--gradient-surface)",
         borderColor: hasViolation
-          ? "color-mix(in oklch, var(--color-danger) 40%, var(--color-border))"
+          ? "color-mix(in oklch, var(--color-danger) 45%, var(--color-border))"
           : "var(--color-border)",
         boxShadow: hasViolation ? "inset 3px 0 0 var(--color-danger)" : "inset 3px 0 0 transparent",
       }}

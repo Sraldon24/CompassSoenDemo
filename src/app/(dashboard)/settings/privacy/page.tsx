@@ -30,12 +30,19 @@ export default async function PrivacySettingsPage(): Promise<React.ReactElement>
 
   return (
     <div className="px-4 md:px-8 py-6 md:py-10 max-w-2xl mx-auto space-y-6">
-      <header className="space-y-1">
-        <h1 className="text-2xl font-semibold tracking-tight">Privacy</h1>
-        <p className="text-sm" style={{ color: "var(--color-text-muted)" }}>
-          Control your public profile. When public, anyone with the link can see your degree
-          progress — no Compass account needed.
-        </p>
+      <header
+        className="relative overflow-hidden rounded-2xl ring-hairline shadow-[var(--shadow-md)] p-6 sm:p-8 animate-rise"
+        style={{ background: "var(--gradient-surface)" }}
+      >
+        <div className="absolute inset-0 bg-gradient-hero" aria-hidden />
+        <div className="relative space-y-2">
+          <p className="eyebrow">Settings</p>
+          <h1 className="text-2xl sm:text-3xl font-semibold tracking-[-0.02em]">Privacy</h1>
+          <p className="text-sm" style={{ color: "var(--color-text-muted)" }}>
+            Control your public profile. When public, anyone with the link can see your degree
+            progress — no Compass account needed.
+          </p>
+        </div>
       </header>
 
       <PrivacyForm
@@ -47,8 +54,8 @@ export default async function PrivacySettingsPage(): Promise<React.ReactElement>
         suggestedSlug={slugFromName(session.user.name ?? session.user.email)}
       />
 
-      <section className="space-y-3">
-        <h2 className="text-lg font-semibold">Your data</h2>
+      <section className="space-y-3 animate-rise">
+        <h2 className="text-lg font-semibold tracking-[-0.01em]">Your data</h2>
         <DataControls />
       </section>
     </div>

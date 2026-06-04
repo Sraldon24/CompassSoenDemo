@@ -11,14 +11,21 @@ export function DataControls(): React.ReactElement {
   const requestDelete = () => {
     startDelete(async () => {
       const res = await fetch("/api/account/delete", { method: "POST" });
-      const data: { message?: string; error?: string } = await res.json().catch(() => ({}));
-      setMessage(res.ok ? (data.message ?? "Deletion scheduled.") : (data.error ?? "Failed."));
+      const data: { payload?: { message?: string }; error?: string } = await res
+        .json()
+        .catch(() => ({}));
+      setMessage(
+        res.ok ? (data.payload?.message ?? "Deletion scheduled.") : (data.error ?? "Failed."),
+      );
       setConfirmDelete(false);
     });
   };
 
   return (
-    <div className="space-y-4 rounded border p-5" style={{ borderColor: "var(--color-border)" }}>
+    <div
+      className="space-y-4 rounded-2xl ring-hairline shadow-[var(--shadow-sm)] p-5"
+      style={{ background: "var(--gradient-surface)" }}
+    >
       <div className="space-y-1">
         <h3 className="text-sm font-medium">Export your data</h3>
         <p className="text-xs" style={{ color: "var(--color-text-muted)" }}>
@@ -32,8 +39,8 @@ export function DataControls(): React.ReactElement {
         </a>
       </div>
 
-      <div className="space-y-1 pt-2 border-t" style={{ borderColor: "var(--color-border)" }}>
-        <h3 className="text-sm font-medium" style={{ color: "var(--color-error, #c43d3d)" }}>
+      <div className="space-y-1 pt-3 border-t" style={{ borderColor: "var(--color-border)" }}>
+        <h3 className="text-sm font-medium" style={{ color: "var(--color-danger, #c43d3d)" }}>
           Delete account
         </h3>
         <p className="text-xs" style={{ color: "var(--color-text-muted)" }}>
@@ -54,7 +61,7 @@ export function DataControls(): React.ReactElement {
               size="sm"
               disabled={deleting}
               onClick={requestDelete}
-              style={{ background: "var(--color-error, #c43d3d)", color: "white" }}
+              style={{ background: "var(--color-danger, #c43d3d)", color: "white" }}
             >
               {deleting ? "Scheduling…" : "Yes, delete my account"}
             </Button>

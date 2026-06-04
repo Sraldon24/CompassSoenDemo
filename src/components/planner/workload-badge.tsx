@@ -40,12 +40,12 @@ export function WorkloadBadge({ level, hoursPerWeek }: WorkloadBadgeProps): Reac
   const filled = FILL_BARS[level];
   return (
     <span
-      className="inline-flex items-center gap-2 rounded-full px-2.5 py-1 text-[11px] font-medium"
+      className="inline-flex items-center gap-2 rounded-full ring-hairline px-2.5 py-1 text-[11px] font-medium"
       style={{ background: SOFT_VAR[level], color: accent }}
       title={`${hoursPerWeek} hrs/week estimated`}
     >
       {/* 4-bar meter */}
-      <span className="inline-flex gap-0.5" aria-hidden>
+      <span className="inline-flex items-end gap-0.5" aria-hidden>
         {[0, 1, 2, 3].map((i) => (
           <span
             key={i}
@@ -53,6 +53,8 @@ export function WorkloadBadge({ level, hoursPerWeek }: WorkloadBadgeProps): Reac
             style={{
               height: 8 + i * 1.5,
               background: i < filled ? accent : "var(--color-border-strong)",
+              boxShadow:
+                i < filled ? "0 0 6px color-mix(in oklch, currentColor 50%, transparent)" : "none",
             }}
           />
         ))}

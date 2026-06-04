@@ -74,15 +74,14 @@ export default async function DashboardPage(): Promise<React.ReactElement> {
     <div className="px-4 md:px-8 py-6 md:py-10 max-w-[1280px] mx-auto space-y-8">
       {/* Welcome + progress — glowing hero panel */}
       <section
-        className="relative overflow-hidden rounded-2xl border p-6 sm:p-8 animate-rise"
-        style={{
-          background: "var(--gradient-surface)",
-          borderColor: "var(--color-border)",
-        }}
+        className="relative overflow-hidden rounded-2xl ring-hairline shadow-[var(--shadow-md)] p-6 sm:p-8 animate-rise"
+        style={{ background: "var(--gradient-surface)" }}
       >
+        <div className="absolute inset-0 bg-gradient-hero" aria-hidden />
         <div className="glow-accent absolute inset-0" aria-hidden />
         <div className="relative space-y-4">
-          <h1 className="text-3xl font-semibold tracking-tight">
+          <p className="eyebrow">Dashboard</p>
+          <h1 className="text-3xl sm:text-4xl font-semibold tracking-[-0.02em]">
             Welcome back, <span className="text-gradient">{name}</span> <span aria-hidden>👋</span>
           </h1>
           <div className="flex items-end justify-between gap-3 flex-wrap">
@@ -102,11 +101,11 @@ export default async function DashboardPage(): Promise<React.ReactElement> {
             </p>
           </div>
           <div
-            className="h-2.5 w-full rounded-full overflow-hidden"
-            style={{ background: "var(--color-surface-2)" }}
+            className="h-2.5 w-full rounded-full overflow-hidden ring-hairline"
+            style={{ background: "var(--color-surface-3)" }}
           >
             <div
-              className="h-full rounded-full transition-[width] duration-700 [transition-timing-function:var(--ease-out-soft)]"
+              className="h-full rounded-full shadow-[0_0_14px_var(--color-accent-ring)] transition-[width] duration-700 [transition-timing-function:var(--ease-out-soft)]"
               style={{ background: "var(--gradient-accent)", width: `${pct}%` }}
             />
           </div>
@@ -180,12 +179,13 @@ export default async function DashboardPage(): Promise<React.ReactElement> {
 
       {/* Quick link to planner — featured CTA banner */}
       <section
-        className="lift group relative overflow-hidden rounded-xl border p-6"
-        style={{ background: "var(--gradient-accent-soft)", borderColor: "var(--color-border)" }}
+        className="lift group relative overflow-hidden rounded-xl ring-hairline shadow-[var(--shadow-sm)] p-6"
+        style={{ background: "var(--gradient-accent-soft)" }}
       >
+        <div className="absolute inset-0 bg-gradient-hero opacity-60" aria-hidden />
         <div className="relative flex items-start gap-4">
           <div
-            className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-xl text-white shadow-sm"
+            className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-xl text-white shadow-[var(--shadow-sm)] ring-hairline transition-transform duration-300 group-hover:scale-105"
             style={{ backgroundImage: "var(--gradient-accent)" }}
           >
             <Calendar className="h-5 w-5" />

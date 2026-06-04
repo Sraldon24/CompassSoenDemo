@@ -63,38 +63,52 @@ export function OnboardingWizard({
   };
 
   return (
-    <Card className="w-full">
-      <CardHeader className="space-y-2">
+    <Card featured className="w-full">
+      <CardHeader className="space-y-2.5">
         <div className="flex items-center gap-1.5" aria-label={`Step ${step + 1} of 3`}>
           {[0, 1, 2].map((i) => (
             <span
               key={i}
-              className="h-1 flex-1 rounded-full"
-              style={{
-                background: i <= step ? "var(--color-accent)" : "var(--color-border)",
-              }}
+              className="h-1.5 flex-1 rounded-full transition-all"
+              style={
+                i <= step
+                  ? {
+                      backgroundImage: "var(--gradient-accent)",
+                      boxShadow: "0 0 14px var(--color-accent-ring)",
+                    }
+                  : { background: "var(--color-surface-3)" }
+              }
               aria-current={i === step ? "step" : undefined}
             />
           ))}
         </div>
+        <p className="eyebrow">Step {step + 1} of 3</p>
         {step === 0 && (
           <>
-            <CardTitle className="text-2xl">
+            <CardTitle className="text-2xl font-semibold tracking-[-0.02em]">
               Welcome{userName ? `, ${userName.split(/\s+/)[0]}` : ""} 👋
             </CardTitle>
-            <CardDescription>Let&apos;s set up your plan in about 60 seconds.</CardDescription>
+            <CardDescription style={{ color: "var(--color-text-muted)" }}>
+              Let&apos;s set up your plan in about 60 seconds.
+            </CardDescription>
           </>
         )}
         {step === 1 && (
           <>
-            <CardTitle className="text-2xl">Your program</CardTitle>
-            <CardDescription>So we know which requirements to track.</CardDescription>
+            <CardTitle className="text-2xl font-semibold tracking-[-0.02em]">
+              Your program
+            </CardTitle>
+            <CardDescription style={{ color: "var(--color-text-muted)" }}>
+              So we know which requirements to track.
+            </CardDescription>
           </>
         )}
         {step === 2 && (
           <>
-            <CardTitle className="text-2xl">You&apos;re all set 🎉</CardTitle>
-            <CardDescription>
+            <CardTitle className="text-2xl font-semibold tracking-[-0.02em]">
+              You&apos;re all set 🎉
+            </CardTitle>
+            <CardDescription style={{ color: "var(--color-text-muted)" }}>
               Your dashboard is ready. We&apos;ll improve it as you add courses.
             </CardDescription>
           </>
@@ -105,24 +119,31 @@ export function OnboardingWizard({
         {step === 0 && (
           <div className="space-y-4">
             <div
-              className="rounded-md border p-4 text-sm leading-relaxed"
+              className="rounded-xl p-4 text-sm leading-relaxed ring-hairline shadow-[var(--shadow-sm)]"
               style={{
-                background: "var(--color-accent-soft)",
-                borderColor: "var(--color-border)",
+                background: "var(--gradient-accent-soft)",
                 color: "var(--color-text)",
               }}
             >
-              <p className="flex items-start gap-2 mb-2 font-medium">
-                <Sparkles className="h-4 w-4 mt-0.5" style={{ color: "var(--color-accent)" }} />
+              <p className="flex items-center gap-2.5 mb-3 font-medium">
+                <span
+                  className="inline-flex h-7 w-7 items-center justify-center rounded-xl ring-hairline"
+                  style={{
+                    background: "var(--gradient-accent-soft)",
+                    color: "var(--color-accent)",
+                  }}
+                >
+                  <Sparkles className="h-4 w-4" aria-hidden />
+                </span>
                 What you&apos;ll get
               </p>
-              <ul className="space-y-1 ml-6 list-disc">
+              <ul className="space-y-1 ml-9 list-disc" style={{ color: "var(--color-text-muted)" }}>
                 <li>Drag-and-drop your courses across terms</li>
                 <li>Real-time prereq + workload warnings</li>
                 <li>An AI assistant trained on Concordia data (coming)</li>
               </ul>
             </div>
-            <Button onClick={() => goNext(1)} className="w-full">
+            <Button onClick={() => goNext(1)} className="w-full pressable">
               Get started
               <ChevronRight className="ml-2 h-4 w-4" />
             </Button>
@@ -137,13 +158,15 @@ export function OnboardingWizard({
                 {PROGRAMS.map((p) => (
                   <label
                     key={p.value}
-                    className="flex items-center gap-2 rounded-md border px-3 py-2 cursor-pointer text-sm transition-colors"
-                    style={{
-                      borderColor:
-                        program === p.value ? "var(--color-accent)" : "var(--color-border)",
-                      background:
-                        program === p.value ? "var(--color-accent-soft)" : "var(--color-surface)",
-                    }}
+                    className="flex items-center gap-2.5 rounded-lg px-3 py-2.5 cursor-pointer text-sm ring-hairline transition-all hover:bg-[var(--color-surface-2)]"
+                    style={
+                      program === p.value
+                        ? {
+                            background: "var(--gradient-accent-soft)",
+                            boxShadow: "0 0 0 1px var(--color-accent), var(--shadow-sm)",
+                          }
+                        : { background: "var(--color-surface)" }
+                    }
                   >
                     <input
                       type="radio"
@@ -176,10 +199,9 @@ export function OnboardingWizard({
                 id="entry-term"
                 value={entryTerm}
                 onChange={(e) => setEntryTerm(e.target.value)}
-                className="w-full rounded-md border px-3 py-2 text-sm focus-visible:outline-none"
+                className="w-full rounded-lg px-3 py-2.5 text-sm ring-hairline shadow-[var(--shadow-xs)] transition-shadow focus-visible:outline-none"
                 style={{
                   background: "var(--color-surface)",
-                  borderColor: "var(--color-border)",
                   color: "var(--color-text)",
                 }}
               >
@@ -207,7 +229,7 @@ export function OnboardingWizard({
                 <ChevronLeft className="mr-2 h-4 w-4" />
                 Back
               </Button>
-              <Button onClick={submitProfile} disabled={isPending} className="flex-1">
+              <Button onClick={submitProfile} disabled={isPending} className="flex-1 pressable">
                 {isPending ? "Saving…" : "Continue"}
                 <ChevronRight className="ml-2 h-4 w-4" />
               </Button>
@@ -216,19 +238,20 @@ export function OnboardingWizard({
         )}
 
         {step === 2 && (
-          <div className="space-y-4">
+          <div className="space-y-4 animate-rise">
             <div className="flex justify-center py-4">
-              <CheckCircle2
-                className="h-16 w-16"
-                style={{ color: "var(--color-accent)" }}
-                aria-hidden
-              />
+              <span
+                className="inline-flex h-20 w-20 items-center justify-center rounded-2xl ring-hairline shadow-[var(--shadow-glow)]"
+                style={{ background: "var(--gradient-accent-soft)", color: "var(--color-accent)" }}
+              >
+                <CheckCircle2 className="h-10 w-10" aria-hidden />
+              </span>
             </div>
             <p className="text-sm text-center" style={{ color: "var(--color-text-muted)" }}>
               Welcome to Compass. We&apos;ll add the rest of the wizard (interests, Excel import) in
               a later phase. Jump in and start planning.
             </p>
-            <Button onClick={finish} disabled={isPending} className="w-full">
+            <Button onClick={finish} disabled={isPending} className="w-full pressable">
               {isPending ? "Finishing…" : "Go to dashboard"}
             </Button>
           </div>

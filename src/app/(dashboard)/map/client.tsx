@@ -40,15 +40,22 @@ export function PrereqMapClient({
 
   return (
     <div className="px-4 md:px-8 py-6 md:py-10 max-w-[1600px] mx-auto space-y-4">
-      <header className="space-y-2 animate-rise">
-        <h1 className="text-3xl font-semibold tracking-tight">Prereq Map</h1>
-        <p className="text-sm" style={{ color: "var(--color-text-muted)" }}>
-          Hover a course to highlight everything connected to it. Solid arrows = hard prereqs;
-          dashed = co-requisites (concurrent OK).
-        </p>
+      <header className="relative overflow-hidden rounded-2xl ring-hairline shadow-[var(--shadow-md)] animate-rise">
+        <div className="absolute inset-0 bg-gradient-hero" aria-hidden />
+        <div
+          className="relative space-y-2 p-6 md:p-8"
+          style={{ background: "var(--gradient-surface)" }}
+        >
+          <p className="eyebrow">DEGREE MAP</p>
+          <h1 className="text-2xl sm:text-3xl font-semibold tracking-[-0.02em]">Prereq Map</h1>
+          <p className="text-sm max-w-2xl" style={{ color: "var(--color-text-muted)" }}>
+            Hover a course to highlight everything connected to it. Solid arrows = hard prereqs;
+            dashed = co-requisites (concurrent OK).
+          </p>
+        </div>
       </header>
 
-      <div className="flex flex-wrap gap-2">
+      <div className="flex flex-wrap gap-2 animate-rise" style={{ animationDelay: "60ms" }}>
         {FILTERS.map((f) => {
           const active = filter === f.value;
           return (
@@ -56,7 +63,7 @@ export function PrereqMapClient({
               key={f.value}
               type="button"
               onClick={() => setFilter(f.value)}
-              className="text-xs px-3 py-1.5 rounded-full border transition-all duration-200 hover:border-accent/40"
+              className="pressable text-xs px-3 py-1.5 rounded-full border transition-all duration-200 hover:border-accent/40"
               style={{
                 borderColor: active
                   ? "color-mix(in oklch, var(--color-accent) 35%, transparent)"
@@ -64,6 +71,7 @@ export function PrereqMapClient({
                 background: active ? "var(--gradient-accent-soft)" : "var(--color-surface)",
                 color: active ? "var(--color-accent)" : "var(--color-text-muted)",
                 fontWeight: active ? 600 : 400,
+                boxShadow: active ? "0 0 14px var(--color-accent-ring)" : "var(--shadow-xs)",
               }}
             >
               {f.label}
@@ -79,30 +87,44 @@ export function PrereqMapClient({
         filterCategory={null}
       />
 
-      <div className="flex flex-wrap gap-4 text-xs" style={{ color: "var(--color-text-muted)" }}>
+      <div
+        className="flex flex-wrap items-center gap-4 rounded-xl ring-hairline shadow-[var(--shadow-sm)] px-4 py-3 text-xs"
+        style={{ background: "var(--gradient-surface)", color: "var(--color-text-muted)" }}
+      >
         <span>
           <span
-            className="inline-block w-2 h-2 rounded-full mr-1 align-middle"
-            style={{ background: "var(--color-success)" }}
+            className="inline-block w-2 h-2 rounded-full mr-1.5 align-middle"
+            style={{
+              background: "var(--color-success)",
+              boxShadow: "0 0 8px var(--color-success-soft)",
+            }}
           />
           Done
         </span>
         <span>
           <span
-            className="inline-block w-2 h-2 rounded-full mr-1 align-middle"
-            style={{ background: "var(--color-accent)" }}
+            className="inline-block w-2 h-2 rounded-full mr-1.5 align-middle"
+            style={{
+              background: "var(--color-accent)",
+              boxShadow: "0 0 8px var(--color-accent-ring)",
+            }}
           />
           In your plan
         </span>
         <span>
           <span
-            className="inline-block w-2 h-2 rounded-full mr-1 align-middle"
+            className="inline-block w-2 h-2 rounded-full mr-1.5 align-middle"
             style={{ background: "var(--color-text-muted)" }}
           />
           Available
         </span>
-        <span>·</span>
-        <span>{catalog.length} total courses</span>
+        <span style={{ color: "var(--color-text-subtle)" }}>·</span>
+        <span>
+          <span className="mono tnum" style={{ color: "var(--color-text)" }}>
+            {catalog.length}
+          </span>{" "}
+          total courses
+        </span>
       </div>
     </div>
   );

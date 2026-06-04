@@ -20,9 +20,10 @@ export default async function ModerationPage(): Promise<React.ReactElement> {
   const flags = await getPendingFlags();
 
   return (
-    <div className="px-4 md:px-8 py-6 md:py-10 max-w-[1100px] mx-auto space-y-8">
+    <div className="px-4 md:px-8 py-6 md:py-10 max-w-[1100px] mx-auto space-y-8 animate-rise">
       <header className="space-y-2">
-        <h1 className="text-3xl font-semibold tracking-tight">Moderation queue</h1>
+        <p className="eyebrow">Admin</p>
+        <h1 className="text-2xl sm:text-3xl font-semibold tracking-[-0.02em]">Moderation queue</h1>
         <p className="text-sm" style={{ color: "var(--color-text-muted)" }}>
           Flagged community content. Flagged items are hidden from public view until you resolve
           them.
@@ -78,8 +79,8 @@ export default async function ModerationPage(): Promise<React.ReactElement> {
                         Flagged content
                       </div>
                       <p
-                        className="rounded px-3 py-2"
-                        style={{ background: "var(--color-surface-muted)" }}
+                        className="rounded-lg px-3 py-2 ring-hairline"
+                        style={{ background: "var(--color-surface-2)" }}
                       >
                         {flag.reviewComment}
                       </p>

@@ -40,9 +40,9 @@ function NavLink({ href, label, icon: Icon, active }: NavLinkProps): React.React
       href={href}
       aria-current={active ? "page" : undefined}
       className={cn(
-        "group relative flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-all duration-200",
+        "group relative flex items-center gap-3 rounded-lg px-3 py-2 text-[0.8125rem] font-medium transition-all duration-200",
         active
-          ? "text-foreground"
+          ? "text-foreground ring-hairline shadow-[var(--shadow-xs)]"
           : "text-muted-foreground hover:translate-x-0.5 hover:text-foreground hover:bg-secondary/70",
       )}
       style={active ? { background: "var(--gradient-accent-soft)" } : undefined}
@@ -51,16 +51,19 @@ function NavLink({ href, label, icon: Icon, active }: NavLinkProps): React.React
       <span
         aria-hidden
         className={cn(
-          "absolute left-0 top-1/2 h-5 w-1 -translate-y-1/2 rounded-r-full transition-all duration-200",
+          "absolute left-0 top-1/2 h-5 w-[3px] -translate-y-1/2 rounded-r-full transition-all duration-200",
           active ? "opacity-100" : "opacity-0 group-hover:opacity-40",
         )}
-        style={{ background: "var(--color-accent)" }}
+        style={{ background: "var(--gradient-accent)" }}
       />
       <Icon
-        className={cn("h-4 w-4 shrink-0 transition-colors", active && "text-[var(--color-accent)]")}
+        className={cn(
+          "h-[1.05rem] w-[1.05rem] shrink-0 transition-colors",
+          active ? "text-[var(--color-accent)]" : "group-hover:text-foreground",
+        )}
         aria-hidden="true"
       />
-      <span>{label}</span>
+      <span className="truncate">{label}</span>
     </Link>
   );
 }
@@ -108,7 +111,13 @@ export function Sidebar({ isAdmin = false }: { isAdmin?: boolean }): React.React
         </Link>
       </div>
 
-      <nav className="flex-1 px-3 py-4 space-y-1">
+      <nav className="flex-1 px-3 py-4 space-y-0.5 scroll-slim overflow-y-auto">
+        <p
+          className="px-3 pb-2 text-[0.625rem] font-semibold uppercase tracking-[0.1em]"
+          style={{ color: "var(--color-text-subtle)" }}
+        >
+          Workspace
+        </p>
         {NAV_ITEMS.map((item) => (
           <NavLink
             key={item.href}
@@ -120,7 +129,10 @@ export function Sidebar({ isAdmin = false }: { isAdmin?: boolean }): React.React
         ))}
       </nav>
 
-      <div className="px-3 py-4 border-t space-y-1" style={{ borderColor: "var(--color-border)" }}>
+      <div
+        className="px-3 py-4 border-t space-y-0.5"
+        style={{ borderColor: "var(--color-border)" }}
+      >
         {isAdmin && (
           <NavLink
             href="/admin/users"
@@ -135,6 +147,12 @@ export function Sidebar({ isAdmin = false }: { isAdmin?: boolean }): React.React
           icon={Settings}
           active={pathname.startsWith("/settings")}
         />
+        <p
+          className="px-3 pt-3 text-[0.625rem] mono tnum"
+          style={{ color: "var(--color-text-subtle)" }}
+        >
+          SOEN Compass · v0.1.0
+        </p>
       </div>
     </aside>
   );

@@ -32,7 +32,10 @@ export function PrivacyForm({ initial, suggestedSlug }: Props): React.ReactEleme
   const profileUrl = slug ? `/u/${slug}` : null;
 
   return (
-    <div className="space-y-5 rounded border p-5" style={{ borderColor: "var(--color-border)" }}>
+    <div
+      className="space-y-5 rounded-2xl ring-hairline shadow-[var(--shadow-sm)] p-5 animate-rise"
+      style={{ background: "var(--gradient-surface)" }}
+    >
       <label className="flex items-center gap-2 text-sm">
         <input type="checkbox" checked={isPublic} onChange={(e) => setIsPublic(e.target.checked)} />
         Make my profile public
@@ -47,11 +50,13 @@ export function PrivacyForm({ initial, suggestedSlug }: Props): React.ReactEleme
           Profile URL
         </label>
         <div className="flex items-center gap-1 text-sm">
-          <span style={{ color: "var(--color-text-muted)" }}>/u/</span>
+          <span className="mono" style={{ color: "var(--color-text-muted)" }}>
+            /u/
+          </span>
           <input
             id="profile-slug"
-            className="flex-1 rounded border px-2 py-1"
-            style={{ borderColor: "var(--color-border)", background: "var(--color-surface)" }}
+            className="mono flex-1 rounded-lg ring-hairline px-2.5 py-1.5 transition-shadow focus:outline-none focus:ring-2 focus:ring-[var(--color-accent-ring)]"
+            style={{ background: "var(--color-surface-2)" }}
             value={slug}
             onChange={(e) => setSlug(e.target.value)}
             placeholder="your-handle"
@@ -82,12 +87,12 @@ export function PrivacyForm({ initial, suggestedSlug }: Props): React.ReactEleme
 
       {message && (
         <div
-          className="text-xs"
+          className="text-xs font-medium"
           style={{
             color:
               message.kind === "ok"
-                ? "var(--color-accent, #2f7d5b)"
-                : "var(--color-error, #c43d3d)",
+                ? "var(--color-success, #2f7d5b)"
+                : "var(--color-danger, #c43d3d)",
           }}
         >
           {message.text}

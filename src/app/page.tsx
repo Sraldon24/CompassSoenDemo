@@ -32,13 +32,15 @@ export default async function Home(): Promise<React.ReactElement> {
 
   return (
     <div
-      className="relative min-h-screen flex flex-col overflow-hidden"
+      className="relative min-h-screen flex flex-col overflow-hidden bg-gradient-hero"
       style={{ background: "var(--color-bg)" }}
     >
-      {/* Animated emerald aurora behind everything */}
+      {/* Animated emerald/iris aurora behind everything */}
       <div className="aurora-bg" aria-hidden />
       {/* Faint dotted grid under the hero */}
-      <div className="absolute inset-x-0 top-0 h-[70vh] grid-backdrop" aria-hidden />
+      <div className="absolute inset-x-0 top-0 h-[75vh] grid-backdrop" aria-hidden />
+      {/* Hero gradient mesh wash */}
+      <div className="absolute inset-x-0 top-0 h-[75vh] bg-gradient-hero" aria-hidden />
 
       <header className="relative z-10 flex items-center justify-between px-6 py-4 max-w-7xl mx-auto w-full">
         <Link href="/" className="flex items-center gap-2" aria-label="SOEN Compass home">
@@ -71,7 +73,7 @@ export default async function Home(): Promise<React.ReactElement> {
         <section className="flex flex-col items-center gap-7 text-center max-w-2xl mt-12 sm:mt-20 animate-rise">
           {/* Invite-only pill */}
           <span
-            className="inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-medium"
+            className="sheen inline-flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-[0.8125rem] font-medium ring-hairline shadow-[var(--shadow-xs)]"
             style={{ background: "var(--gradient-accent-soft)", color: "var(--color-accent)" }}
           >
             <Sparkles className="h-3.5 w-3.5" />
@@ -95,11 +97,14 @@ export default async function Home(): Promise<React.ReactElement> {
             className="hidden dark:block"
           />
 
-          <h1 className="text-4xl sm:text-6xl font-semibold tracking-tight leading-[1.05]">
+          <h1 className="text-display font-semibold text-balance">
             Plan your Software Engineering degree the{" "}
             <span className="text-gradient">smart way.</span>
           </h1>
-          <p className="text-lg leading-relaxed" style={{ color: "var(--color-text-muted)" }}>
+          <p
+            className="text-lg sm:text-xl leading-relaxed text-balance max-w-xl"
+            style={{ color: "var(--color-text-muted)" }}
+          >
             Drag-and-drop term planning, an AI chatbot that knows your plan, an interactive
             prerequisite map, and real community insights — built for Concordia BEng SOEN students.
           </p>
@@ -137,15 +142,15 @@ export default async function Home(): Promise<React.ReactElement> {
               <div
                 key={f.title}
                 style={{ ["--i" as string]: i }}
-                className="lift rounded-xl border p-6 text-left bg-card ring-1 ring-foreground/5"
+                className="group lift rounded-xl p-6 text-left bg-card ring-hairline shadow-[var(--shadow-sm)] hover:shadow-[var(--shadow-glow)]"
               >
                 <div
-                  className="inline-flex h-10 w-10 items-center justify-center rounded-lg mb-4"
+                  className="inline-flex h-11 w-11 items-center justify-center rounded-xl mb-4 ring-hairline transition-transform duration-300 group-hover:scale-105 group-hover:-rotate-3"
                   style={{ background: "var(--gradient-accent-soft)" }}
                 >
                   <Icon className="h-5 w-5" style={{ color: "var(--color-accent)" }} />
                 </div>
-                <h3 className="text-base font-semibold tracking-tight">{f.title}</h3>
+                <h3 className="text-[0.9375rem] font-semibold tracking-tight">{f.title}</h3>
                 <p
                   className="mt-2 text-sm leading-relaxed"
                   style={{ color: "var(--color-text-muted)" }}

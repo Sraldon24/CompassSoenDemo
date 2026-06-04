@@ -38,8 +38,11 @@ export function CoursePicker({
   return (
     // biome-ignore lint/a11y/useKeyWithClickEvents: backdrop click is a mouse convenience; Escape (handled on the input) is the keyboard equivalent.
     <div
-      className="fixed inset-0 z-50 flex items-start justify-center p-4 pt-24"
-      style={{ background: "rgba(0,0,0,0.5)" }}
+      className="animate-fade-in fixed inset-0 z-50 flex items-start justify-center p-4 pt-24"
+      style={{
+        background: "color-mix(in oklch, var(--color-bg) 55%, transparent)",
+        backdropFilter: "blur(6px)",
+      }}
       onClick={onClose}
       role="dialog"
       aria-modal="true"
@@ -47,27 +50,28 @@ export function CoursePicker({
     >
       {/* biome-ignore lint/a11y/useKeyWithClickEvents: stops backdrop dismissal; no keyboard action intended. */}
       <div
-        className="w-full max-w-md rounded-lg border shadow-lg"
-        style={{ background: "var(--color-surface)", borderColor: "var(--color-border)" }}
+        className="animate-rise w-full max-w-md overflow-hidden rounded-2xl ring-hairline shadow-[var(--shadow-xl)]"
+        style={{ background: "var(--gradient-surface)" }}
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="p-3 border-b" style={{ borderColor: "var(--color-border)" }}>
-          <div className="text-sm font-semibold mb-2">Add course to {term}</div>
+        <div className="p-4 border-b" style={{ borderColor: "var(--color-border)" }}>
+          <p className="eyebrow mb-1">ADD COURSE</p>
+          <div className="text-sm font-semibold mb-3">Add course to {term}</div>
           <input
             // biome-ignore lint/a11y/noAutofocus: search field in a modal the user just opened
             autoFocus
-            className="w-full rounded border px-2 py-1.5 text-sm"
-            style={{ borderColor: "var(--color-border)", background: "var(--color-surface-2)" }}
+            className="w-full rounded-lg ring-hairline px-3 py-2 text-sm transition-shadow focus-visible:outline-none focus-visible:shadow-[0_0_0_3px_var(--color-accent-ring)]"
+            style={{ background: "var(--color-surface-2)" }}
             placeholder="Search by code or title…"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             onKeyDown={(e) => e.key === "Escape" && onClose()}
           />
         </div>
-        <ul className="max-h-80 overflow-y-auto p-1">
+        <ul className="max-h-80 overflow-y-auto scroll-slim p-1.5">
           {matches.length === 0 ? (
             <li
-              className="px-3 py-4 text-center text-sm"
+              className="px-3 py-6 text-center text-sm"
               style={{ color: "var(--color-text-muted)" }}
             >
               No matching courses.
@@ -77,16 +81,16 @@ export function CoursePicker({
               <li key={c.code}>
                 <button
                   type="button"
-                  className="flex w-full items-baseline gap-2 rounded px-3 py-2 text-left text-sm hover:bg-accent/10"
+                  className="flex w-full items-baseline gap-2 rounded-lg px-3 py-2 text-left text-sm transition-colors hover:bg-[var(--color-surface-2)]"
                   onClick={() => onPick(c.code)}
                 >
-                  <span className="mono shrink-0 font-medium">{c.code}</span>
+                  <span className="mono tnum shrink-0 font-medium">{c.code}</span>
                   <span className="truncate" style={{ color: "var(--color-text-muted)" }}>
                     {c.title}
                   </span>
                   <span
-                    className="ml-auto shrink-0 text-xs"
-                    style={{ color: "var(--color-text-muted)" }}
+                    className="mono tnum ml-auto shrink-0 text-xs"
+                    style={{ color: "var(--color-text-subtle)" }}
                   >
                     {c.credits} cr
                   </span>

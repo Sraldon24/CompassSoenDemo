@@ -36,15 +36,18 @@ export function CookieBanner(): React.ReactElement | null {
 
   return (
     <section
-      className="fixed inset-x-0 bottom-0 z-50 border-t px-4 py-3"
-      style={{ background: "var(--color-surface)", borderColor: "var(--color-border)" }}
+      className="glass animate-rise fixed inset-x-3 bottom-3 z-50 rounded-2xl ring-hairline shadow-[var(--shadow-lg)] px-4 py-3"
       aria-label="Cookie consent"
     >
       <div className="max-w-4xl mx-auto flex flex-col sm:flex-row items-start sm:items-center gap-3 text-sm">
         <p className="flex-1" style={{ color: "var(--color-text-muted)" }}>
           We use essential cookies to keep you signed in. With your OK, we also use privacy-friendly
           analytics to improve Compass. See our{" "}
-          <Link href="/privacy" className="underline">
+          <Link
+            href="/privacy"
+            className="underline underline-offset-2"
+            style={{ color: "var(--color-accent)" }}
+          >
             Privacy Policy
           </Link>
           .
@@ -53,16 +56,16 @@ export function CookieBanner(): React.ReactElement | null {
           <button
             type="button"
             onClick={() => choose("rejected")}
-            className="rounded border px-3 py-1.5"
-            style={{ borderColor: "var(--color-border)" }}
+            className="pressable rounded-lg ring-hairline px-3 py-1.5 transition-colors hover:bg-[var(--color-surface-2)]"
+            style={{ background: "var(--color-surface)" }}
           >
             Reject non-essential
           </button>
           <button
             type="button"
             onClick={() => choose("accepted")}
-            className="rounded px-3 py-1.5 font-medium"
-            style={{ background: "var(--color-accent, #2f7d5b)", color: "white" }}
+            className="pressable rounded-lg px-3 py-1.5 font-medium shadow-[var(--shadow-sm)]"
+            style={{ background: "var(--gradient-accent)", color: "white" }}
           >
             Accept
           </button>

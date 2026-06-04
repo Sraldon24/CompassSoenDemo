@@ -47,9 +47,10 @@ export default async function ScrapedChangesPage(): Promise<React.ReactElement> 
   const resolved = recent.filter((r) => r.status !== "pending").slice(0, 10);
 
   return (
-    <div className="px-4 md:px-8 py-6 md:py-10 max-w-[1280px] mx-auto space-y-8">
+    <div className="px-4 md:px-8 py-6 md:py-10 max-w-[1280px] mx-auto space-y-8 animate-rise">
       <header className="space-y-2">
-        <h1 className="text-3xl font-semibold tracking-tight">Scraped changes</h1>
+        <p className="eyebrow">Admin</p>
+        <h1 className="text-2xl sm:text-3xl font-semibold tracking-[-0.02em]">Scraped changes</h1>
         <p className="text-sm" style={{ color: "var(--color-text-muted)" }}>
           Proposed updates from the weekly Concordia calendar scraper. Approve to apply to the live
           catalog, reject to dismiss.
@@ -106,7 +107,7 @@ function ChangeRow({ change }: { change: ScrapedChangeRow }): React.ReactElement
     <Card>
       <CardHeader className="flex flex-row items-start justify-between gap-3 space-y-0">
         <div className="space-y-1">
-          <CardTitle className="text-lg font-mono">{change.entityId}</CardTitle>
+          <CardTitle className="text-lg mono tnum">{change.entityId}</CardTitle>
           <div
             className="flex items-center gap-2 text-xs"
             style={{ color: "var(--color-text-muted)" }}
@@ -132,11 +133,11 @@ function ResolvedRow({ change }: { change: ScrapedChangeRow }): React.ReactEleme
   const isApproved = change.status === "approved";
   return (
     <div
-      className="flex items-center gap-3 px-4 py-2 rounded border"
-      style={{ borderColor: "var(--color-border)" }}
+      className="flex items-center gap-3 px-4 py-2 rounded-lg ring-hairline transition-colors hover:bg-[var(--color-surface-2)]"
+      style={{ background: "var(--color-surface)" }}
     >
       <span className={statusBadgeClass(change.status)}>{change.status}</span>
-      <span className="font-mono text-sm">{change.entityId}</span>
+      <span className="mono tnum text-sm">{change.entityId}</span>
       <span className="text-xs" style={{ color: "var(--color-text-muted)" }}>
         {change.changeType}
       </span>
@@ -160,9 +161,9 @@ function ValueDiff({
   const display = formatValue(raw);
   return (
     <div
-      className="flex gap-3 px-3 py-2 rounded text-sm font-mono"
+      className="flex gap-3 px-3 py-2 rounded-lg ring-hairline text-sm mono"
       style={{
-        background: highlight ? "rgba(34, 197, 94, 0.08)" : "var(--color-surface-muted)",
+        background: highlight ? "var(--color-accent-soft)" : "var(--color-surface-2)",
         color: display === "—" ? "var(--color-text-muted)" : "var(--color-text)",
       }}
     >
@@ -188,22 +189,24 @@ function formatValue(raw: unknown): string {
 
 function badgeClass(kind: string): string {
   const base =
-    "inline-flex items-center px-2 py-0.5 rounded text-[10px] font-medium uppercase tracking-wider";
+    "inline-flex items-center px-2 py-0.5 rounded-full ring-hairline text-[10px] font-medium uppercase tracking-wider";
   const palette: Record<string, string> = {
-    added: "bg-emerald-100 text-emerald-800",
-    removed: "bg-red-100 text-red-800",
-    title: "bg-blue-100 text-blue-800",
-    credits: "bg-amber-100 text-amber-800",
-    prereq: "bg-violet-100 text-violet-800",
-    description: "bg-slate-100 text-slate-800",
+    added: "bg-[var(--color-success-soft)] text-[var(--color-success)]",
+    removed: "bg-[var(--color-danger-soft)] text-[var(--color-danger)]",
+    title: "bg-[var(--color-info-soft)] text-[var(--color-info)]",
+    credits: "bg-[var(--color-warning-soft)] text-[var(--color-warning)]",
+    prereq: "bg-[var(--color-accent-soft)] text-[var(--color-accent)]",
+    description: "bg-[var(--color-surface-2)] text-[var(--color-text-muted)]",
   };
-  return `${base} ${palette[kind] ?? "bg-gray-100 text-gray-800"}`;
+  return `${base} ${palette[kind] ?? "bg-[var(--color-surface-2)] text-[var(--color-text-muted)]"}`;
 }
 
 function statusBadgeClass(status: string): string {
   const base =
-    "inline-flex items-center px-2 py-0.5 rounded text-[10px] font-medium uppercase tracking-wider";
-  if (status === "approved") return `${base} bg-emerald-100 text-emerald-800`;
-  if (status === "rejected") return `${base} bg-gray-200 text-gray-700`;
-  return `${base} bg-amber-100 text-amber-800`;
+    "inline-flex items-center px-2 py-0.5 rounded-full ring-hairline text-[10px] font-medium uppercase tracking-wider";
+  if (status === "approved")
+    return `${base} bg-[var(--color-success-soft)] text-[var(--color-success)]`;
+  if (status === "rejected")
+    return `${base} bg-[var(--color-surface-2)] text-[var(--color-text-muted)]`;
+  return `${base} bg-[var(--color-warning-soft)] text-[var(--color-warning)]`;
 }

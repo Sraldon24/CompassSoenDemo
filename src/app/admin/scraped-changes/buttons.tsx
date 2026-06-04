@@ -12,6 +12,7 @@ export function ApproveRejectButtons({ changeId }: { changeId: string }): React.
       <Button
         size="sm"
         variant="outline"
+        className="pressable"
         disabled={pending}
         onClick={() => {
           startTransition(async () => {
@@ -26,6 +27,7 @@ export function ApproveRejectButtons({ changeId }: { changeId: string }): React.
       </Button>
       <Button
         size="sm"
+        className="pressable"
         disabled={pending}
         onClick={() => {
           startTransition(async () => {

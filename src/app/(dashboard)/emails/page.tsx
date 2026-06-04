@@ -34,20 +34,27 @@ export default async function EmailsPage(): Promise<React.ReactElement> {
 
   return (
     <div className="px-4 md:px-8 py-6 md:py-10 max-w-[1280px] mx-auto space-y-8">
-      <header className="space-y-2 animate-rise">
-        <h1 className="text-3xl font-semibold tracking-tight flex items-center gap-2.5">
-          <span
-            className="inline-flex h-9 w-9 items-center justify-center rounded-xl text-white shadow-sm"
-            style={{ backgroundImage: "var(--gradient-accent)" }}
-          >
-            <Mail className="h-5 w-5" />
-          </span>
-          Email Templates
-        </h1>
-        <p className="text-sm" style={{ color: "var(--color-text-muted)" }}>
-          Pre-drafted emails for advisors, professors, and the co-op office. Click to copy or open
-          in your mail app — edit the bracketed parts before sending.
-        </p>
+      <header
+        className="relative overflow-hidden rounded-2xl ring-hairline shadow-[var(--shadow-md)] p-6 sm:p-8 animate-rise"
+        style={{ background: "var(--gradient-surface)" }}
+      >
+        <div className="absolute inset-0 bg-gradient-hero" aria-hidden />
+        <div className="relative space-y-3">
+          <p className="eyebrow">Outreach</p>
+          <h1 className="text-2xl sm:text-3xl font-semibold tracking-[-0.02em] flex items-center gap-3">
+            <span
+              className="inline-flex h-10 w-10 items-center justify-center rounded-xl ring-hairline text-white shadow-[var(--shadow-sm)]"
+              style={{ backgroundImage: "var(--gradient-accent)" }}
+            >
+              <Mail className="h-5 w-5" />
+            </span>
+            Email Templates
+          </h1>
+          <p className="text-sm max-w-2xl" style={{ color: "var(--color-text-muted)" }}>
+            Pre-drafted emails for advisors, professors, and the co-op office. Click to copy or open
+            in your mail app — edit the bracketed parts before sending.
+          </p>
+        </div>
       </header>
 
       <EmailDraftAssistant />

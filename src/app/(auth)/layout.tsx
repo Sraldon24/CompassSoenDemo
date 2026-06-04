@@ -10,6 +10,8 @@ export default function AuthLayout({
       style={{ background: "var(--color-bg)" }}
     >
       <div className="aurora-bg" aria-hidden />
+      <div className="absolute inset-0 bg-gradient-hero" aria-hidden />
+      <div className="absolute inset-0 grid-backdrop opacity-60" aria-hidden />
       <Link href="/" className="relative z-10 mb-8 animate-rise" aria-label="SOEN Compass home">
         <Image
           src="/brand/lockup.svg"

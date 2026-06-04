@@ -16,13 +16,25 @@ export function ModerationButtons({ flagId }: { flagId: string }): React.ReactEl
 
   return (
     <div className="flex items-center gap-2">
-      <Button size="sm" variant="outline" disabled={pending} onClick={() => act("keep")}>
+      <Button
+        size="sm"
+        variant="outline"
+        className="pressable"
+        disabled={pending}
+        onClick={() => act("keep")}
+      >
         Keep
       </Button>
-      <Button size="sm" variant="outline" disabled={pending} onClick={() => act("remove")}>
+      <Button
+        size="sm"
+        variant="outline"
+        className="pressable"
+        disabled={pending}
+        onClick={() => act("remove")}
+      >
         Remove
       </Button>
-      <Button size="sm" disabled={pending} onClick={() => act("ban")}>
+      <Button size="sm" className="pressable" disabled={pending} onClick={() => act("ban")}>
         Ban author
       </Button>
     </div>

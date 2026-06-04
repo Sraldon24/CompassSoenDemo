@@ -160,18 +160,14 @@ export function PrereqMapSVG({
             }}
             placeholder="Find a course…"
             aria-label="Search courses"
-            className="h-8 w-48 rounded-lg border pl-8 pr-2 text-sm focus-visible:outline-none"
+            className="ring-hairline h-8 w-48 rounded-lg pl-8 pr-2 text-sm shadow-[var(--shadow-xs)] transition-shadow focus-visible:outline-none focus-visible:shadow-[var(--shadow-sm)]"
             style={{
               background: "var(--color-surface)",
-              borderColor: "var(--color-border)",
               color: "var(--color-text)",
             }}
           />
           {matches.length > 0 && (
-            <ul
-              className="absolute z-10 mt-1 w-64 overflow-hidden rounded-lg border shadow-lg"
-              style={{ background: "var(--color-surface)", borderColor: "var(--color-border)" }}
-            >
+            <ul className="glass ring-hairline absolute z-10 mt-1.5 w-64 overflow-hidden rounded-xl shadow-[var(--shadow-lg)] animate-fade-in">
               {matches.map((m) => (
                 <li key={m.code}>
                   <button
@@ -180,7 +176,7 @@ export function PrereqMapSVG({
                       focusNode(m.code);
                       setQuery("");
                     }}
-                    className="flex w-full items-baseline gap-2 px-3 py-1.5 text-left text-sm hover:bg-accent/10"
+                    className="flex w-full items-baseline gap-2 px-3 py-2 text-left text-sm transition-colors hover:bg-[var(--color-surface-2)]"
                   >
                     <span className="mono tnum font-semibold">{m.code}</span>
                     <span className="truncate text-xs" style={{ color: "var(--color-text-muted)" }}>
@@ -194,14 +190,14 @@ export function PrereqMapSVG({
         </div>
 
         <div
-          className="flex items-center rounded-lg border"
-          style={{ borderColor: "var(--color-border)" }}
+          className="ring-hairline flex items-center overflow-hidden rounded-lg shadow-[var(--shadow-xs)]"
+          style={{ background: "var(--color-surface)" }}
         >
           <button
             type="button"
             aria-label="Zoom out"
             onClick={() => setZoom((z) => clampZoom(z * 0.9))}
-            className="flex h-8 w-8 items-center justify-center hover:bg-accent/10"
+            className="pressable flex h-8 w-8 items-center justify-center transition-colors hover:bg-[var(--color-surface-2)]"
           >
             <Minus className="h-4 w-4" />
           </button>
@@ -215,7 +211,7 @@ export function PrereqMapSVG({
             type="button"
             aria-label="Zoom in"
             onClick={() => setZoom((z) => clampZoom(z * 1.1))}
-            className="flex h-8 w-8 items-center justify-center hover:bg-accent/10"
+            className="pressable flex h-8 w-8 items-center justify-center transition-colors hover:bg-[var(--color-surface-2)]"
           >
             <Plus className="h-4 w-4" />
           </button>
@@ -224,8 +220,8 @@ export function PrereqMapSVG({
         <button
           type="button"
           onClick={resetView}
-          className="inline-flex h-8 items-center gap-1.5 rounded-lg border px-2.5 text-xs hover:bg-accent/10"
-          style={{ borderColor: "var(--color-border)", color: "var(--color-text-muted)" }}
+          className="ring-hairline pressable inline-flex h-8 items-center gap-1.5 rounded-lg px-2.5 text-xs shadow-[var(--shadow-xs)] transition-colors hover:bg-[var(--color-surface-2)]"
+          style={{ background: "var(--color-surface)", color: "var(--color-text-muted)" }}
         >
           <Maximize2 className="h-3.5 w-3.5" />
           Reset
@@ -235,8 +231,12 @@ export function PrereqMapSVG({
           <button
             type="button"
             onClick={() => setPinned(null)}
-            className="inline-flex h-8 items-center gap-1.5 rounded-lg px-2.5 text-xs font-medium"
-            style={{ background: "var(--gradient-accent-soft)", color: "var(--color-accent)" }}
+            className="pressable inline-flex h-8 items-center gap-1.5 rounded-lg px-2.5 text-xs font-medium animate-fade-in"
+            style={{
+              background: "var(--gradient-accent-soft)",
+              color: "var(--color-accent)",
+              boxShadow: "0 0 14px var(--color-accent-ring)",
+            }}
           >
             Focused: <span className="mono tnum">{pinned}</span>
             <X className="h-3.5 w-3.5" />
@@ -251,10 +251,9 @@ export function PrereqMapSVG({
       {/* Canvas */}
       <div
         ref={containerRef}
-        className="relative w-full overflow-hidden rounded-xl border"
+        className="ring-hairline relative w-full overflow-hidden rounded-2xl shadow-[var(--shadow-md)]"
         style={{
           background: "var(--gradient-surface)",
-          borderColor: "var(--color-border)",
           height: "75vh",
           cursor: dragRef.current ? "grabbing" : "grab",
           touchAction: "none",
@@ -264,12 +263,16 @@ export function PrereqMapSVG({
         onPointerMove={onPointerMove}
         onPointerUp={onPointerUp}
       >
+        <div
+          className="grid-backdrop pointer-events-none absolute inset-0 opacity-60"
+          aria-hidden
+        />
         <svg
           width="100%"
           height="100%"
           role="img"
           aria-label="Prerequisite map"
-          style={{ display: "block" }}
+          style={{ display: "block", position: "relative" }}
         >
           <defs>
             <marker
@@ -294,6 +297,15 @@ export function PrereqMapSVG({
             >
               <path d="M0,-5L10,0L0,5" fill="var(--color-accent)" />
             </marker>
+            <filter id="node-focus-glow" x="-40%" y="-40%" width="180%" height="180%">
+              <feDropShadow
+                dx="0"
+                dy="2"
+                stdDeviation="6"
+                floodColor="var(--color-accent)"
+                floodOpacity="0.45"
+              />
+            </filter>
           </defs>
 
           <g transform={`translate(${pan.x},${pan.y}) scale(${zoom})`}>
@@ -361,10 +373,11 @@ export function PrereqMapSVG({
                     y={n.y}
                     width={NODE_WIDTH}
                     height={NODE_HEIGHT}
-                    rx={8}
+                    rx={10}
                     fill={fill}
                     stroke={stroke}
                     strokeWidth={isFocus ? 2.5 : inChain ? 2 : 1}
+                    filter={isFocus ? "url(#node-focus-glow)" : undefined}
                   />
                   <text
                     x={n.x + 10}
@@ -387,17 +400,18 @@ export function PrereqMapSVG({
 
         {/* Focus legend when a course is pinned */}
         {pinned && (
-          <div
-            className="pointer-events-none absolute bottom-3 left-3 rounded-lg border px-3 py-2 text-xs backdrop-blur-md"
-            style={{
-              background: "color-mix(in oklch, var(--color-surface) 85%, transparent)",
-              borderColor: "var(--color-border)",
-            }}
-          >
-            <div className="font-semibold">
+          <div className="glass ring-hairline pointer-events-none absolute bottom-3 left-3 rounded-xl px-3.5 py-2.5 text-xs shadow-[var(--shadow-md)] animate-fade-in">
+            <div className="flex items-center gap-1.5 font-semibold">
+              <span
+                className="inline-block h-1.5 w-1.5 rounded-full"
+                style={{
+                  background: "var(--color-accent)",
+                  boxShadow: "0 0 8px var(--color-accent-ring)",
+                }}
+              />
               <span className="mono tnum">{pinned}</span> path
             </div>
-            <div style={{ color: "var(--color-text-muted)" }}>
+            <div className="mt-0.5" style={{ color: "var(--color-text-muted)" }}>
               {active ? (
                 <>
                   {[...active.nodes].length - 1} connected course

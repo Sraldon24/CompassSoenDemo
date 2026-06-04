@@ -14,10 +14,13 @@ export const metadata: Metadata = {
 export default function PrivacyPage(): React.ReactElement {
   return (
     <main className="min-h-screen px-4 py-12" style={{ background: "var(--color-bg)" }}>
-      <article className="max-w-2xl mx-auto space-y-6 text-sm leading-relaxed">
-        <header className="space-y-1">
-          <h1 className="text-3xl font-semibold tracking-tight">Privacy Policy</h1>
-          <p style={{ color: "var(--color-text-muted)" }}>Last updated: 2026-05-30</p>
+      <article className="max-w-2xl mx-auto space-y-6 text-sm leading-relaxed animate-rise">
+        <header className="space-y-1.5">
+          <p className="eyebrow">Legal</p>
+          <h1 className="text-2xl sm:text-3xl font-semibold tracking-[-0.02em]">Privacy Policy</h1>
+          <p className="text-xs" style={{ color: "var(--color-text-muted)" }}>
+            Last updated: 2026-05-30
+          </p>
         </header>
 
         <Section title="Who we are">
@@ -77,18 +80,33 @@ export default function PrivacyPage(): React.ReactElement {
 
         <Section title="Contact">
           Questions? Email{" "}
-          <a href="mailto:sraldon24@gmail.com" className="underline">
+          <a
+            href="mailto:sraldon24@gmail.com"
+            className="underline underline-offset-2"
+            style={{ color: "var(--color-accent)" }}
+          >
             sraldon24@gmail.com
           </a>
           .
         </Section>
 
-        <footer className="pt-6">
-          <Link href="/" className="underline">
+        <footer
+          className="pt-6 mt-2 border-t"
+          style={{ borderColor: "var(--color-border)", color: "var(--color-text-muted)" }}
+        >
+          <Link
+            href="/"
+            className="underline underline-offset-2"
+            style={{ color: "var(--color-accent)" }}
+          >
             ← Back to SOEN Compass
           </Link>{" "}
           ·{" "}
-          <Link href="/terms" className="underline">
+          <Link
+            href="/terms"
+            className="underline underline-offset-2"
+            style={{ color: "var(--color-accent)" }}
+          >
             Terms of Service
           </Link>
         </footer>
@@ -103,7 +121,7 @@ function Section({
 }: { title: string; children: React.ReactNode }): React.ReactElement {
   return (
     <section className="space-y-2">
-      <h2 className="text-lg font-semibold">{title}</h2>
+      <h2 className="text-base sm:text-lg font-semibold tracking-[-0.01em]">{title}</h2>
       <div style={{ color: "var(--color-text)" }}>{children}</div>
     </section>
   );
