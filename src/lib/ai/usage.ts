@@ -7,16 +7,34 @@ import { db } from "@/lib/data/db";
 import { aiUsage } from "@/lib/data/schema";
 import type { GroqModel } from "./types";
 
+/** The `ai_model` DB enum values (what actually gets stored). */
+type AiModelEnum =
+  | "groq-llama-3.1-8b"
+  | "groq-llama-3.3-70b"
+  | "gemini-2.0-flash"
+  | "gemini-2.5-flash"
+  | "cached";
+
+/** Accept either a raw Groq model id, an already-resolved served-model enum
+ * value (e.g. from streamChatWithFallback().servedBy()), or "cached". */
+type UsageModel = GroqModel | AiModelEnum;
+
 interface RecordUsageInput {
   userId: string;
   feature: string;
-  model: GroqModel | "cached";
+  model: UsageModel;
   tokensUsed: number;
 }
 
-const MODEL_MAP: Record<string, "groq-llama-3.1-8b" | "groq-llama-3.3-70b" | "cached"> = {
+const MODEL_MAP: Record<string, AiModelEnum> = {
+  // Raw Groq SDK ids → enum
   "llama-3.1-8b-instant": "groq-llama-3.1-8b",
   "llama-3.3-70b-versatile": "groq-llama-3.3-70b",
+  // Already-resolved served-model enum values → passthrough
+  "groq-llama-3.1-8b": "groq-llama-3.1-8b",
+  "groq-llama-3.3-70b": "groq-llama-3.3-70b",
+  "gemini-2.0-flash": "gemini-2.0-flash",
+  "gemini-2.5-flash": "gemini-2.5-flash",
   cached: "cached",
 };
 

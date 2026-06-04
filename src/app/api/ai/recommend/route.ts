@@ -1,7 +1,7 @@
 import { runRecommendationGraph } from "@/lib/ai/graphs/recommend-graph";
+import { apiOk } from "@/lib/api/response";
 import { aiGuard } from "@/lib/api/route-guard";
 import { runAiUsage } from "@/lib/limits";
-import { NextResponse } from "next/server";
 import { z } from "zod";
 
 export const dynamic = "force-dynamic";
@@ -48,5 +48,5 @@ export async function POST(req: Request): Promise<Response> {
   );
   if (!run.ok) return run.response;
 
-  return NextResponse.json({ recommendations: run.data });
+  return apiOk({ recommendations: run.data });
 }

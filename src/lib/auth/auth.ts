@@ -1,3 +1,5 @@
+import { ANALYTICS_EVENTS } from "@/lib/analytics/events";
+import { trackServer } from "@/lib/analytics/server";
 import { isSignupAllowed } from "@/lib/auth/access-control";
 import { db } from "@/lib/data/db";
 import { accounts, sessions, users, verifications } from "@/lib/data/schema";
@@ -51,6 +53,20 @@ export const auth = betterAuth({
       maxAge: 5 * 60, // 5 min cookie cache for hot-path session checks
     },
   },
+  // Per-IP rate limiting on the auth API. Defends an invite-only app against
+  // credential stuffing / signup abuse. Sign-in + sign-up get a tighter bucket
+  // than the default. (In-memory store — resets per replica/redeploy, matching
+  // the rest of the app's limiter; fine for v1 single-replica.)
+  rateLimit: {
+    enabled: true,
+    window: 60, // seconds
+    max: 30, // default: 30 auth requests / IP / minute
+    customRules: {
+      "/sign-in/email": { window: 60, max: 8 },
+      "/sign-up/email": { window: 60, max: 5 },
+      "/forget-password": { window: 60, max: 5 },
+    },
+  },
   user: {
     additionalFields: {
       role: { type: "string", required: false, defaultValue: "user", input: false },
@@ -77,6 +93,11 @@ export const auth = betterAuth({
           const isAdminEmail =
             user.email.trim().toLowerCase() === process.env.ADMIN_EMAIL?.trim().toLowerCase();
           return { data: { ...user, status: isAdminEmail ? "approved" : "pending" } };
+        },
+        // Funnel analytics: capture the signup once the account row is created.
+        // Fire-and-forget (no-ops without PostHog configured); never blocks auth.
+        after: async (user) => {
+          void trackServer(user.id, ANALYTICS_EVENTS.signup, {});
         },
       },
     },

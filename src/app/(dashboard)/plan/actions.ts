@@ -1,5 +1,7 @@
 "use server";
 
+import { ANALYTICS_EVENTS } from "@/lib/analytics/events";
+import { trackServer } from "@/lib/analytics/server";
 import { getSession } from "@/lib/auth/get-session";
 import { db } from "@/lib/data/db";
 import { courses, userCourses } from "@/lib/data/schema";
@@ -64,6 +66,7 @@ export async function moveCourseToTerm(input: {
     return { success: false, error: "Course not found or not owned by you" };
   }
 
+  void trackServer(session.user.id, ANALYTICS_EVENTS.term_changed, { toTerm });
   revalidatePath("/plan");
   return { success: true, data: { id: updated.id, term: updated.term ?? toTerm } };
 }
@@ -111,6 +114,7 @@ export async function addCourseToPlan(input: {
 
   if (!inserted) return { success: false, error: "Could not add course" };
 
+  void trackServer(session.user.id, ANALYTICS_EVENTS.course_added, { courseCode, term });
   revalidatePath("/plan");
   return { success: true, data: { id: inserted.id, courseCode, term } };
 }
@@ -219,6 +223,7 @@ export async function removeCourseFromPlan(input: {
 
   if (!deleted) return { success: false, error: "Course not found or not owned by you" };
 
+  void trackServer(session.user.id, ANALYTICS_EVENTS.course_removed, {});
   revalidatePath("/plan");
   return { success: true, data: { id: deleted.id } };
 }

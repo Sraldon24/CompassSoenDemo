@@ -6,7 +6,7 @@
  */
 
 import { _resetGroqQuotaForTesting, checkQuota } from "@/lib/ai/groq-quota";
-import { NextResponse } from "next/server";
+import { apiError } from "@/lib/api/response";
 import { LIMITS } from "./config";
 import { type GuardDecision, Limiter, type QuotaSource, type WithUsageOptions } from "./limiter";
 import { MemoryLimitStore } from "./memory-store";
@@ -33,15 +33,14 @@ export type { GuardDecision, Feature, Identity } from "./limiter";
  */
 export function denyResponse(d: GuardDecision): Response {
   if (d.denyReason === "quota") {
-    return NextResponse.json(
-      { error: `Daily AI quota nearly exhausted${d.quota?.reason ? ` (${d.quota.reason})` : ""}.` },
-      { status: 503 },
+    return apiError(
+      `Daily AI quota nearly exhausted${d.quota?.reason ? ` (${d.quota.reason})` : ""}.`,
+      503,
     );
   }
-  return NextResponse.json(
-    { error: "Rate limit reached. Try again later." },
-    { status: 429, headers: { "Retry-After": String(Math.ceil(d.retryAfterMs / 1000)) } },
-  );
+  return apiError("Rate limit reached. Try again later.", 429, {
+    headers: { "Retry-After": String(Math.ceil(d.retryAfterMs / 1000)) },
+  });
 }
 
 /**
@@ -62,13 +61,9 @@ export async function runAiUsage<T>(
     const data = await withUsage(opts, work);
     return { ok: true, data };
   } catch (err) {
+    // Log the real error server-side; return ONLY the safe static label to the
+    // client (never err.message — it can leak DB/internal details).
     console.error(`[ai] ${opts.feature} failed:`, err);
-    return {
-      ok: false,
-      response: NextResponse.json(
-        { error: err instanceof Error ? err.message : errorLabel },
-        { status: 503 },
-      ),
-    };
+    return { ok: false, response: apiError(errorLabel, 503) };
   }
 }

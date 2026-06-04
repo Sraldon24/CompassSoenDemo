@@ -8,8 +8,8 @@
  */
 
 import { cancelAccountDeletion, scheduleAccountDeletion } from "@/lib/account/gdpr";
+import { apiOk } from "@/lib/api/response";
 import { authGuard } from "@/lib/api/route-guard";
-import { NextResponse } from "next/server";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
@@ -19,8 +19,7 @@ export async function POST(): Promise<Response> {
   if (!guard.ok) return guard.response;
 
   const result = await scheduleAccountDeletion(guard.session.user.id, new Date());
-  return NextResponse.json({
-    ok: true,
+  return apiOk({
     message: `Account scheduled for deletion. You have until ${result.purgeAfter.slice(0, 10)} to change your mind by signing in again.`,
     purgeAfter: result.purgeAfter,
   });
@@ -31,5 +30,5 @@ export async function DELETE(): Promise<Response> {
   if (!guard.ok) return guard.response;
 
   await cancelAccountDeletion(guard.session.user.id);
-  return NextResponse.json({ ok: true, message: "Deletion cancelled. Your account is active." });
+  return apiOk({ message: "Deletion cancelled. Your account is active." });
 }

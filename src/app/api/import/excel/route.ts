@@ -6,20 +6,20 @@
  * lives in `@/lib/imports/excel-engine` (unit-tested without DB/HTTP).
  */
 
+import { apiError, apiOk } from "@/lib/api/response";
 import { getSession } from "@/lib/auth/get-session";
 import { db } from "@/lib/data/db";
 import { checklistItems, courses, importJobs, userCourses } from "@/lib/data/schema";
 import { extractMilestones, parseExcelPlan } from "@/lib/imports/excel-engine";
 import { denyResponse, guardAiCall } from "@/lib/limits";
 import { and, eq } from "drizzle-orm";
-import { NextResponse } from "next/server";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
 
 export async function POST(req: Request): Promise<Response> {
   const session = await getSession();
-  if (!session) return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
+  if (!session) return apiError("Not authenticated", 401);
 
   const decision = guardAiCall({
     feature: "import",
@@ -30,18 +30,13 @@ export async function POST(req: Request): Promise<Response> {
   const form = await req.formData();
   const file = form.get("file") as File | null;
   const mode = (form.get("mode") as "preview" | "commit") ?? "preview";
-  if (!file) return NextResponse.json({ error: "No file uploaded" }, { status: 400 });
+  if (!file) return apiError("No file uploaded", 400);
 
   // Hard size cap. Real Concordia plans are <100 KB; 5 MB gives plenty of headroom
   // while protecting against accidental or malicious oversized uploads from OOMing Node.
   const MAX_BYTES = 5 * 1024 * 1024;
   if (file.size > MAX_BYTES) {
-    return NextResponse.json(
-      {
-        error: `File too large (${(file.size / 1024 / 1024).toFixed(1)} MB). Max 5 MB.`,
-      },
-      { status: 413 },
-    );
+    return apiError("File too large. Max 5 MB.", 413);
   }
 
   const buf = await file.arrayBuffer();
@@ -53,7 +48,7 @@ export async function POST(req: Request): Promise<Response> {
   const parsed = parseExcelPlan(buf, validCodes);
 
   if (mode === "preview") {
-    return NextResponse.json({
+    return apiOk({
       total: parsed.length,
       ok: parsed.filter((r) => r.errors.length === 0).length,
       errored: parsed.filter((r) => r.errors.length > 0).length,
@@ -77,10 +72,7 @@ export async function POST(req: Request): Promise<Response> {
   const usable = skipErrors ? chosen.filter((r) => r.errors.length === 0) : chosen;
   const hasErrors = usable.some((r) => r.errors.length > 0);
   if (hasErrors) {
-    return NextResponse.json(
-      { error: "Some rows have errors. Re-submit with skipErrors=true to ignore them." },
-      { status: 400 },
-    );
+    return apiError("Some rows have errors. Re-submit with skipErrors=true to ignore them.", 400);
   }
 
   const [job] = await db
@@ -95,7 +87,7 @@ export async function POST(req: Request): Promise<Response> {
     .returning({ id: importJobs.id });
 
   if (!job) {
-    return NextResponse.json({ error: "Failed to create import job" }, { status: 500 });
+    return apiError("Failed to create import job", 500);
   }
 
   // Wipe-and-replace the plan inside a transaction so a partial-insert failure
@@ -142,6 +134,7 @@ export async function POST(req: Request): Promise<Response> {
     });
   } catch (err) {
     // The transaction rolled back the wipe; mark the job as failed and surface a 500.
+    console.error("Excel import transaction failed:", err);
     await db
       .update(importJobs)
       .set({
@@ -151,10 +144,7 @@ export async function POST(req: Request): Promise<Response> {
         completedAt: new Date(),
       })
       .where(eq(importJobs.id, job.id));
-    return NextResponse.json(
-      { error: "Import failed and was rolled back. Your existing plan is unchanged." },
-      { status: 500 },
-    );
+    return apiError("Import failed and was rolled back. Your existing plan is unchanged.", 500);
   }
 
   await db
@@ -166,5 +156,5 @@ export async function POST(req: Request): Promise<Response> {
     })
     .where(eq(importJobs.id, job.id));
 
-  return NextResponse.json({ jobId: job.id, imported: inserted });
+  return apiOk({ jobId: job.id, imported: inserted });
 }

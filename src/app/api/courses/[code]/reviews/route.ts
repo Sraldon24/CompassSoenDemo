@@ -7,9 +7,9 @@
  * as a "review."
  */
 
+import { apiError, apiOk } from "@/lib/api/response";
 import { courseGuard, courseThenLimitGuard } from "@/lib/api/route-guard";
 import { getCourseReviews, submitReview } from "@/lib/community/reviews";
-import { NextResponse } from "next/server";
 import { z } from "zod";
 
 export const dynamic = "force-dynamic";
@@ -35,7 +35,7 @@ export async function GET(_request: Request, context: RouteContext): Promise<Res
   if (!guard.ok) return guard.response;
 
   const summary = await getCourseReviews(guard.code);
-  return NextResponse.json({ courseCode: guard.code, ...summary });
+  return apiOk({ courseCode: guard.code, ...summary });
 }
 
 export async function POST(request: Request, context: RouteContext): Promise<Response> {
@@ -48,10 +48,8 @@ export async function POST(request: Request, context: RouteContext): Promise<Res
   try {
     parsed = submitSchema.parse(await request.json());
   } catch (err) {
-    return NextResponse.json(
-      { error: "invalid_body", detail: err instanceof Error ? err.message : "unknown" },
-      { status: 400 },
-    );
+    console.error(`[reviews] invalid body for ${code}:`, err);
+    return apiError("invalid_body", 400);
   }
 
   try {
@@ -66,12 +64,9 @@ export async function POST(request: Request, context: RouteContext): Promise<Res
       comment: parsed.comment ?? null,
       isAnonymous: parsed.isAnonymous ?? true,
     });
-    return NextResponse.json({ ok: true, reviewId: id });
+    return apiOk({ reviewId: id });
   } catch (err) {
     console.error(`[reviews] submit failed for ${code}:`, err);
-    return NextResponse.json(
-      { error: "submit_failed", detail: err instanceof Error ? err.message : "unknown" },
-      { status: 500 },
-    );
+    return apiError("submit_failed", 500);
   }
 }

@@ -1,16 +1,16 @@
 import { ANALYTICS_EVENTS } from "@/lib/analytics/events";
 import { trackServer } from "@/lib/analytics/server";
 import { getSession } from "@/lib/auth/get-session";
+import { apiError } from "@/lib/api/response";
 import { getUserPlanSnapshot } from "@/lib/data/queries/plan";
 import { type ICSEvent, buildICS, termToStartDate } from "@/lib/exports/ics";
-import { NextResponse } from "next/server";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
 
 export async function GET(): Promise<Response> {
   const session = await getSession();
-  if (!session) return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
+  if (!session) return apiError("unauthorized", 401);
 
   const { userPlan, catalog } = await getUserPlanSnapshot(session.user.id);
 

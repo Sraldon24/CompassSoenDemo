@@ -17,6 +17,9 @@ export const groqProvider: LlmProvider = {
       system: input.system,
       messages: input.messages,
       temperature: input.temperature ?? 0.4,
+      // Honor the caller's output cap (recommend/email/review/summarize set this).
+      // Previously dropped here → every Groq completion ran uncapped.
+      ...(input.maxTokens ? { maxOutputTokens: input.maxTokens } : {}),
       maxRetries: 0, // provider.ts handles retries
     });
     return { text: result.text, usage: { tokens: result.usage?.totalTokens ?? 0 } };

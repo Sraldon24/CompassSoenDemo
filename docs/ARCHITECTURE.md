@@ -363,7 +363,7 @@ This document captures **why** we made each major technical decision. Useful for
 
 ### ADR-012: Groq-only AI provider for v1 (Gemini fallback deferred)
 
-**Status:** Accepted
+**Status:** Superseded by ADR-016 (2026-06-04)
 **Date:** 2026-05-27
 **Supersedes part of:** ADR-004
 
@@ -459,6 +459,36 @@ Total: **124 courses** with prereqs, credits, categories. Seeded into Postgres v
 - Catalog drifts if Concordia updates §71.70.10 between v1 and Phase 4. Mitigation: PRD §15 admin-review queue.
 - Manual review of `courses-supplementary.json` before commit caught at least one ambiguity (ENGR 245 / MIAE 221 as Eng & Nat Sci Group alternatives — both are valid).
 - Removing 17 stale courses or fixing a wrong credit value requires editing the JSON, not the DB directly.
+
+---
+
+### ADR-016: Gemini 2.5 Flash for fast chat + OpenRouter free fallback (formalized)
+
+**Status:** Accepted
+**Date:** 2026-06-04
+**Supersedes:** ADR-012 (and the "Groq-only, no Gemini" constraint as stated in earlier docs)
+
+**Context:** ADR-012 deferred Gemini and shipped Groq-only with retry+backoff. In practice the AI layer evolved past that during the AI/speed work: the streaming chat path now races Groq 70B against a fast model, and OpenRouter free models were added as a cross-provider fallback for the non-streaming path. A backend audit (2026-06) surfaced that the code contradicted the documented "Groq-only, no Gemini" constraint. Rather than rip out a working, free-tier path, we formalize the real architecture.
+
+**Decision:** The AI provider is a **layered, all-free chain**, not single-provider:
+
+1. **Streaming chat** (`streamChatWithFallback`): quality-first race — start Groq **70B**, and if it hasn't produced a first token within ~8s (or the 70B daily quota is throttled, or the query is a simple lookup), stream from the **fast model**: **Gemini 2.5 Flash** (Google AI Studio free tier) when `GEMINI_API_KEY` is set, else Groq **8B-instant**. The served model is recorded accurately in `ai_usage` / `ai_messages` (enum includes `gemini-2.5-flash`).
+2. **Non-streaming** (`generateResponse`, used by recommend/email/review/insight/summarize): Groq selected model → Groq 8B downgrade → **OpenRouter free models** (`:free` only, never-spend guards per ADR/`project-openrouter-never-spend`). Network errors (no HTTP status) are treated as retryable so transient blips fall through the chain instead of hard-failing.
+
+**Rationale:**
+- Gemini 2.5 Flash is genuinely free (AI Studio tier), fast (~1.2s first token), and independent of Groq's quota — it directly serves the PRD's "<2s first token" budget on the most-used surface (chat).
+- OpenRouter's `:free` tier (unlocked by a $5 credit that is **never spent** — three guards) gives real cross-provider resilience for the batch paths when Groq throttles, at $0/mo.
+- All three providers are free; the $0/month constraint is preserved. The only constraint relaxed is the *literal* "no Gemini" wording, which was already false in code.
+
+**Constraints that still hold:**
+- **No paid APIs.** No OpenAI/Anthropic direct calls. OpenRouter is `:free`-only with an allowlist + per-process balance pre-flight + dashboard cap; the $5 credit must never be drawn down.
+- Groq remains the primary/quality model (70B) for chat and the batch paths.
+
+**Consequences:**
+- Adds `@ai-sdk/google` as a (free-tier) dependency on the chat hot path — accepted.
+- Three model behaviors to keep prompts robust against (Llama 70B/8B, Gemini, OpenRouter free models). Prompts are written provider-agnostic.
+- `.env.local.example` documents `GEMINI_API_KEY` and `OPENROUTER_API_KEY` as optional; the app still runs Groq-only if neither is set (graceful degradation).
+- The OpenRouter free-model slug list drifts upstream; the rotation falls through 404s, so a stale entry degrades gracefully rather than breaking the fallback. Verified against the live `/models` catalog on 2026-06.
 
 ---
 

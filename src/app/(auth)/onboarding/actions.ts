@@ -1,5 +1,7 @@
 "use server";
 
+import { ANALYTICS_EVENTS } from "@/lib/analytics/events";
+import { trackServer } from "@/lib/analytics/server";
 import { getSession } from "@/lib/auth/get-session";
 import { db } from "@/lib/data/db";
 import { profiles } from "@/lib/data/schema";
@@ -69,6 +71,10 @@ export async function completeOnboarding(): Promise<ActionResult<{ ok: true }>> 
     onboardingCompleted: true,
     onboardingStep: 3,
   });
+
+  // Emit BEFORE redirect() (which throws to unwind), and await so the serverless
+  // function doesn't freeze before the event flushes.
+  await trackServer(session.user.id, ANALYTICS_EVENTS.onboarding_completed, {});
 
   revalidatePath("/dashboard");
   redirect("/dashboard");

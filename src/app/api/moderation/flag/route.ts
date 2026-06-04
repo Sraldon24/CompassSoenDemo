@@ -6,9 +6,9 @@
  * can't mass-flag the board.
  */
 
+import { apiError, apiOk } from "@/lib/api/response";
 import { authLimitGuard } from "@/lib/api/route-guard";
 import { type FlaggableEntity, flagEntity } from "@/lib/community/moderation";
-import { NextResponse } from "next/server";
 import { z } from "zod";
 
 export const dynamic = "force-dynamic";
@@ -29,7 +29,7 @@ export async function POST(request: Request): Promise<Response> {
   try {
     parsed = bodySchema.parse(await request.json());
   } catch {
-    return NextResponse.json({ error: "invalid_body" }, { status: 400 });
+    return apiError("invalid_body", 400);
   }
 
   try {
@@ -39,9 +39,9 @@ export async function POST(request: Request): Promise<Response> {
       entityId: parsed.entityId,
       reason: parsed.reason,
     });
-    return NextResponse.json({ ok: true, ...result });
+    return apiOk({ ok: true, ...result });
   } catch (err) {
     console.error("[moderation] flag failed:", err);
-    return NextResponse.json({ error: "flag_failed" }, { status: 500 });
+    return apiError("flag_failed", 500);
   }
 }

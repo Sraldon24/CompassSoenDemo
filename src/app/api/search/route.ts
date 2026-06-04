@@ -1,10 +1,10 @@
 import { embed } from "@/lib/ai/embeddings";
+import { apiOk } from "@/lib/api/response";
 import { getSession } from "@/lib/auth/get-session";
 import { db } from "@/lib/data/db";
 import { courses } from "@/lib/data/schema";
 import { denyResponse, guardAiCall } from "@/lib/limits";
 import { ilike, or, sql } from "drizzle-orm";
-import { NextResponse } from "next/server";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
@@ -27,7 +27,7 @@ export async function GET(req: Request): Promise<Response> {
   const mode = url.searchParams.get("mode") === "semantic" ? "semantic" : "keyword";
 
   if (query.length === 0) {
-    return NextResponse.json({ results: [] });
+    return apiOk({ results: [] });
   }
 
   // Rate limit by user when authed, else by IP (anonymous users can still search).
@@ -90,5 +90,5 @@ export async function GET(req: Request): Promise<Response> {
     }));
   }
 
-  return NextResponse.json({ results, mode });
+  return apiOk({ results, mode });
 }

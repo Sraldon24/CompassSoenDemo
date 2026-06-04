@@ -23,13 +23,21 @@ import type { LlmCallInput, LlmGenerateResult, LlmProvider } from "../llm-port";
 const OPENROUTER_API = "https://openrouter.ai/api/v1/chat/completions";
 const OPENROUTER_KEY_URL = "https://openrouter.ai/api/v1/auth/key";
 
-/** Pre-vetted free models, in priority order. All end in ":free" (guard #1). */
+/**
+ * Pre-vetted free models, in priority order. All end in ":free" (guard #1).
+ *
+ * Verified against the live OpenRouter /models catalog (2026-06). Free model ids
+ * drift over time — when a slug 404s the rotation just falls through to the next,
+ * so a stale entry degrades gracefully rather than breaking the fallback. Keep
+ * general-purpose *instruct* models here (no coder/safety/vision-only variants),
+ * ordered strongest-first.
+ */
 export const OPENROUTER_FREE_MODELS = [
-  "nvidia/nemotron-3-super-120b-a12b:free",
   "meta-llama/llama-3.3-70b-instruct:free",
-  "deepseek/deepseek-v4-flash:free",
-  "google/gemma-4-31b-it:free",
   "qwen/qwen3-next-80b-a3b-instruct:free",
+  "nvidia/nemotron-3-super-120b-a12b:free",
+  "google/gemma-4-31b-it:free",
+  "openai/gpt-oss-120b:free",
 ] as const;
 
 const REFERER = "https://github.com/Sraldon24/CompassSoenDemo";

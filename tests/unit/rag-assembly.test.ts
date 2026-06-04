@@ -12,6 +12,7 @@ import {
   type RedditHit,
   assembleRAGContext,
   extractCodesFromQuery,
+  similarityFromDistance,
 } from "@/lib/ai/rag";
 import { describe, expect, it } from "vitest";
 
@@ -71,9 +72,33 @@ describe("assembleRAGContext", () => {
     expect(r.sources[0]?.id).toBe("course:COMP 352");
   });
 
-  it("clamps negative similarity (distance > 1) to 0", () => {
-    const r = assembleRAGContext({ ...empty, courseHits: [courseHit("COMP 352", 1.6)] });
-    expect(r.sources[0]?.score).toBe(0);
+  it("similarityFromDistance clamps to [0, 1]", () => {
+    expect(similarityFromDistance(0.25)).toBeCloseTo(0.75);
+    expect(similarityFromDistance(1.6)).toBe(0); // distance > 1 → clamp to 0
+    expect(similarityFromDistance(-0.4)).toBe(1); // distance < 0 → clamp to 1
+  });
+
+  it("drops semantic hits below the relevance floor (noise filtering)", () => {
+    // similarity 1 - 0.95 = 0.05 < 0.2 floor → filtered out entirely.
+    const r = assembleRAGContext({ ...empty, courseHits: [courseHit("COMP 352", 0.95)] });
+    expect(r.sources).toEqual([]);
+    expect(r.text).toBe("");
+  });
+
+  it("keeps semantic hits at or above the relevance floor", () => {
+    // similarity 1 - 0.79 = 0.21 ≥ 0.2 floor → kept.
+    const r = assembleRAGContext({ ...empty, courseHits: [courseHit("COMP 352", 0.79)] });
+    expect(r.sources[0]?.id).toBe("course:COMP 352");
+  });
+
+  it("never filters force-included explicit mentions (always score 1.0)", () => {
+    // Even paired with a noisy semantic hit, the explicit course survives.
+    const r = assembleRAGContext({
+      ...empty,
+      explicitHits: [explicit("COMP 472")],
+      courseHits: [courseHit("COMP 352", 0.99)], // below floor → dropped
+    });
+    expect(r.sources.map((s) => s.id)).toEqual(["course:COMP 472"]);
   });
 
   it("force-includes explicit mentions FIRST with score 1.0 and an E-prefixed section", () => {

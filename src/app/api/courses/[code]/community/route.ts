@@ -12,9 +12,9 @@
  * historical order for this route).
  */
 
+import { apiError, apiOk } from "@/lib/api/response";
 import { courseLimitGuard } from "@/lib/api/route-guard";
 import { getCourseSummary } from "@/lib/community/summaries";
-import { NextResponse } from "next/server";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
@@ -32,13 +32,13 @@ export async function GET(_request: Request, context: RouteContext): Promise<Res
   try {
     const row = await getCourseSummary(code);
     if (!row) {
-      return NextResponse.json({
+      return apiOk({
         courseCode: code,
         hasData: false,
         message: "No community discussion found yet for this course.",
       });
     }
-    return NextResponse.json({
+    return apiOk({
       courseCode: code,
       hasData: true,
       generatedAt: row.generatedAt.toISOString(),
@@ -46,13 +46,8 @@ export async function GET(_request: Request, context: RouteContext): Promise<Res
       summary: row.summary,
     });
   } catch (err) {
+    // Log the real error server-side; return only a safe static label (no leak).
     console.error(`[community] failed for ${code}:`, err);
-    return NextResponse.json(
-      {
-        error: "summary_generation_failed",
-        detail: err instanceof Error ? err.message : "unknown",
-      },
-      { status: 500 },
-    );
+    return apiError("summary_generation_failed", 500);
   }
 }

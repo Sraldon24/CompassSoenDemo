@@ -23,25 +23,26 @@ import {
   denyResponse,
   guardAiCall,
 } from "@/lib/limits";
-import { NextResponse } from "next/server";
 import type { z } from "zod";
 import { normalizeCourseCode } from "./course-code";
+import { apiError } from "./response";
 
 type Session = NonNullable<Awaited<ReturnType<typeof getSession>>>;
+
+/** Max JSON body size accepted by /ai/* routes (bytes). Chat is the largest
+ * payload at ~2k chars; 64 KB is a generous ceiling that blocks abuse. */
+const MAX_AI_BODY_BYTES = 64 * 1024;
 
 export type GuardDenied = { ok: false; response: Response };
 export type GuardOkAuth = { ok: true; session: Session; code: undefined };
 export type GuardOkCourse = { ok: true; session: Session; code: string };
 
 function unauthorized(): GuardDenied {
-  return { ok: false, response: NextResponse.json({ error: "unauthorized" }, { status: 401 }) };
+  return { ok: false, response: apiError("unauthorized", 401) };
 }
 
 function invalidCode(): GuardDenied {
-  return {
-    ok: false,
-    response: NextResponse.json({ error: "invalid_course_code" }, { status: 400 }),
-  };
+  return { ok: false, response: apiError("invalid_course_code", 400) };
 }
 
 /** Community-flavored deny envelope, byte-identical to what these routes
@@ -52,10 +53,10 @@ function communityDeny(decision: { retryAfterMs: number }): GuardDenied {
   const retryAfter = Math.ceil(decision.retryAfterMs / 1000);
   return {
     ok: false,
-    response: NextResponse.json(
-      { error: "rate_limited", retryAfter },
-      { status: 429, headers: { "Retry-After": String(retryAfter) } },
-    ),
+    response: apiError("rate_limited", 429, {
+      headers: { "Retry-After": String(retryAfter) },
+      data: { retryAfter },
+    }),
   };
 }
 
@@ -127,9 +128,9 @@ export async function courseThenLimitGuard(
 
 export type AiGuardOk<T> = { ok: true; session: Session; body: T; decision: GuardDecision };
 
-/** Bad-request envelope used by /ai/* routes (matches their historical shape). */
+/** Bad-request envelope used by /ai/* routes. */
 function badRequest(message: string): GuardDenied {
-  return { ok: false, response: NextResponse.json({ error: message }, { status: 400 }) };
+  return { ok: false, response: apiError(message, 400) };
 }
 
 /**
@@ -146,13 +147,16 @@ export async function aiGuard<T>(
   model?: GroqModel,
 ): Promise<GuardDenied | AiGuardOk<T>> {
   const session = await getSession();
-  // /ai/* routes historically emit `{error:"Not authenticated"}`, NOT the
-  // community `{error:"unauthorized"}` — preserve it (zero observable change).
   if (!session) {
-    return {
-      ok: false,
-      response: NextResponse.json({ error: "Not authenticated" }, { status: 401 }),
-    };
+    return { ok: false, response: apiError("unauthorized", 401) };
+  }
+
+  // Reject oversized bodies before parsing them into memory. All /ai/* payloads
+  // are small (the largest field is a ~2k-char chat message), so 64 KB is a
+  // generous ceiling that still blocks abuse.
+  const declaredLength = Number(req.headers.get("content-length") ?? 0);
+  if (declaredLength > MAX_AI_BODY_BYTES) {
+    return { ok: false, response: apiError("Request body too large", 413) };
   }
 
   let body: T;

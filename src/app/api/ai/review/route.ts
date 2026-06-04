@@ -12,6 +12,7 @@
 
 import { createHash } from "node:crypto";
 import { generateResponse } from "@/lib/ai/provider";
+import { apiError, apiOk } from "@/lib/api/response";
 import { getSession } from "@/lib/auth/get-session";
 import { db } from "@/lib/data/db";
 import { getAllCourses, getUserPlanSnapshot } from "@/lib/data/queries/plan";
@@ -20,7 +21,6 @@ import { denyResponse, guardAiCall, runAiUsage } from "@/lib/limits";
 import { buildPlan, validatePlan } from "@/lib/validation/plan";
 import { eq } from "drizzle-orm";
 import type { NextRequest } from "next/server";
-import { NextResponse } from "next/server";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
@@ -43,7 +43,7 @@ Respond with ONLY a JSON array (no prose, no markdown) of objects:
 
 export async function GET(req: NextRequest): Promise<Response> {
   const session = await getSession();
-  if (!session) return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
+  if (!session) return apiError("Not authenticated", 401);
 
   // ?refresh=1 forces a fresh LLM pass (the Refresh button); otherwise we serve
   // a cached review when the plan hasn't changed — avoiding repeat token spend.
@@ -56,7 +56,7 @@ export async function GET(req: NextRequest): Promise<Response> {
   const catalog = new Map(catalogList.map((c) => [c.code, c]));
 
   if (userPlan.length === 0) {
-    return NextResponse.json({
+    return apiOk({
       suggestions: [
         {
           kind: "elective",
@@ -101,7 +101,7 @@ export async function GET(req: NextRequest): Promise<Response> {
       .where(eq(aiReviewCache.userId, session.user.id))
       .limit(1);
     if (hit && hit.planHash === planHash) {
-      return NextResponse.json({ suggestions: hit.suggestions, cached: true });
+      return apiOk({ suggestions: hit.suggestions, cached: true });
     }
   }
 
@@ -147,7 +147,7 @@ export async function GET(req: NextRequest): Promise<Response> {
       set: { planHash, suggestions: run.data, generatedAt: new Date() },
     });
 
-  return NextResponse.json({ suggestions: run.data, remaining: decision.remaining, cached: false });
+  return apiOk({ suggestions: run.data, remaining: decision.remaining, cached: false });
 }
 
 /** Extract the JSON array from the model output, tolerating stray prose/fences. */

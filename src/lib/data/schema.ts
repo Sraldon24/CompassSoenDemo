@@ -9,7 +9,7 @@
  * (user, session, account, verification) to these plural names — see `src/lib/auth.ts`.
  */
 
-import { relations } from "drizzle-orm";
+import { relations, sql } from "drizzle-orm";
 import {
   boolean,
   index,
@@ -21,6 +21,7 @@ import {
   real,
   text,
   timestamp,
+  uniqueIndex,
   uuid,
   vector,
 } from "drizzle-orm/pg-core";
@@ -69,6 +70,7 @@ export const aiModelEnum = pgEnum("ai_model", [
   "groq-llama-3.1-8b",
   "groq-llama-3.3-70b",
   "gemini-2.0-flash",
+  "gemini-2.5-flash",
   "cached",
 ]);
 
@@ -77,21 +79,28 @@ export const aiModelEnum = pgEnum("ai_model", [
 // Plural name per PRD; Better Auth singular `user` aliased via config.
 // ============================================================================
 
-export const users = pgTable("users", {
-  id: text("id").primaryKey(),
-  email: text("email").notNull().unique(),
-  emailVerified: boolean("email_verified").default(false).notNull(),
-  name: text("name"),
-  image: text("image"),
-  role: text("role").default("user").notNull(),
-  // Invite-only access (layer 2). New signups start "pending"; an admin approves
-  // them via /admin/users. Default "approved" so the migration grandfathers in
-  // all existing accounts. Values: "pending" | "approved" | "rejected".
-  status: text("status").default("approved").notNull(),
-  createdAt: timestamp("created_at").defaultNow().notNull(),
-  updatedAt: timestamp("updated_at").defaultNow().notNull(),
-  deletedAt: timestamp("deleted_at"),
-});
+export const users = pgTable(
+  "users",
+  {
+    id: text("id").primaryKey(),
+    email: text("email").notNull().unique(),
+    emailVerified: boolean("email_verified").default(false).notNull(),
+    name: text("name"),
+    image: text("image"),
+    role: text("role").default("user").notNull(),
+    // Invite-only access (layer 2). New signups start "pending"; an admin approves
+    // them via /admin/users. Default "approved" so the migration grandfathers in
+    // all existing accounts. Values: "pending" | "approved" | "rejected".
+    status: text("status").default("approved").notNull(),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at").defaultNow().notNull(),
+    deletedAt: timestamp("deleted_at"),
+  },
+  (table) => ({
+    // Admin /users list filters + orders by status.
+    statusIdx: index("idx_users_status").on(table.status),
+  }),
+);
 
 export const sessions = pgTable("sessions", {
   id: text("id").primaryKey(),
@@ -215,24 +224,32 @@ export const courseEmbeddings = pgTable(
 // USER PLAN (user_courses)
 // ============================================================================
 
-export const userCourses = pgTable("user_courses", {
-  id: uuid("id").primaryKey().defaultRandom(),
-  userId: text("user_id")
-    .references(() => users.id, { onDelete: "cascade" })
-    .notNull(),
-  courseCode: text("course_code")
-    .references(() => courses.code)
-    .notNull(),
-  status: courseStatusEnum("status").default("planned").notNull(),
-  term: text("term"),
-  year: integer("year"),
-  grade: text("grade"),
-  gradePoint: real("grade_point"),
-  isDeficiency: boolean("is_deficiency").default(false).notNull(),
-  notes: text("notes"),
-  createdAt: timestamp("created_at").defaultNow().notNull(),
-  updatedAt: timestamp("updated_at").defaultNow().notNull(),
-});
+export const userCourses = pgTable(
+  "user_courses",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    userId: text("user_id")
+      .references(() => users.id, { onDelete: "cascade" })
+      .notNull(),
+    courseCode: text("course_code")
+      .references(() => courses.code)
+      .notNull(),
+    status: courseStatusEnum("status").default("planned").notNull(),
+    term: text("term"),
+    year: integer("year"),
+    grade: text("grade"),
+    gradePoint: real("grade_point"),
+    isDeficiency: boolean("is_deficiency").default(false).notNull(),
+    notes: text("notes"),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at").defaultNow().notNull(),
+  },
+  (table) => ({
+    // Hot path: every plan/dashboard/RAG read filters by user_id.
+    userIdx: index("idx_user_courses_user").on(table.userId),
+    courseIdx: index("idx_user_courses_course").on(table.courseCode),
+  }),
+);
 
 // ============================================================================
 // DEADLINES + CHECKLIST
@@ -287,50 +304,81 @@ export const difficultyVotes = pgTable(
   },
   (table) => ({
     pk: primaryKey({ columns: [table.userId, table.courseCode] }),
+    // Difficulty aggregate for a course filters by course_code (PK leads with
+    // user_id, so it doesn't serve this query).
+    courseIdx: index("idx_difficulty_votes_course").on(table.courseCode),
   }),
 );
 
-export const professors = pgTable("professors", {
-  id: uuid("id").primaryKey().defaultRandom(),
-  name: text("name").notNull(),
-  department: text("department"),
-  email: text("email"),
-  externalUrl: text("external_url"),
-  createdAt: timestamp("created_at").defaultNow().notNull(),
-});
+export const professors = pgTable(
+  "professors",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    name: text("name").notNull(),
+    department: text("department"),
+    email: text("email"),
+    externalUrl: text("external_url"),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (table) => ({
+    // Case-insensitive uniqueness so "Leila Kosseim" / "leila kosseim" can't
+    // create duplicate rows (which would split a professor's review aggregates).
+    // submitReview() relies on this for onConflictDoNothing.
+    nameUnique: uniqueIndex("uq_professors_name_lower").on(sql`lower(${table.name})`),
+  }),
+);
 
-export const professorReviews = pgTable("professor_reviews", {
-  id: uuid("id").primaryKey().defaultRandom(),
-  userId: text("user_id")
-    .references(() => users.id, { onDelete: "cascade" })
-    .notNull(),
-  professorId: uuid("professor_id")
-    .references(() => professors.id)
-    .notNull(),
-  courseCode: text("course_code").references(() => courses.code),
-  rating: integer("rating").notNull(),
-  difficulty: integer("difficulty"),
-  term: text("term"),
-  wouldTakeAgain: boolean("would_take_again"),
-  comment: text("comment"),
-  isAnonymous: boolean("is_anonymous").default(true).notNull(),
-  moderationStatus: moderationStatusEnum("moderation_status").default("active").notNull(),
-  createdAt: timestamp("created_at").defaultNow().notNull(),
-});
+export const professorReviews = pgTable(
+  "professor_reviews",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    userId: text("user_id")
+      .references(() => users.id, { onDelete: "cascade" })
+      .notNull(),
+    professorId: uuid("professor_id")
+      .references(() => professors.id)
+      .notNull(),
+    courseCode: text("course_code").references(() => courses.code),
+    rating: integer("rating").notNull(),
+    difficulty: integer("difficulty"),
+    term: text("term"),
+    wouldTakeAgain: boolean("would_take_again"),
+    comment: text("comment"),
+    isAnonymous: boolean("is_anonymous").default(true).notNull(),
+    moderationStatus: moderationStatusEnum("moderation_status").default("active").notNull(),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (table) => ({
+    // Course detail page lists active reviews for a course.
+    courseStatusIdx: index("idx_prof_reviews_course_status").on(
+      table.courseCode,
+      table.moderationStatus,
+    ),
+    professorIdx: index("idx_prof_reviews_professor").on(table.professorId),
+  }),
+);
 
-export const moderationFlags = pgTable("moderation_flags", {
-  id: uuid("id").primaryKey().defaultRandom(),
-  reporterId: text("reporter_id")
-    .references(() => users.id)
-    .notNull(),
-  entityType: text("entity_type").notNull(),
-  entityId: text("entity_id").notNull(),
-  reason: text("reason").notNull(),
-  status: text("status").default("pending").notNull(),
-  reviewedBy: text("reviewed_by").references(() => users.id),
-  reviewedAt: timestamp("reviewed_at"),
-  createdAt: timestamp("created_at").defaultNow().notNull(),
-});
+export const moderationFlags = pgTable(
+  "moderation_flags",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    reporterId: text("reporter_id")
+      .references(() => users.id)
+      .notNull(),
+    entityType: text("entity_type").notNull(),
+    entityId: text("entity_id").notNull(),
+    reason: text("reason").notNull(),
+    status: text("status").default("pending").notNull(),
+    reviewedBy: text("reviewed_by").references(() => users.id),
+    reviewedAt: timestamp("reviewed_at"),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (table) => ({
+    // Moderation queue lists pending flags.
+    statusIdx: index("idx_moderation_flags_status").on(table.status),
+    entityIdx: index("idx_moderation_flags_entity").on(table.entityType, table.entityId),
+  }),
+);
 
 // ============================================================================
 // AI CONVERSATIONS + USAGE
@@ -346,18 +394,28 @@ export const aiConversations = pgTable("ai_conversations", {
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
 
-export const aiMessages = pgTable("ai_messages", {
-  id: uuid("id").primaryKey().defaultRandom(),
-  conversationId: uuid("conversation_id")
-    .references(() => aiConversations.id, { onDelete: "cascade" })
-    .notNull(),
-  role: text("role").notNull(),
-  content: text("content").notNull(),
-  model: aiModelEnum("model"),
-  tokensUsed: integer("tokens_used"),
-  contextSources: jsonb("context_sources").$type<string[]>(),
-  createdAt: timestamp("created_at").defaultNow().notNull(),
-});
+export const aiMessages = pgTable(
+  "ai_messages",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    conversationId: uuid("conversation_id")
+      .references(() => aiConversations.id, { onDelete: "cascade" })
+      .notNull(),
+    role: text("role").notNull(),
+    content: text("content").notNull(),
+    model: aiModelEnum("model"),
+    tokensUsed: integer("tokens_used"),
+    contextSources: jsonb("context_sources").$type<string[]>(),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (table) => ({
+    // Chat history load fetches a conversation's messages ordered by time.
+    conversationIdx: index("idx_ai_messages_conversation").on(
+      table.conversationId,
+      table.createdAt,
+    ),
+  }),
+);
 
 /**
  * AI Review cache — one row per user. Stores the last generated review keyed by
@@ -409,45 +467,66 @@ export const importJobs = pgTable("import_jobs", {
   completedAt: timestamp("completed_at"),
 });
 
-export const usageEvents = pgTable("usage_events", {
-  id: uuid("id").primaryKey().defaultRandom(),
-  userId: text("user_id").references(() => users.id),
-  sessionId: text("session_id"),
-  eventName: text("event_name").notNull(),
-  properties: jsonb("properties"),
-  createdAt: timestamp("created_at").defaultNow().notNull(),
-});
+export const usageEvents = pgTable(
+  "usage_events",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    userId: text("user_id").references(() => users.id),
+    sessionId: text("session_id"),
+    eventName: text("event_name").notNull(),
+    properties: jsonb("properties"),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (table) => ({
+    // Analytics queries slice by event name over time.
+    eventTimeIdx: index("idx_usage_events_name_time").on(table.eventName, table.createdAt),
+  }),
+);
 
 // ============================================================================
 // SCRAPING + REDDIT (Phase 4)
 // ============================================================================
 
-export const scrapedChanges = pgTable("scraped_changes", {
-  id: uuid("id").primaryKey().defaultRandom(),
-  source: text("source").notNull(),
-  entityType: text("entity_type").notNull(),
-  entityId: text("entity_id").notNull(),
-  changeType: text("change_type").notNull(),
-  oldValue: jsonb("old_value"),
-  newValue: jsonb("new_value"),
-  status: text("status").default("pending").notNull(),
-  reviewedBy: text("reviewed_by").references(() => users.id),
-  reviewedAt: timestamp("reviewed_at"),
-  createdAt: timestamp("created_at").defaultNow().notNull(),
-});
+export const scrapedChanges = pgTable(
+  "scraped_changes",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    source: text("source").notNull(),
+    entityType: text("entity_type").notNull(),
+    entityId: text("entity_id").notNull(),
+    changeType: text("change_type").notNull(),
+    oldValue: jsonb("old_value"),
+    newValue: jsonb("new_value"),
+    status: text("status").default("pending").notNull(),
+    reviewedBy: text("reviewed_by").references(() => users.id),
+    reviewedAt: timestamp("reviewed_at"),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (table) => ({
+    // Admin /scraped-changes review queue filters by status.
+    statusIdx: index("idx_scraped_changes_status").on(table.status),
+  }),
+);
 
-export const redditPosts = pgTable("reddit_posts", {
-  id: text("id").primaryKey(),
-  courseCode: text("course_code").references(() => courses.code),
-  title: text("title").notNull(),
-  body: text("body"),
-  author: text("author"),
-  score: integer("score"),
-  numComments: integer("num_comments"),
-  url: text("url"),
-  postedAt: timestamp("posted_at"),
-  fetchedAt: timestamp("fetched_at").defaultNow().notNull(),
-});
+export const redditPosts = pgTable(
+  "reddit_posts",
+  {
+    id: text("id").primaryKey(),
+    courseCode: text("course_code").references(() => courses.code),
+    title: text("title").notNull(),
+    body: text("body"),
+    author: text("author"),
+    score: integer("score"),
+    numComments: integer("num_comments"),
+    url: text("url"),
+    postedAt: timestamp("posted_at"),
+    fetchedAt: timestamp("fetched_at").defaultNow().notNull(),
+  },
+  (table) => ({
+    // Summaries pull a course's posts by course_code.
+    courseIdx: index("idx_reddit_posts_course").on(table.courseCode),
+  }),
+);
 
 export const redditEmbeddings = pgTable(
   "reddit_embeddings",

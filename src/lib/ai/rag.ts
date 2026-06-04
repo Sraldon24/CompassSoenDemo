@@ -31,6 +31,20 @@ const COURSE_TOP_K = 5;
 const REDDIT_TOP_K = 5;
 const MAX_CONTEXT_CHARS = 4_500;
 
+/**
+ * Minimum cosine similarity (1 − distance) for a SEMANTIC hit to be injected.
+ * Below this, a match is essentially noise — including it just pads the context
+ * and dilutes grounding (and costs tokens). Force-included explicit mentions
+ * (score 1.0) are never filtered. all-MiniLM cosine sims cluster low, so this
+ * floor is deliberately gentle.
+ */
+const MIN_SIMILARITY = 0.2;
+
+/** Cosine similarity from a pgvector `<=>` distance, clamped to [0, 1]. */
+export function similarityFromDistance(distance: number): number {
+  return Math.max(0, Math.min(1, 1 - distance));
+}
+
 // ── Pure assembly layer ──────────────────────────────────────────────────────
 // Row shapes the assembler consumes. Kept structural (not DB-tied) so the
 // assembly logic — section ordering, scoring (1 - distance), force-include,
@@ -80,7 +94,15 @@ export interface RAGAssemblyInput {
  * - final text capped at MAX_CONTEXT_CHARS
  */
 export function assembleRAGContext(input: RAGAssemblyInput): RAGContext {
-  const { explicitHits, courseHits, redditHits, planByCode } = input;
+  const { explicitHits, planByCode } = input;
+  // Relevance floor: drop near-zero-similarity semantic hits so the context is
+  // grounded, not padded. Explicit (force-included) hits are exempt.
+  const courseHits = input.courseHits.filter(
+    (c) => similarityFromDistance(c.distance) >= MIN_SIMILARITY,
+  );
+  const redditHits = input.redditHits.filter(
+    (r) => similarityFromDistance(r.distance) >= MIN_SIMILARITY,
+  );
   const sources: RAGSource[] = [];
   const sections: string[] = [];
 
@@ -117,7 +139,7 @@ export function assembleRAGContext(input: RAGAssemblyInput): RAGContext {
         id: `course:${c.code}`,
         label: `${c.code} catalog`,
         snippet: (c.description ?? "").slice(0, 240),
-        score: Math.max(0, 1 - c.distance),
+        score: similarityFromDistance(c.distance),
         kind: "course",
       });
       sections.push(
@@ -134,7 +156,7 @@ export function assembleRAGContext(input: RAGAssemblyInput): RAGContext {
         label: `r/Concordia: ${r.title.slice(0, 60)}`,
         url: r.url ?? undefined,
         snippet: (r.body ?? r.title).slice(0, 240),
-        score: Math.max(0, 1 - r.distance),
+        score: similarityFromDistance(r.distance),
         kind: "reddit",
       });
       sections.push(

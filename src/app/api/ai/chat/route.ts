@@ -2,13 +2,19 @@ import { COMPASS_SYSTEM } from "@/lib/ai/prompts";
 import { isComplexQuery, streamChatWithFallback } from "@/lib/ai/provider";
 import { buildRAGContext } from "@/lib/ai/rag";
 import { recordAIUsage } from "@/lib/ai/usage";
+import { ANALYTICS_EVENTS } from "@/lib/analytics/events";
+import { trackServer } from "@/lib/analytics/server";
+import { apiError } from "@/lib/api/response";
 import { aiGuard } from "@/lib/api/route-guard";
 import { db } from "@/lib/data/db";
 import { aiConversations, aiMessages } from "@/lib/data/schema";
-import { eq } from "drizzle-orm";
+import { and, desc, eq, ne } from "drizzle-orm";
 import type { NextRequest } from "next/server";
-import { NextResponse } from "next/server";
 import { z } from "zod";
+
+/** How many prior turns to feed the model for follow-up context. Keep small so
+ * the context (and token cost) stays bounded; RAG carries the heavy grounding. */
+const HISTORY_TURNS = 8;
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
@@ -40,7 +46,7 @@ export async function POST(req: NextRequest): Promise<Response> {
       })
       .returning({ id: aiConversations.id });
     if (!conv) {
-      return NextResponse.json({ error: "Failed to create conversation" }, { status: 500 });
+      return apiError("Failed to create conversation", 500);
     }
     conversationId = conv.id;
   } else {
@@ -51,15 +57,36 @@ export async function POST(req: NextRequest): Promise<Response> {
       .where(eq(aiConversations.id, conversationId))
       .limit(1);
     if (!conv || conv.userId !== session.user.id) {
-      return NextResponse.json({ error: "Conversation not found" }, { status: 404 });
+      return apiError("Conversation not found", 404);
     }
   }
+
+  // Load prior turns BEFORE inserting the new message, so multi-turn chat has
+  // context (follow-ups like "what about its prereq?"). Fetch the NEWEST rows
+  // (desc + limit — uses idx_ai_messages_conversation), then reverse back to
+  // chronological order so the model reads oldest→newest with the latest turns.
+  const priorRows = await db
+    .select({ role: aiMessages.role, content: aiMessages.content })
+    .from(aiMessages)
+    .where(and(eq(aiMessages.conversationId, conversationId), ne(aiMessages.role, "system")))
+    .orderBy(desc(aiMessages.createdAt))
+    .limit(HISTORY_TURNS * 2);
+  const history = priorRows
+    .filter(
+      (m): m is { role: "user" | "assistant"; content: string } =>
+        (m.role === "user" || m.role === "assistant") && m.content.length > 0,
+    )
+    .reverse();
 
   // Save the user message first so it persists even if the LLM fails.
   await db.insert(aiMessages).values({
     conversationId,
     role: "user",
     content: parsed.message,
+  });
+
+  void trackServer(session.user.id, ANALYTICS_EVENTS.ai_chat_sent, {
+    complex: isComplexQuery(parsed.message),
   });
 
   // Build RAG context from the user's query.
@@ -76,7 +103,7 @@ export async function POST(req: NextRequest): Promise<Response> {
   const chat = streamChatWithFallback({
     task: "chat-complex",
     system: `${COMPASS_SYSTEM}\n\n## Context\n${rag.text || "(no relevant context found)"}`,
-    messages: [{ role: "user", content: parsed.message }],
+    messages: [...history, { role: "user", content: parsed.message }],
     temperature: 0.4,
     preferFast: !isComplexQuery(parsed.message),
   });
@@ -100,7 +127,9 @@ export async function POST(req: NextRequest): Promise<Response> {
         await recordAIUsage({
           userId: session.user.id,
           feature: "chat",
-          model: "llama-3.1-8b-instant",
+          // Record the model that ACTUALLY served the stream (70B / Gemini / 8B),
+          // not a hardcoded guess — keeps the per-model usage ledger accurate.
+          model: chat.servedBy(),
           tokensUsed: Math.ceil(assistantText.length / 4),
         });
       } catch (err) {

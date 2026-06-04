@@ -14,12 +14,27 @@ const guardAiCallMock = vi.fn();
 vi.mock("@/lib/auth/get-session", () => ({ getSession: () => getSessionMock() }));
 vi.mock("@/lib/limits", () => ({
   guardAiCall: (...args: unknown[]) => guardAiCallMock(...args),
-  // Real-shaped deny envelope so aiGuard's 429/503 mapping is exercised honestly.
+  // Real-shaped deny envelope ({success,payload,error}) so aiGuard's 429/503
+  // mapping is exercised honestly against the unified contract.
   denyResponse: (d: { denyReason?: string; retryAfterMs: number }) =>
     d.denyReason === "quota"
-      ? NextResponse.json({ error: "Daily AI quota nearly exhausted." }, { status: 503 })
-      : NextResponse.json({ error: "Rate limit reached. Try again later." }, { status: 429 }),
+      ? NextResponse.json(
+          { success: false, payload: null, error: "Daily AI quota nearly exhausted." },
+          { status: 503 },
+        )
+      : NextResponse.json(
+          { success: false, payload: null, error: "Rate limit reached. Try again later." },
+          { status: 429 },
+        ),
 }));
+
+/** The unified error envelope for a given message (+ optional extra fields). */
+const errEnvelope = (error: string, extra: Record<string, unknown> = {}) => ({
+  success: false,
+  payload: null,
+  error,
+  ...extra,
+});
 
 import {
   aiGuard,
@@ -67,7 +82,7 @@ describe("courseGuard (auth + code, no limit)", () => {
     expect(r.ok).toBe(false);
     if (!r.ok) {
       expect(r.response.status).toBe(400);
-      expect(await r.response.json()).toEqual({ error: "invalid_course_code" });
+      expect(await r.response.json()).toEqual(errEnvelope("invalid_course_code"));
     }
   });
   it("ok + normalized code (4-digit accepted)", async () => {
@@ -88,7 +103,7 @@ describe("courseLimitGuard (limit BEFORE code — community order)", () => {
     if (!r.ok) {
       expect(r.response.status).toBe(429);
       expect(r.response.headers.get("Retry-After")).toBe("30");
-      expect(await r.response.json()).toEqual({ error: "rate_limited", retryAfter: 30 });
+      expect(await r.response.json()).toEqual(errEnvelope("rate_limited", { retryAfter: 30 }));
     }
   });
   it("ok when allowed + valid code", async () => {
@@ -124,7 +139,7 @@ describe("authLimitGuard (flag)", () => {
     const r = await authLimitGuard("moderationFlag");
     if (!r.ok) {
       expect(r.response.status).toBe(429);
-      expect(await r.response.json()).toEqual({ error: "rate_limited", retryAfter: 30 });
+      expect(await r.response.json()).toEqual(errEnvelope("rate_limited", { retryAfter: 30 }));
     }
   });
 });
@@ -134,13 +149,13 @@ describe("aiGuard (/ai/* preamble: auth → body → limit)", () => {
   const req = (body: unknown) =>
     new Request("http://x/api/ai/x", { method: "POST", body: JSON.stringify(body) });
 
-  it("401 'Not authenticated' (AI envelope, not community 'unauthorized')", async () => {
+  it("401 unauthorized (unified envelope)", async () => {
     getSessionMock.mockResolvedValue(null);
     const r = await aiGuard(req({ message: "hi" }), schema, "aiChat");
     expect(r.ok).toBe(false);
     if (!r.ok) {
       expect(r.response.status).toBe(401);
-      expect(await r.response.json()).toEqual({ error: "Not authenticated" });
+      expect(await r.response.json()).toEqual(errEnvelope("unauthorized"));
     }
   });
 
@@ -161,7 +176,9 @@ describe("aiGuard (/ai/* preamble: auth → body → limit)", () => {
     expect(r.ok).toBe(false);
     if (!r.ok) {
       expect(r.response.status).toBe(429);
-      expect(await r.response.json()).toEqual({ error: "Rate limit reached. Try again later." });
+      expect(await r.response.json()).toEqual(
+        errEnvelope("Rate limit reached. Try again later."),
+      );
     }
   });
 

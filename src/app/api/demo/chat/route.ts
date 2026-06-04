@@ -8,9 +8,10 @@
  */
 
 import { generateResponse } from "@/lib/ai/provider";
+import { apiError, apiOk } from "@/lib/api/response";
 import { DEMO_AI_MESSAGE_CAP, DEMO_PLAN } from "@/lib/demo/sample-plan";
 import { rateLimitByIp } from "@/lib/ip-rate-limit";
-import { NextResponse } from "next/server";
+import type { NextResponse } from "next/server";
 import { z } from "zod";
 
 export const dynamic = "force-dynamic";
@@ -40,7 +41,7 @@ export async function POST(req: Request): Promise<NextResponse> {
   try {
     parsed = bodySchema.parse(await req.json());
   } catch {
-    return NextResponse.json({ error: "invalid_body" }, { status: 400 });
+    return apiError("invalid_body", 400);
   }
 
   // Per-IP daily backstop — generous enough for a genuine try, tight enough
@@ -52,7 +53,7 @@ export async function POST(req: Request): Promise<NextResponse> {
     24 * 60 * 60 * 1000,
   );
   if (!limit.allowed) {
-    return NextResponse.json({ error: "demo_limit" }, { status: 429 });
+    return apiError("demo_limit", 429);
   }
 
   try {
@@ -63,9 +64,9 @@ export async function POST(req: Request): Promise<NextResponse> {
       temperature: 0.3,
       maxTokens: 200,
     });
-    return NextResponse.json({ reply: text });
+    return apiOk({ reply: text });
   } catch (err) {
     console.error("[demo-chat] failed:", err);
-    return NextResponse.json({ error: "ai_unavailable" }, { status: 503 });
+    return apiError("ai_unavailable", 503);
   }
 }

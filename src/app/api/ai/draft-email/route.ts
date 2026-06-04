@@ -1,9 +1,9 @@
 import { runEmailDraftGraph } from "@/lib/ai/graphs/email-graph";
 import { ANALYTICS_EVENTS } from "@/lib/analytics/events";
 import { trackServer } from "@/lib/analytics/server";
+import { apiOk } from "@/lib/api/response";
 import { aiGuard } from "@/lib/api/route-guard";
 import { runAiUsage } from "@/lib/limits";
-import { NextResponse } from "next/server";
 import { z } from "zod";
 
 export const dynamic = "force-dynamic";
@@ -39,5 +39,5 @@ export async function POST(req: Request): Promise<Response> {
   void trackServer(session.user.id, ANALYTICS_EVENTS.email_drafted, {
     recipientRole: body.recipientRole,
   });
-  return NextResponse.json({ draft: run.data.draft });
+  return apiOk({ draft: run.data.draft });
 }

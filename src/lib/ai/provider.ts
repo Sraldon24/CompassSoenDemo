@@ -99,10 +99,23 @@ async function sleep(ms: number): Promise<void> {
   return new Promise((res) => setTimeout(res, ms));
 }
 
+/** Transient network failures carry no HTTP status but should still retry/fall
+ * back (a dropped socket to Groq is exactly when the 8B/OpenRouter chain helps). */
+function isNetworkError(err: unknown): boolean {
+  const e = err as { code?: string; name?: string; message?: string; cause?: { code?: string } };
+  const code = e?.code ?? e?.cause?.code;
+  if (code && ["ECONNRESET", "ETIMEDOUT", "ECONNREFUSED", "EAI_AGAIN", "EPIPE"].includes(code)) {
+    return true;
+  }
+  if (e?.name === "AbortError" || e?.name === "TimeoutError") return true;
+  const msg = (e?.message ?? "").toLowerCase();
+  return msg.includes("fetch failed") || msg.includes("network") || msg.includes("socket hang up");
+}
+
 function isRetryable(err: unknown): boolean {
   const e = err as { status?: number; statusCode?: number; cause?: { status?: number } };
   const status = e?.status ?? e?.statusCode ?? e?.cause?.status;
-  if (!status) return false;
+  if (!status) return isNetworkError(err);
   return status === 429 || (status >= 500 && status <= 599);
 }
 
@@ -265,7 +278,11 @@ const gemini = geminiKey ? createGoogleGenerativeAI({ apiKey: geminiKey }) : nul
 const FIRST_TOKEN_TIMEOUT_MS = 8_000;
 
 /** Matches the `ai_model` DB enum so it can be persisted directly. */
-export type ServedModel = "groq-llama-3.3-70b" | "groq-llama-3.1-8b" | "gemini-2.0-flash";
+export type ServedModel =
+  | "groq-llama-3.3-70b"
+  | "groq-llama-3.1-8b"
+  | "gemini-2.0-flash"
+  | "gemini-2.5-flash";
 
 /**
  * Balanced router: decide if a chat message warrants the deep model (70B) or
@@ -343,13 +360,14 @@ export function streamChatWithFallback(opts: CallOptions): StreamWithFallback {
 
   const fastStream = () => {
     if (gemini) {
-      served = "gemini-2.0-flash"; // DB enum label (closest available value)
+      served = "gemini-2.5-flash"; // label the model we actually stream (was mislabeled 2.0)
       // Fast, free, no Groq quota impact.
       return streamText({
         model: gemini(GEMINI_MODEL),
         system: opts.system,
         messages: opts.messages,
         temperature: opts.temperature ?? 0.4,
+        ...(opts.maxTokens ? { maxOutputTokens: opts.maxTokens } : {}),
         maxRetries: 1,
       }).textStream;
     }
@@ -359,6 +377,7 @@ export function streamChatWithFallback(opts: CallOptions): StreamWithFallback {
       system: opts.system,
       messages: opts.messages,
       temperature: opts.temperature ?? 0.4,
+      ...(opts.maxTokens ? { maxOutputTokens: opts.maxTokens } : {}),
       maxRetries: 1,
       onFinish: ({ usage }) => recordGroqUsage("llama-3.1-8b-instant", usage?.totalTokens ?? 0),
     }).textStream;
@@ -380,6 +399,7 @@ export function streamChatWithFallback(opts: CallOptions): StreamWithFallback {
       system: opts.system,
       messages: opts.messages,
       temperature: opts.temperature ?? 0.4,
+      ...(opts.maxTokens ? { maxOutputTokens: opts.maxTokens } : {}),
       maxRetries: 1,
       onFinish: ({ usage }) => recordGroqUsage(primary, usage?.totalTokens ?? 0),
     });

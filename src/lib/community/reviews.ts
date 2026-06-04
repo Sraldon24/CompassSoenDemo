@@ -107,27 +107,35 @@ export async function submitReview(input: SubmitReviewInput): Promise<{ id: stri
   }
 
   return db.transaction(async (tx) => {
-    // Upsert-by-name on professors. There's no unique constraint in the
-    // schema so we do an explicit SELECT-then-INSERT pattern.
+    // Upsert-by-name on professors. The `uq_professors_name_lower` unique index
+    // (on lower(name)) makes this race-safe: INSERT … ON CONFLICT DO NOTHING,
+    // then read back. Two concurrent first-reviews can no longer create
+    // duplicate professor rows that would split a professor's aggregates.
     const normalizedName = input.professorName.trim();
     if (!normalizedName) throw new Error("professorName required");
 
-    const [existing] = await tx
-      .select({ id: professors.id })
-      .from(professors)
-      .where(sql`LOWER(${professors.name}) = LOWER(${normalizedName})`)
-      .limit(1);
+    // Bare onConflictDoNothing: the professors table's only unique constraint is
+    // the expression index uq_professors_name_lower (on lower(name)), so any
+    // conflict here is a case-insensitive name collision. (Drizzle's `target`
+    // option only accepts columns, not the lower(name) expression, so we omit it.)
+    const [inserted] = await tx
+      .insert(professors)
+      .values({ name: normalizedName })
+      .onConflictDoNothing()
+      .returning({ id: professors.id });
 
     let professorId: string;
-    if (existing) {
-      professorId = existing.id;
-    } else {
-      const [inserted] = await tx
-        .insert(professors)
-        .values({ name: normalizedName })
-        .returning({ id: professors.id });
-      if (!inserted) throw new Error("failed to create professor row");
+    if (inserted) {
       professorId = inserted.id;
+    } else {
+      // Conflict — the row already exists; fetch it.
+      const [existing] = await tx
+        .select({ id: professors.id })
+        .from(professors)
+        .where(sql`LOWER(${professors.name}) = LOWER(${normalizedName})`)
+        .limit(1);
+      if (!existing) throw new Error("failed to resolve professor row");
+      professorId = existing.id;
     }
 
     const [reviewRow] = await tx
