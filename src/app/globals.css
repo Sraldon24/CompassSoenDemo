@@ -19,27 +19,28 @@
 
 @theme {
   /* ---- COLOR (light) — apply on :root --------------------------------------
-     Canvas carries a faint cool cast. Three clearly separated surface tiers so
-     elevation reads without heavy shadow. Borders are crisper than before. */
-  --color-bg: oklch(0.985 0.0015 250);
+     "SOLID" upgrade: deeper canvas so pure-white cards read as confident,
+     grounded objects; stronger, clearly visible borders (not faint hairlines);
+     darker ink for higher-contrast, more substantial type. */
+  --color-bg: oklch(0.965 0.0025 250);
   --color-surface: oklch(1 0 0);
-  --color-surface-2: oklch(0.972 0.002 250);
-  --color-surface-3: oklch(0.955 0.0025 250);
-  --color-border: oklch(0.916 0.003 250);
-  --color-border-strong: oklch(0.85 0.004 250);
-  --color-text: oklch(0.205 0.012 255);
-  --color-text-muted: oklch(0.48 0.01 255);
-  --color-text-subtle: oklch(0.62 0.008 255);
-  --color-primary: oklch(0.235 0.014 258);
-  --color-primary-hover: oklch(0.17 0.014 258);
+  --color-surface-2: oklch(0.955 0.003 250);
+  --color-surface-3: oklch(0.93 0.004 250);
+  --color-border: oklch(0.86 0.006 250);
+  --color-border-strong: oklch(0.74 0.008 250);
+  --color-text: oklch(0.17 0.014 258);
+  --color-text-muted: oklch(0.44 0.012 255);
+  --color-text-subtle: oklch(0.58 0.01 255);
+  --color-primary: oklch(0.2 0.016 258);
+  --color-primary-hover: oklch(0.13 0.016 258);
   --color-primary-fg: oklch(0.99 0.002 250);
 
-  /* Signature: a slightly cooler, richer emerald that leans teal. */
-  --color-accent: oklch(0.62 0.135 168);
-  --color-accent-hover: oklch(0.555 0.14 168);
-  --color-accent-2: oklch(0.66 0.115 192);
-  --color-accent-soft: oklch(0.965 0.028 172);
-  --color-accent-ring: oklch(0.62 0.135 168 / 0.4);
+  /* Signature: a deeper, more committed emerald — reads as solid, not pastel. */
+  --color-accent: oklch(0.575 0.15 166);
+  --color-accent-hover: oklch(0.5 0.155 166);
+  --color-accent-2: oklch(0.61 0.13 192);
+  --color-accent-soft: oklch(0.945 0.04 170);
+  --color-accent-ring: oklch(0.575 0.15 166 / 0.45);
 
   /* Brand iris — used for links, selection, secondary focus accents. */
   --color-iris: oklch(0.56 0.14 264);
@@ -86,34 +87,35 @@
   --spacing-16: 64px;
   --spacing-20: 80px;
 
-  /* ---- RADIUS — a touch larger / softer than before ---- */
-  --radius-sm: 8px;
-  --radius-md: 10px;
-  --radius-lg: 14px;
-  --radius-xl: 20px;
-  --radius-2xl: 28px;
+  /* ---- RADIUS — tighter / more architectural for a solid, grounded feel ---- */
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-lg: 10px;
+  --radius-xl: 14px;
+  --radius-2xl: 20px;
   --radius-full: 9999px;
 
   /* ---- ELEVATION ------------------------------------------------------------
-     Layered, slightly cool-tinted shadows (not flat black) → expensive feel. */
-  --shadow-xs: 0 1px 2px oklch(0.2 0.02 258 / 0.05);
-  --shadow-sm: 0 1px 2px oklch(0.2 0.02 258 / 0.06), 0 1px 3px oklch(0.2 0.02 258 / 0.05);
-  --shadow-md: 0 2px 4px oklch(0.2 0.02 258 / 0.04), 0 6px 16px oklch(0.2 0.02 258 / 0.07);
-  --shadow-lg: 0 4px 8px oklch(0.2 0.02 258 / 0.05), 0 16px 36px oklch(0.2 0.02 258 / 0.1);
-  --shadow-xl: 0 8px 16px oklch(0.2 0.02 258 / 0.06), 0 28px 64px oklch(0.2 0.02 258 / 0.14);
-  --shadow-glow: 0 0 0 1px oklch(0.62 0.135 168 / 0.16), 0 10px 30px oklch(0.62 0.135 168 / 0.16);
-  --shadow-inset: inset 0 1px 0 oklch(1 0 0 / 0.6);
+     "SOLID" shadows: deeper, firmer, less diffuse — cards sit FIRMLY on the
+     page rather than floating. Paired with the stronger borders above. */
+  --shadow-xs: 0 1px 1px oklch(0.18 0.02 258 / 0.08);
+  --shadow-sm: 0 1px 2px oklch(0.18 0.02 258 / 0.1), 0 2px 4px oklch(0.18 0.02 258 / 0.06);
+  --shadow-md: 0 2px 4px oklch(0.18 0.02 258 / 0.08), 0 8px 16px oklch(0.18 0.02 258 / 0.1);
+  --shadow-lg: 0 4px 8px oklch(0.18 0.02 258 / 0.1), 0 16px 32px oklch(0.18 0.02 258 / 0.14);
+  --shadow-xl: 0 8px 16px oklch(0.18 0.02 258 / 0.12), 0 32px 56px oklch(0.18 0.02 258 / 0.18);
+  --shadow-glow: 0 0 0 1px oklch(0.575 0.15 166 / 0.3), 0 8px 24px oklch(0.575 0.15 166 / 0.22);
+  --shadow-inset: inset 0 1px 0 oklch(1 0 0 / 0.5);
 
   /* ---- GRADIENTS / GLOW -----------------------------------------------------
      Signature emerald→teal sweep + a refined neutral surface gradient. */
-  --gradient-accent: linear-gradient(135deg, oklch(0.66 0.135 168), oklch(0.64 0.115 196));
-  --gradient-accent-bright: linear-gradient(135deg, oklch(0.7 0.15 165), oklch(0.66 0.13 200));
+  --gradient-accent: linear-gradient(135deg, oklch(0.6 0.15 166), oklch(0.56 0.13 194));
+  --gradient-accent-bright: linear-gradient(135deg, oklch(0.65 0.16 164), oklch(0.6 0.14 198));
   --gradient-accent-soft: linear-gradient(
     135deg,
-    oklch(0.66 0.135 168 / 0.13),
-    oklch(0.62 0.12 200 / 0.05)
+    oklch(0.6 0.15 166 / 0.16),
+    oklch(0.56 0.13 198 / 0.06)
   );
-  --gradient-primary: linear-gradient(180deg, oklch(0.29 0.016 258), oklch(0.2 0.014 258));
+  --gradient-primary: linear-gradient(180deg, oklch(0.26 0.018 258), oklch(0.16 0.016 258));
   --gradient-surface: linear-gradient(180deg, oklch(1 0 0), oklch(0.984 0.0025 250));
   --gradient-hero: radial-gradient(
       120% 120% at 0% 0%,
@@ -244,14 +246,15 @@
 
 .dark {
   /* ---- COLOR (dark) ---------------------------------------------------------
-     Deep cool-charcoal canvas with lifted surface tiers; brighter emerald so
-     the accent still pops against the dark ground. */
-  --color-bg: oklch(0.165 0.008 260);
-  --color-surface: oklch(0.205 0.009 260);
-  --color-surface-2: oklch(0.238 0.01 260);
-  --color-surface-3: oklch(0.272 0.011 260);
-  --color-border: oklch(0.3 0.012 260);
-  --color-border-strong: oklch(0.4 0.014 260);
+     "SOLID" dark: a deeper near-black canvas with clearly stepped surface tiers
+     and stronger borders, so panels read as distinct, substantial blocks.
+     Brighter emerald keeps the accent popping against the darker ground. */
+  --color-bg: oklch(0.145 0.009 260);
+  --color-surface: oklch(0.195 0.01 260);
+  --color-surface-2: oklch(0.235 0.011 260);
+  --color-surface-3: oklch(0.275 0.012 260);
+  --color-border: oklch(0.34 0.014 260);
+  --color-border-strong: oklch(0.46 0.016 260);
   --color-text: oklch(0.97 0.003 250);
   --color-text-muted: oklch(0.72 0.008 255);
   --color-text-subtle: oklch(0.58 0.008 255);
@@ -434,11 +437,13 @@
     background: var(--color-accent-soft);
     color: var(--color-text);
   }
-  /* Tighten heading rhythm globally. */
+  /* "Solid" headings: heavier weight + tighter tracking for a confident,
+     substantial feel across every page. */
   h1,
   h2,
   h3 {
     letter-spacing: var(--tracking-tight);
+    font-weight: 650;
   }
 }
 
@@ -498,19 +503,21 @@
   background-image: var(--gradient-hero);
 }
 
-/* Hairline ring — the signature 1px separator used on every card/panel. */
+/* "Solid" ring — a real, confidently visible 1px border on every card/panel
+   (kept named ring-hairline so all existing markup picks it up). */
 .ring-hairline {
-  box-shadow: inset 0 0 0 1px oklch(0.5 0.01 258 / 0.1);
+  box-shadow: inset 0 0 0 1px var(--color-border);
 }
 .dark .ring-hairline {
-  box-shadow: inset 0 0 0 1px oklch(1 0 0 / 0.06);
+  box-shadow: inset 0 0 0 1px oklch(1 0 0 / 0.1);
 }
 
-/* Frosted glass panel — for topbars, popovers, floating bars. */
+/* Frosted glass panel — for topbars, popovers, floating bars. Less transparent
+   now so it reads as a solid bar with a subtle blur, not a ghost. */
 .glass {
-  background: color-mix(in oklch, var(--color-surface) 72%, transparent);
-  backdrop-filter: blur(16px) saturate(180%);
-  -webkit-backdrop-filter: blur(16px) saturate(180%);
+  background: color-mix(in oklch, var(--color-surface) 85%, transparent);
+  backdrop-filter: blur(14px) saturate(160%);
+  -webkit-backdrop-filter: blur(14px) saturate(160%);
 }
 
 /* Glow halo behind hero art / featured cards. */
