@@ -80,29 +80,45 @@ function Tile({ tile, index }: { tile: StatTile; index: number }): React.ReactEl
   const reduced = usePrefersReducedMotion();
   const value = useCountUp(tile.value, !reduced);
   const Icon = ICONS[tile.icon];
+  // First tile is accent-tinted to anchor the row (Meridian).
+  const accent = index === 0;
   return (
-    <Card interactive size="sm" style={{ ["--i" as string]: index }} className="animate-rise">
-      <CardContent className="p-4">
+    <Card
+      interactive
+      size="sm"
+      style={{
+        ["--i" as string]: index,
+        ...(accent
+          ? {
+              background: "var(--accent-soft)",
+              borderColor: "color-mix(in oklch, var(--accent) 38%, transparent)",
+            }
+          : {}),
+      }}
+      className="card-hard animate-rise"
+    >
+      <CardContent className="p-[18px]">
         <div className="flex items-center justify-between">
+          <div className="eyebrow">{tile.label}</div>
           <div
-            className="text-[11px] font-medium uppercase tracking-wide"
-            style={{ color: "var(--color-text-muted)" }}
-          >
-            {tile.label}
-          </div>
-          <div
-            className="inline-flex h-7 w-7 items-center justify-center rounded-lg"
-            style={{ background: "var(--gradient-accent-soft)" }}
+            className="inline-flex h-7 w-7 items-center justify-center rounded-lg ring-hairline"
+            style={{ background: "var(--surface)" }}
           >
             <Icon className="h-4 w-4" style={{ color: tile.color }} aria-hidden />
           </div>
         </div>
-        <div className="mt-2 flex items-baseline gap-1">
-          <span className="text-2xl font-semibold mono tnum" style={{ color: "var(--color-text)" }}>
+        <div className="mt-2.5 flex items-baseline gap-1.5">
+          <span
+            className="mono tnum text-[30px] font-bold leading-none"
+            style={{ color: accent ? "var(--accent-deep)" : "var(--ink)" }}
+          >
             {value}
           </span>
           {tile.suffix && (
-            <span className="text-sm font-medium" style={{ color: "var(--color-text-subtle)" }}>
+            <span
+              className="mono text-[15px] font-semibold"
+              style={{ color: accent ? "var(--accent-deep)" : "var(--ink-3)" }}
+            >
               {tile.suffix}
             </span>
           )}

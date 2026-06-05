@@ -1,7 +1,7 @@
 import { ANALYTICS_EVENTS } from "@/lib/analytics/events";
 import { trackServer } from "@/lib/analytics/server";
-import { getSession } from "@/lib/auth/get-session";
 import { apiError } from "@/lib/api/response";
+import { getSession } from "@/lib/auth/get-session";
 import { getUserPlanSnapshot } from "@/lib/data/queries/plan";
 import { type ICSEvent, buildICS, termToStartDate } from "@/lib/exports/ics";
 

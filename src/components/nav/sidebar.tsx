@@ -33,36 +33,30 @@ type NavLinkProps = {
   active: boolean;
 };
 
-/** A single nav row: emerald accent rail + soft-gradient pill when active. */
+/** A single nav row: active = surface fill + ink border + offset hard-shadow + accent icon. */
 function NavLink({ href, label, icon: Icon, active }: NavLinkProps): React.ReactElement {
   return (
     <Link
       href={href}
       aria-current={active ? "page" : undefined}
       className={cn(
-        "group relative flex items-center gap-3 rounded-lg px-3 py-2 text-[0.8125rem] font-medium transition-all duration-200",
+        "group relative flex items-center gap-[11px] rounded-[var(--r-md)] px-3 py-2.5 text-[0.9rem] transition-all duration-150",
         active
-          ? "text-foreground ring-hairline shadow-[var(--shadow-xs)]"
-          : "text-muted-foreground hover:translate-x-0.5 hover:text-foreground hover:bg-secondary/70",
+          ? "font-bold text-[var(--ink)] shadow-[var(--hard-shadow)]"
+          : "font-medium text-[var(--ink-2)] hover:translate-x-0.5 hover:text-[var(--ink)] hover:bg-[var(--surface-2)]",
       )}
-      style={active ? { background: "var(--gradient-accent-soft)" } : undefined}
+      style={{
+        border: `1.5px solid ${active ? "var(--line-strong)" : "transparent"}`,
+        background: active ? "var(--surface)" : "transparent",
+      }}
     >
-      {/* Accent rail */}
       <span
         aria-hidden
-        className={cn(
-          "absolute left-0 top-1/2 h-5 w-[3px] -translate-y-1/2 rounded-r-full transition-all duration-200",
-          active ? "opacity-100" : "opacity-0 group-hover:opacity-40",
-        )}
-        style={{ background: "var(--gradient-accent)" }}
-      />
-      <Icon
-        className={cn(
-          "h-[1.05rem] w-[1.05rem] shrink-0 transition-colors",
-          active ? "text-[var(--color-accent)]" : "group-hover:text-foreground",
-        )}
-        aria-hidden="true"
-      />
+        className="flex shrink-0 transition-colors"
+        style={{ color: active ? "var(--accent-deep)" : "var(--ink-3)" }}
+      >
+        <Icon className="h-[1.2rem] w-[1.2rem]" aria-hidden="true" />
+      </span>
       <span className="truncate">{label}</span>
     </Link>
   );
@@ -75,17 +69,17 @@ export function Sidebar({ isAdmin = false }: { isAdmin?: boolean }): React.React
 
   return (
     <aside
-      className="hidden md:flex md:w-60 lg:w-64 shrink-0 flex-col border-r"
+      className="hidden md:flex md:w-60 lg:w-64 shrink-0 flex-col"
       style={{
-        background: "var(--gradient-surface)",
-        borderColor: "var(--color-border)",
+        background: "var(--paper-2)",
+        borderRight: "1.5px solid var(--line)",
       }}
     >
       <div
-        className="flex h-16 items-center px-5 border-b"
-        style={{ borderColor: "var(--color-border)" }}
+        className="flex h-16 items-center px-5"
+        style={{ borderBottom: "1.5px solid var(--line)" }}
       >
-        <Link href="/dashboard" className="group flex items-center gap-2.5">
+        <Link href="/dashboard" className="group flex items-center gap-[11px]">
           <span className="relative inline-flex">
             <span
               aria-hidden
@@ -95,29 +89,37 @@ export function Sidebar({ isAdmin = false }: { isAdmin?: boolean }): React.React
             <Image
               src="/brand/mark.svg"
               alt="SOEN Compass"
-              width={28}
-              height={28}
+              width={32}
+              height={32}
               className="dark:hidden"
             />
             <Image
               src="/brand/mark-reverse.svg"
               alt="SOEN Compass"
-              width={28}
-              height={28}
+              width={32}
+              height={32}
               className="hidden dark:block"
             />
           </span>
-          <span className="text-[15px] font-semibold tracking-tight">Compass</span>
+          <span className="flex flex-col">
+            <span
+              className="text-[18px] font-extrabold leading-none tracking-[-0.02em]"
+              style={{ fontFamily: "var(--font-display)" }}
+            >
+              Compass
+            </span>
+            <span
+              className="mono mt-[3px] text-[10.5px] tracking-[0.06em]"
+              style={{ color: "var(--ink-3)" }}
+            >
+              SOEN · CONCORDIA
+            </span>
+          </span>
         </Link>
       </div>
 
-      <nav className="flex-1 px-3 py-4 space-y-0.5 scroll-slim overflow-y-auto">
-        <p
-          className="px-3 pb-2 text-[0.625rem] font-semibold uppercase tracking-[0.1em]"
-          style={{ color: "var(--color-text-subtle)" }}
-        >
-          Workspace
-        </p>
+      <nav className="flex-1 px-3 py-[14px] space-y-[3px] scroll-slim overflow-y-auto">
+        <p className="eyebrow px-2.5 pb-2 pt-1">Navigate</p>
         {NAV_ITEMS.map((item) => (
           <NavLink
             key={item.href}
@@ -130,8 +132,8 @@ export function Sidebar({ isAdmin = false }: { isAdmin?: boolean }): React.React
       </nav>
 
       <div
-        className="px-3 py-4 border-t space-y-0.5"
-        style={{ borderColor: "var(--color-border)" }}
+        className="px-3 py-[14px] space-y-[3px]"
+        style={{ borderTop: "1.5px solid var(--line)" }}
       >
         {isAdmin && (
           <NavLink
@@ -147,10 +149,7 @@ export function Sidebar({ isAdmin = false }: { isAdmin?: boolean }): React.React
           icon={Settings}
           active={pathname.startsWith("/settings")}
         />
-        <p
-          className="px-3 pt-3 text-[0.625rem] mono tnum"
-          style={{ color: "var(--color-text-subtle)" }}
-        >
+        <p className="px-3 pt-3 text-[0.625rem] mono tnum" style={{ color: "var(--ink-3)" }}>
           SOEN Compass · v0.1.0
         </p>
       </div>

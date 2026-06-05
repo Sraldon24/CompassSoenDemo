@@ -20,10 +20,10 @@ function Card({
       data-slot="card"
       data-size={size}
       className={cn(
-        "group/card flex flex-col gap-4 overflow-hidden rounded-xl bg-card py-5 text-sm text-card-foreground ring-hairline shadow-[var(--shadow-sm)] transition-shadow has-data-[slot=card-footer]:pb-0 has-[>img:first-child]:pt-0 data-[size=sm]:gap-3 data-[size=sm]:py-4 data-[size=sm]:has-data-[slot=card-footer]:pb-0 *:[img:first-child]:rounded-t-xl *:[img:last-child]:rounded-b-xl",
+        "group/card flex flex-col gap-4 overflow-hidden rounded-[var(--r-lg)] border-[1.5px] border-[var(--line)] bg-card py-5 text-sm text-card-foreground transition-all has-data-[slot=card-footer]:pb-0 has-[>img:first-child]:pt-0 data-[size=sm]:gap-3 data-[size=sm]:py-4 data-[size=sm]:has-data-[slot=card-footer]:pb-0 *:[img:first-child]:rounded-t-[var(--r-lg)] *:[img:last-child]:rounded-b-[var(--r-lg)]",
         interactive &&
-          "lift cursor-pointer hover:shadow-[var(--shadow-glow)] focus-visible:shadow-[var(--shadow-glow)]",
-        featured && "shadow-[var(--shadow-glow)]",
+          "lift cursor-pointer border-[var(--line-strong)] hover:shadow-[var(--hard-shadow-strong)]",
+        featured && "border-[var(--line-strong)] shadow-[var(--hard-shadow)]",
         className,
       )}
       {...props}

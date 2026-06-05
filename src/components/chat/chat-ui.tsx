@@ -3,8 +3,8 @@
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { SUGGESTED_QUESTIONS } from "@/lib/ai/prompts";
-import { Send, Sparkles, ThumbsDown, ThumbsUp, Trash2 } from "lucide-react";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { ArrowRight, Sparkles, ThumbsDown, ThumbsUp, Trash2 } from "lucide-react";
+import { Fragment, useCallback, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 
 interface Message {
@@ -15,6 +15,123 @@ interface Message {
 }
 
 const RATE_LIMIT_DAILY = 50;
+
+/** Meridian compass mark: accent disc, ink ring, paper needle. */
+function CompassMark({ size = 32 }: { size?: number }): React.ReactElement {
+  return (
+    <svg width={size} height={size} viewBox="0 0 40 40" fill="none" aria-hidden="true">
+      <circle cx="20" cy="20" r="18" fill="var(--accent)" />
+      <circle cx="20" cy="20" r="18" stroke="var(--ink)" strokeWidth="1.6" opacity="0.9" />
+      <path d="M20 8 L24 20 L20 32 L16 20 Z" fill="var(--on-accent)" opacity="0.95" />
+      <path d="M20 8 L24 20 L20 20 Z" fill="var(--ink)" opacity="0.35" />
+      <circle cx="20" cy="20" r="2.2" fill="var(--ink)" />
+    </svg>
+  );
+}
+
+/**
+ * Render assistant text with Meridian flair: paragraph blocks, **bold** runs,
+ * and numbered/lettered citation chips ([E1], [1]) that scroll to their source.
+ */
+function renderRich(text: string, onCite: (id: string) => void): React.ReactNode {
+  const blocks = text.split("\n\n");
+  return blocks.map((block, bi) => {
+    const parts = block
+      .split(/(\*\*[^*]+\*\*|\[E\d+\]|\[\d+\])/g)
+      .filter((p): p is string => Boolean(p));
+    return (
+      <p
+        // biome-ignore lint/suspicious/noArrayIndexKey: rich-text blocks are positional
+        key={bi}
+        className="text-[15.5px] leading-[1.62]"
+        style={{ marginBottom: bi < blocks.length - 1 ? 12 : 0, color: "var(--ink)" }}
+      >
+        {parts.map((part, i) => {
+          if (/^\*\*[^*]+\*\*$/.test(part)) {
+            return (
+              // biome-ignore lint/suspicious/noArrayIndexKey: positional text run
+              <strong key={i} className="font-[750]">
+                {part.slice(2, -2)}
+              </strong>
+            );
+          }
+          const m = part.match(/^\[(E?\d+)\]$/);
+          const id = m?.[1];
+          if (id) {
+            return (
+              <sup
+                // biome-ignore lint/suspicious/noArrayIndexKey: positional text run
+                key={i}
+                className="mx-px"
+              >
+                <button
+                  type="button"
+                  onClick={() => onCite(id)}
+                  className="mono cursor-pointer rounded-[5px] border px-[5px] py-px align-baseline text-[10.5px] font-bold"
+                  style={{
+                    background: "var(--accent-soft)",
+                    color: "var(--accent-deep)",
+                    borderColor: "color-mix(in oklch, var(--accent) 35%, transparent)",
+                  }}
+                >
+                  {id}
+                </button>
+              </sup>
+            );
+          }
+          return (
+            // biome-ignore lint/suspicious/noArrayIndexKey: positional text run
+            <Fragment key={i}>{part}</Fragment>
+          );
+        })}
+      </p>
+    );
+  });
+}
+
+/** A single citation source: numbered accent chip + label, on a surface tile. */
+function SourceRow({
+  source,
+}: {
+  source: { id: string; label: string; url?: string };
+}): React.ReactElement {
+  const base =
+    "flex items-start gap-2.5 rounded-[var(--r-sm)] border-[1.5px] border-[var(--line)] px-2.5 py-2";
+  const chip = (
+    <span
+      className="mono mt-px shrink-0 rounded-[5px] px-1.5 py-0.5 text-[10.5px] font-bold"
+      style={{ background: "var(--accent)", color: "var(--on-accent)" }}
+    >
+      {source.id}
+    </span>
+  );
+  const label = (
+    <span className="text-[12.5px] leading-[1.4]" style={{ color: "var(--ink-2)" }}>
+      {source.label}
+    </span>
+  );
+  if (source.url) {
+    return (
+      <a
+        id={`cite-${source.id}`}
+        href={source.url}
+        target="_blank"
+        rel="noopener noreferrer"
+        className={`${base} transition-colors hover:border-[var(--line-strong)]`}
+        style={{ background: "var(--surface-2)" }}
+      >
+        {chip}
+        {label}
+      </a>
+    );
+  }
+  return (
+    <div id={`cite-${source.id}`} className={base} style={{ background: "var(--surface-2)" }}>
+      {chip}
+      {label}
+    </div>
+  );
+}
 
 export function ChatUI(): React.ReactElement {
   const [messages, setMessages] = useState<Message[]>([]);
@@ -116,32 +233,39 @@ export function ChatUI(): React.ReactElement {
     setConversationId(null);
   };
 
+  // Briefly flash a source row when its inline citation chip is clicked.
+  const onCite = (id: string) => {
+    const el = document.getElementById(`cite-${id}`);
+    if (el) {
+      el.style.transition = "background .3s";
+      const o = el.style.background;
+      el.style.background = "var(--accent-soft)";
+      setTimeout(() => {
+        el.style.background = o;
+      }, 900);
+    }
+  };
+
   return (
-    <div className="flex flex-col h-[calc(100vh-4rem)]">
+    <div className="flex h-[calc(100vh-4rem)] flex-col" style={{ background: "var(--paper)" }}>
+      {/* Header */}
       <div
-        className="flex items-center justify-between px-6 py-4 ring-hairline shadow-[var(--shadow-sm)] backdrop-blur-md"
-        style={{
-          background: "color-mix(in oklch, var(--color-bg) 80%, transparent)",
-        }}
+        className="flex items-center justify-between px-7 py-4"
+        style={{ borderBottom: "1.5px solid var(--line)", background: "var(--paper)" }}
       >
-        <div>
-          <h1 className="flex items-center gap-2.5 text-lg font-semibold tracking-[-0.01em]">
-            <span
-              className="inline-flex h-7 w-7 items-center justify-center rounded-xl text-white shadow-[0_0_14px_var(--color-accent-ring)]"
-              style={{ backgroundImage: "var(--gradient-accent)" }}
-            >
-              <Sparkles className="h-4 w-4" />
-            </span>
-            Ask Compass
-          </h1>
-          <p className="mt-0.5 text-xs" style={{ color: "var(--color-text-muted)" }}>
-            AI assistant trained on your plan + Concordia course catalog
-          </p>
+        <div className="flex items-center gap-3">
+          <CompassMark size={30} />
+          <div>
+            <h1 className="font-[var(--font-display)] text-lg tracking-[-0.02em]">Ask Compass</h1>
+            <p className="mt-0.5 text-xs" style={{ color: "var(--ink-3)" }}>
+              AI assistant trained on your plan + Concordia course catalog
+            </p>
+          </div>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-3">
           {remaining !== null && (
-            <span className="text-xs mono tnum" style={{ color: "var(--color-text-muted)" }}>
-              {remaining} / {RATE_LIMIT_DAILY} messages today
+            <span className="mono tnum text-xs" style={{ color: "var(--ink-3)" }}>
+              {remaining} / {RATE_LIMIT_DAILY} today
             </span>
           )}
           {messages.length > 0 && (
@@ -153,158 +277,139 @@ export function ChatUI(): React.ReactElement {
       </div>
 
       {/* Messages */}
-      <div className="flex-1 overflow-y-auto px-6 py-6 space-y-6">
+      <div className="scroll flex-1 overflow-y-auto px-7 pt-7 pb-2">
         {messages.length === 0 ? (
-          <div className="max-w-2xl mx-auto space-y-4 animate-rise">
-            <p className="eyebrow">ASK COMPASS</p>
-            <h2 className="text-2xl sm:text-3xl font-semibold tracking-[-0.02em]">
-              Hi — what would you like to <span className="text-gradient">plan?</span>
-            </h2>
-            <p style={{ color: "var(--color-text-muted)" }}>
-              Try asking about prereqs, electives, or your current plan. I'll cite where each answer
-              comes from.
-            </p>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-4 stagger">
-              {SUGGESTED_QUESTIONS.map((q, i) => (
-                <button
-                  key={q}
-                  type="button"
-                  onClick={() => send(q)}
-                  style={{ ["--i" as string]: i, background: "var(--gradient-surface)" }}
-                  className="lift group flex items-center justify-between gap-2 text-left rounded-xl ring-hairline shadow-[var(--shadow-sm)] px-4 py-3.5 text-sm transition-shadow hover:shadow-[var(--shadow-glow)] focus-visible:outline-none"
-                >
-                  <span style={{ color: "var(--color-text)" }}>{q}</span>
-                  <Send
-                    className="h-3.5 w-3.5 shrink-0 opacity-0 transition-opacity group-hover:opacity-100"
-                    style={{ color: "var(--color-accent)" }}
-                  />
-                </button>
-              ))}
+          <div className="mx-auto max-w-[760px]">
+            <div className="rise pt-[6vh] text-center">
+              <div className="mb-[18px] inline-flex">
+                <CompassMark size={56} />
+              </div>
+              <h2 className="mb-2.5 font-[var(--font-display)] text-[30px] tracking-[-0.03em]">
+                Ask Compass anything
+              </h2>
+              <p
+                className="mx-auto mb-7 max-w-[480px] text-[16px] leading-[1.55]"
+                style={{ color: "var(--ink-2)" }}
+              >
+                Grounded in the Concordia catalog and <em>your</em> plan. Every answer cites its
+                sources.
+              </p>
+              <div className="stagger mx-auto grid max-w-[560px] grid-cols-1 gap-[11px] sm:grid-cols-2">
+                {SUGGESTED_QUESTIONS.map((q, i) => (
+                  <button
+                    key={q}
+                    type="button"
+                    onClick={() => send(q)}
+                    style={{ ["--i" as string]: i }}
+                    className="card lift group flex items-center gap-[11px] px-4 py-[14px] text-left text-sm font-[550] transition-all hover:-translate-y-0.5 hover:border-[var(--line-strong)] hover:shadow-[var(--hard-shadow)] focus-visible:outline-none"
+                  >
+                    <span className="flex" style={{ color: "var(--accent-deep)" }}>
+                      <Sparkles className="h-[17px] w-[17px]" />
+                    </span>
+                    <span className="flex-1" style={{ color: "var(--ink)" }}>
+                      {q}
+                    </span>
+                    <ArrowRight className="h-[15px] w-[15px]" style={{ color: "var(--ink-3)" }} />
+                  </button>
+                ))}
+              </div>
             </div>
           </div>
         ) : (
-          <div className="max-w-3xl mx-auto space-y-6">
+          <div className="mx-auto flex max-w-[760px] flex-col gap-[18px]">
             {messages.map((m) => (
-              <article key={m.id} className="flex gap-3 animate-rise" data-role={m.role}>
-                {/* Avatar */}
-                <div
-                  className={
-                    m.role === "assistant"
-                      ? "mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-[11px] font-semibold shadow-[0_0_14px_var(--color-accent-ring)]"
-                      : "mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-[11px] font-semibold ring-hairline"
-                  }
-                  style={
-                    m.role === "assistant"
-                      ? { backgroundImage: "var(--gradient-accent)", color: "white" }
-                      : { background: "var(--color-surface-2)", color: "var(--color-text-muted)" }
-                  }
-                  aria-hidden
-                >
-                  {m.role === "assistant" ? <Sparkles className="h-4 w-4" /> : "You"}
-                </div>
-
-                <div className="flex-1 min-w-0 space-y-2">
-                  <div
-                    className="text-[11px] uppercase tracking-wide font-medium"
-                    style={{
-                      color: m.role === "user" ? "var(--color-text-subtle)" : "var(--color-accent)",
-                    }}
-                  >
-                    {m.role === "user" ? "You" : "Compass"}
-                  </div>
-                  {m.content === "" && m.role === "assistant" ? (
+              <article key={m.id} className="fade" data-role={m.role}>
+                {m.role === "user" ? (
+                  <div className="flex justify-end">
                     <div
-                      className="space-y-2 rounded-xl rounded-tl-sm ring-hairline shadow-[var(--shadow-sm)] p-3.5"
+                      className="max-w-[82%] px-4 py-[11px] text-[15px] font-medium"
                       style={{
-                        background: "var(--color-surface)",
+                        borderRadius: "var(--r-lg) var(--r-lg) 4px var(--r-lg)",
+                        background: "var(--ink)",
+                        color: "var(--paper)",
+                        boxShadow: "var(--hard-shadow)",
                       }}
-                    >
-                      <div
-                        className="flex items-center gap-2 text-sm"
-                        style={{ color: "var(--color-text-muted)" }}
-                        aria-live="polite"
-                      >
-                        <span className="flex gap-1" aria-hidden>
-                          <span
-                            className="h-1.5 w-1.5 rounded-full animate-bounce [animation-delay:-0.3s]"
-                            style={{ background: "var(--color-accent)" }}
-                          />
-                          <span
-                            className="h-1.5 w-1.5 rounded-full animate-bounce [animation-delay:-0.15s]"
-                            style={{ background: "var(--color-accent)" }}
-                          />
-                          <span
-                            className="h-1.5 w-1.5 rounded-full animate-bounce"
-                            style={{ background: "var(--color-accent)" }}
-                          />
-                        </span>
-                        Compass is thinking… this can take a few seconds.
-                      </div>
-                      <Skeleton className="h-3 w-3/4" />
-                      <Skeleton className="h-3 w-1/2" />
-                    </div>
-                  ) : (
-                    <div
-                      className={
-                        m.role === "user"
-                          ? "prose-sm whitespace-pre-wrap rounded-xl rounded-tr-sm shadow-[var(--shadow-sm)] p-3.5 text-[15px] leading-relaxed ring-1 ring-[color-mix(in_oklch,var(--color-accent)_22%,transparent)]"
-                          : "prose-sm whitespace-pre-wrap rounded-xl rounded-tl-sm ring-hairline shadow-[var(--shadow-sm)] p-3.5 text-[15px] leading-relaxed"
-                      }
-                      style={
-                        m.role === "user"
-                          ? {
-                              background: "var(--gradient-accent-soft)",
-                              color: "var(--color-text)",
-                            }
-                          : {
-                              background: "var(--color-surface)",
-                              color: "var(--color-text)",
-                            }
-                      }
                     >
                       {m.content}
                     </div>
-                  )}
-                  {m.sources && m.sources.length > 0 && (
-                    <div className="flex flex-wrap gap-1.5 pt-1">
-                      {m.sources.map((s) => (
-                        <a
-                          key={s.id}
-                          href={s.url ?? "#"}
-                          target={s.url ? "_blank" : undefined}
-                          rel="noopener noreferrer"
-                          className="inline-flex items-center text-[11px] px-2.5 py-0.5 rounded-full ring-hairline transition-colors hover:bg-[var(--color-surface-2)] hover:text-[var(--color-accent)]"
-                          style={{
-                            background: "var(--color-surface)",
-                            color: "var(--color-text-muted)",
-                          }}
-                        >
-                          {s.label}
-                        </a>
-                      ))}
+                  </div>
+                ) : (
+                  <div className="flex gap-[13px]">
+                    <div className="mt-0.5 shrink-0" aria-hidden>
+                      <CompassMark size={32} />
                     </div>
-                  )}
-                  {m.role === "assistant" && m.content !== "" && (
-                    <div className="flex items-center gap-1 pt-1">
-                      <button
-                        type="button"
-                        aria-label="Helpful"
-                        className="pressable p-1.5 rounded-lg transition-colors hover:bg-[var(--color-surface-2)] hover:text-[var(--color-accent)]"
-                        style={{ color: "var(--color-text-subtle)" }}
-                      >
-                        <ThumbsUp className="h-3.5 w-3.5" />
-                      </button>
-                      <button
-                        type="button"
-                        aria-label="Not helpful"
-                        className="pressable p-1.5 rounded-lg transition-colors hover:bg-[var(--color-surface-2)] hover:text-[var(--color-accent)]"
-                        style={{ color: "var(--color-text-subtle)" }}
-                      >
-                        <ThumbsDown className="h-3.5 w-3.5" />
-                      </button>
+                    <div
+                      className="card card-hard min-w-0 flex-1 px-[18px] py-4"
+                      style={{ borderRadius: "4px var(--r-lg) var(--r-lg) var(--r-lg)" }}
+                    >
+                      {m.content === "" ? (
+                        <div className="space-y-2">
+                          <div
+                            className="flex items-center gap-2.5 text-sm"
+                            style={{ color: "var(--ink-3)" }}
+                            aria-live="polite"
+                          >
+                            <span className="flex gap-1" aria-hidden>
+                              <span
+                                className="h-[7px] w-[7px] rounded-full animate-bounce [animation-delay:-0.3s]"
+                                style={{ background: "var(--accent)" }}
+                              />
+                              <span
+                                className="h-[7px] w-[7px] rounded-full animate-bounce [animation-delay:-0.15s]"
+                                style={{ background: "var(--accent)" }}
+                              />
+                              <span
+                                className="h-[7px] w-[7px] rounded-full animate-bounce"
+                                style={{ background: "var(--accent)" }}
+                              />
+                            </span>
+                            Compass is thinking… this can take a few seconds.
+                          </div>
+                          <Skeleton className="h-3 w-3/4" />
+                          <Skeleton className="h-3 w-1/2" />
+                        </div>
+                      ) : (
+                        <>
+                          {renderRich(m.content, onCite)}
+                          {m.sources && m.sources.length > 0 && (
+                            <div
+                              className="mt-4 pt-3.5"
+                              style={{ borderTop: "1.5px dashed var(--line-strong)" }}
+                            >
+                              <div className="eyebrow mb-[9px]">Sources</div>
+                              <div className="flex flex-col gap-[7px]">
+                                {m.sources.map((s) => (
+                                  <SourceRow key={s.id} source={s} />
+                                ))}
+                              </div>
+                            </div>
+                          )}
+                          <div
+                            className="mt-3 flex items-center gap-1 pt-2.5"
+                            style={{ borderTop: "1.5px solid var(--line)" }}
+                          >
+                            <button
+                              type="button"
+                              aria-label="Helpful"
+                              className="pressable rounded-[var(--r-sm)] p-1.5 transition-colors hover:bg-[var(--surface-2)] hover:text-[var(--accent-deep)]"
+                              style={{ color: "var(--ink-3)" }}
+                            >
+                              <ThumbsUp className="h-3.5 w-3.5" />
+                            </button>
+                            <button
+                              type="button"
+                              aria-label="Not helpful"
+                              className="pressable rounded-[var(--r-sm)] p-1.5 transition-colors hover:bg-[var(--surface-2)] hover:text-[var(--accent-deep)]"
+                              style={{ color: "var(--ink-3)" }}
+                            >
+                              <ThumbsDown className="h-3.5 w-3.5" />
+                            </button>
+                          </div>
+                        </>
+                      )}
                     </div>
-                  )}
-                </div>
+                  </div>
+                )}
               </article>
             ))}
             <div ref={bottomRef} />
@@ -315,45 +420,47 @@ export function ChatUI(): React.ReactElement {
       {/* Composer */}
       <form
         onSubmit={onSubmit}
-        className="px-6 py-4 ring-hairline"
-        style={{
-          background: "color-mix(in oklch, var(--color-bg) 80%, transparent)",
-        }}
+        className="px-7 pt-3 pb-[22px]"
+        style={{ borderTop: "1.5px solid var(--line)", background: "var(--paper)" }}
       >
-        <div className="max-w-3xl mx-auto glass flex gap-2 rounded-xl ring-hairline shadow-[var(--shadow-md)] p-2">
-          <textarea
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            onKeyDown={(e) => {
-              if ((e.metaKey || e.ctrlKey) && e.key === "Enter") {
-                e.preventDefault();
-                send(input);
-              }
-            }}
-            placeholder="Ask anything about your degree plan…"
-            rows={2}
-            className="flex-1 resize-none rounded-lg border-0 bg-transparent px-2.5 py-1.5 text-sm focus-visible:outline-none"
-            style={{
-              color: "var(--color-text)",
-            }}
-            disabled={pending}
-          />
-          <Button
-            type="submit"
-            variant="accent"
-            disabled={pending || !input.trim()}
-            className="pressable shrink-0 self-end shadow-[0_0_14px_var(--color-accent-ring)]"
+        <div className="mx-auto max-w-[760px]">
+          <div
+            className="card flex items-end gap-2.5 py-2 pr-2 pl-4"
+            style={{ borderColor: "var(--line-strong)" }}
           >
-            <Send className="h-4 w-4 mr-1.5" />
-            Send
-          </Button>
+            <textarea
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              onKeyDown={(e) => {
+                if ((e.metaKey || e.ctrlKey) && e.key === "Enter") {
+                  e.preventDefault();
+                  send(input);
+                }
+              }}
+              placeholder="Ask about prerequisites, workload, electives…"
+              rows={2}
+              className="flex-1 resize-none border-0 bg-transparent py-2 text-[15.5px] focus-visible:outline-none"
+              style={{ color: "var(--ink)", fontFamily: "var(--font-ui)" }}
+              disabled={pending}
+            />
+            <Button
+              type="submit"
+              variant="accent"
+              disabled={pending || !input.trim()}
+              className="pressable shrink-0 self-end"
+            >
+              <ArrowRight className="mr-1.5 h-4 w-4" />
+              Send
+            </Button>
+          </div>
+          <p
+            className="mx-auto mt-[9px] text-center text-[11.5px]"
+            style={{ color: "var(--ink-3)" }}
+          >
+            Compass routes simple lookups to a fast model and strategy questions to a smarter one ·
+            ⌘+Enter to send · answers can be wrong even when cited
+          </p>
         </div>
-        <p
-          className="max-w-3xl mx-auto mt-2 text-[10px]"
-          style={{ color: "var(--color-text-muted)" }}
-        >
-          ⌘+Enter to send. Compass cites sources but can still be wrong — verify with your advisor.
-        </p>
       </form>
     </div>
   );

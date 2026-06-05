@@ -5,74 +5,33 @@
 @custom-variant dark (&:is(.dark *));
 
 /* =============================================================================
- * LUMEN design system  —  full visual rework (v2)
+ * MERIDIAN — design system (full visual rework v3)
  * -----------------------------------------------------------------------------
- * A refined, premium, content-first language: a calm neutral canvas with real
- * layered depth, a confident emerald→teal signature, sharp typography, and
- * restrained motion. Linear/Vercel-grade polish.
+ * A warm editorial almanac for the Compass degree planner: bone-paper canvas,
+ * confident ink borders with offset HARD-shadows (a risograph / print feel),
+ * boxed mono course codes, Clementine accent. Bricolage Grotesque (display) +
+ * Hanken Grotesk (UI) + JetBrains Mono (code/numerics).
  *
- * Every legacy token NAME is preserved (so existing markup keeps working); only
- * the VALUES were upgraded, and a handful of new tokens/utilities were added.
- * shadcn semantic vars are mapped from these tokens in the :root block below —
- * adjust mappings there, not the shadcn names directly.
+ * Source of truth: the Claude Design "Meridian" handoff bundle.
+ *
+ * Strategy: Meridian-native tokens (--paper/--ink/--line/--hard-shadow/--accent…)
+ * are the primitives. Every LEGACY Lumen token name (--color-*, --gradient-*,
+ * --shadow-*, etc.) is ALIASED to a Meridian value below, so existing components
+ * and pages keep working — now rendered in the Meridian identity.
  * ============================================================================= */
 
 @theme {
-  /* ---- COLOR (light) — apply on :root --------------------------------------
-     "SOLID" upgrade: deeper canvas so pure-white cards read as confident,
-     grounded objects; stronger, clearly visible borders (not faint hairlines);
-     darker ink for higher-contrast, more substantial type. */
-  --color-bg: oklch(0.965 0.0025 250);
-  --color-surface: oklch(1 0 0);
-  --color-surface-2: oklch(0.955 0.003 250);
-  --color-surface-3: oklch(0.93 0.004 250);
-  --color-border: oklch(0.86 0.006 250);
-  --color-border-strong: oklch(0.74 0.008 250);
-  --color-text: oklch(0.17 0.014 258);
-  --color-text-muted: oklch(0.44 0.012 255);
-  --color-text-subtle: oklch(0.58 0.01 255);
-  --color-primary: oklch(0.2 0.016 258);
-  --color-primary-hover: oklch(0.13 0.016 258);
-  --color-primary-fg: oklch(0.99 0.002 250);
+  /* ---- TYPE (wired from next/font in layout.tsx) ---- */
+  --font-display: var(--font-display), "Bricolage Grotesque", ui-sans-serif, system-ui, sans-serif;
+  --font-ui: var(--font-ui), "Hanken Grotesk", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-mono), "JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;
+  --font-sans: var(--font-ui);
+  --font-heading: var(--font-display);
+  --tracking-tight: -0.02em;
+  --tracking-tighter: -0.035em;
 
-  /* Signature: a deeper, more committed emerald — reads as solid, not pastel. */
-  --color-accent: oklch(0.575 0.15 166);
-  --color-accent-hover: oklch(0.5 0.155 166);
-  --color-accent-2: oklch(0.61 0.13 192);
-  --color-accent-soft: oklch(0.945 0.04 170);
-  --color-accent-ring: oklch(0.575 0.15 166 / 0.45);
-
-  /* Brand iris — used for links, selection, secondary focus accents. */
-  --color-iris: oklch(0.56 0.14 264);
-  --color-iris-soft: oklch(0.96 0.025 264);
-
-  --color-success: oklch(0.62 0.12 162);
-  --color-success-soft: oklch(0.96 0.025 162);
-  --color-warning: oklch(0.74 0.13 72);
-  --color-warning-soft: oklch(0.97 0.035 80);
-  --color-danger: oklch(0.585 0.2 22);
-  --color-danger-soft: oklch(0.965 0.022 22);
-  --color-info: oklch(0.62 0.12 232);
-  --color-info-soft: oklch(0.96 0.025 232);
-
-  /* ---- TYPE ----------------------------------------------------------------
-     Fluid display sizes (clamp) for headings + a fixed step scale for UI. */
-  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
-  --font-mono: var(--font-geist-mono), ui-monospace, "SF Mono", Menlo, monospace;
-  --text-11: 11px;
-  --text-12: 12px;
-  --text-13: 13px;
-  --text-14: 14px;
-  --text-16: 16px;
-  --text-18: 18px;
-  --text-20: 20px;
-  --text-24: 24px;
-  --text-30: 30px;
-  --text-36: 36px;
-  --text-display: clamp(2.4rem, 1.6rem + 3.4vw, 4.25rem);
-  --text-display-sm: clamp(1.85rem, 1.4rem + 2vw, 3rem);
-  --tracking-tight: -0.018em;
-  --tracking-tighter: -0.03em;
+  --text-display: clamp(2.6rem, 1.6rem + 3.4vw, 4.4rem);
+  --text-display-sm: clamp(1.9rem, 1.4rem + 1.6vw, 2.8rem);
 
   /* ---- SPACING (4px base) ---- */
   --spacing-1: 4px;
@@ -87,71 +46,44 @@
   --spacing-16: 64px;
   --spacing-20: 80px;
 
-  /* ---- RADIUS — tighter / more architectural for a solid, grounded feel ---- */
-  --radius-sm: 6px;
-  --radius-md: 8px;
-  --radius-lg: 10px;
-  --radius-xl: 14px;
-  --radius-2xl: 20px;
-  --radius-full: 9999px;
-
-  /* ---- ELEVATION ------------------------------------------------------------
-     "SOLID" shadows: deeper, firmer, less diffuse — cards sit FIRMLY on the
-     page rather than floating. Paired with the stronger borders above. */
-  --shadow-xs: 0 1px 1px oklch(0.18 0.02 258 / 0.08);
-  --shadow-sm: 0 1px 2px oklch(0.18 0.02 258 / 0.1), 0 2px 4px oklch(0.18 0.02 258 / 0.06);
-  --shadow-md: 0 2px 4px oklch(0.18 0.02 258 / 0.08), 0 8px 16px oklch(0.18 0.02 258 / 0.1);
-  --shadow-lg: 0 4px 8px oklch(0.18 0.02 258 / 0.1), 0 16px 32px oklch(0.18 0.02 258 / 0.14);
-  --shadow-xl: 0 8px 16px oklch(0.18 0.02 258 / 0.12), 0 32px 56px oklch(0.18 0.02 258 / 0.18);
-  --shadow-glow: 0 0 0 1px oklch(0.575 0.15 166 / 0.3), 0 8px 24px oklch(0.575 0.15 166 / 0.22);
-  --shadow-inset: inset 0 1px 0 oklch(1 0 0 / 0.5);
-
-  /* ---- GRADIENTS / GLOW -----------------------------------------------------
-     Signature emerald→teal sweep + a refined neutral surface gradient. */
-  --gradient-accent: linear-gradient(135deg, oklch(0.6 0.15 166), oklch(0.56 0.13 194));
-  --gradient-accent-bright: linear-gradient(135deg, oklch(0.65 0.16 164), oklch(0.6 0.14 198));
-  --gradient-accent-soft: linear-gradient(
-    135deg,
-    oklch(0.6 0.15 166 / 0.16),
-    oklch(0.56 0.13 198 / 0.06)
-  );
-  --gradient-primary: linear-gradient(180deg, oklch(0.26 0.018 258), oklch(0.16 0.016 258));
-  --gradient-surface: linear-gradient(180deg, oklch(1 0 0), oklch(0.984 0.0025 250));
-  --gradient-hero: radial-gradient(
-      120% 120% at 0% 0%,
-      oklch(0.66 0.135 168 / 0.1) 0%,
-      transparent 45%
-    ), radial-gradient(120% 120% at 100% 0%, oklch(0.56 0.14 264 / 0.08) 0%, transparent 45%);
-  --glow-accent: radial-gradient(
-    60% 60% at 50% 0%,
-    oklch(0.66 0.135 168 / 0.18) 0%,
-    transparent 72%
-  );
-  --sheen: linear-gradient(
-    100deg,
-    transparent 20%,
-    oklch(1 0 0 / 0.18) 48%,
-    oklch(1 0 0 / 0.06) 52%,
-    transparent 78%
-  );
+  /* ---- RADIUS — Meridian: tight, architectural ---- */
+  --r-sm: 6px;
+  --r-md: 10px;
+  --r-lg: 14px;
+  --r-xl: 20px;
+  --r-full: 999px;
+  --radius-sm: var(--r-sm);
+  --radius-md: var(--r-md);
+  --radius-lg: var(--r-lg);
+  --radius-xl: var(--r-xl);
+  --radius-2xl: var(--r-xl);
+  --radius-full: var(--r-full);
 
   /* ---- MOTION ---- */
+  --ease: cubic-bezier(0.22, 1, 0.36, 1);
   --ease-out-soft: cubic-bezier(0.22, 1, 0.36, 1);
-  --ease-spring: cubic-bezier(0.34, 1.4, 0.5, 1);
+  --ease-spring: cubic-bezier(0.34, 1.45, 0.5, 1);
   --ease-in-out-soft: cubic-bezier(0.65, 0, 0.35, 1);
-  --duration-fast: 130ms;
-  --duration-base: 220ms;
-  --duration-slow: 400ms;
+  --duration-fast: 150ms;
+  --duration-base: 240ms;
+  --duration-slow: 420ms;
 
-  /* ---- KEYFRAMES ---- */
-  --animate-fade-in: fade-in var(--duration-base) var(--ease-out-soft) both;
-  --animate-rise: rise var(--duration-slow) var(--ease-out-soft) both;
+  /* ---- KEYFRAMES (Meridian + retained Lumen names) ---- */
+  --animate-fade-in: fade 0.4s var(--ease) both;
+  --animate-rise: rise 0.5s var(--ease) both;
   --animate-shimmer: shimmer 2.4s linear infinite;
-  --animate-aurora: aurora 22s ease-in-out infinite alternate;
-  --animate-sheen: sheen 2.8s var(--ease-out-soft) infinite;
-  --animate-pulse-ring: pulse-ring 2.4s var(--ease-out-soft) infinite;
 
-  @keyframes fade-in {
+  @keyframes rise {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+  @keyframes fade {
     from {
       opacity: 0;
     }
@@ -159,14 +91,12 @@
       opacity: 1;
     }
   }
-  @keyframes rise {
+  @keyframes fade-in {
     from {
       opacity: 0;
-      transform: translateY(12px);
     }
     to {
       opacity: 1;
-      transform: translateY(0);
     }
   }
   @keyframes shimmer {
@@ -177,30 +107,14 @@
       background-position: 200% 0;
     }
   }
-  @keyframes aurora {
+  @keyframes pop {
     0% {
-      transform: translate3d(-4%, -2%, 0) scale(1) rotate(0deg);
+      transform: scale(0.9);
+      opacity: 0;
     }
     100% {
-      transform: translate3d(5%, 4%, 0) scale(1.12) rotate(8deg);
-    }
-  }
-  @keyframes sheen {
-    0% {
-      background-position: -150% 0;
-    }
-    60%,
-    100% {
-      background-position: 250% 0;
-    }
-  }
-  @keyframes pulse-ring {
-    0% {
-      box-shadow: 0 0 0 0 oklch(0.62 0.135 168 / 0.35);
-    }
-    70%,
-    100% {
-      box-shadow: 0 0 0 10px oklch(0.62 0.135 168 / 0);
+      transform: scale(1);
+      opacity: 1;
     }
   }
   @keyframes skeleton-sweep {
@@ -208,146 +122,261 @@
       transform: translateX(100%);
     }
   }
+  @keyframes sheetIn {
+    from {
+      transform: translateX(40px);
+      opacity: 0;
+    }
+    to {
+      transform: none;
+      opacity: 1;
+    }
+  }
 }
 
 /* =============================================================================
- * shadcn semantic variable mappings (light).
+ * MERIDIAN tokens — LIGHT (bone paper + ink)
  * ============================================================================= */
+:root,
+:root[data-theme="light"] {
+  --paper: oklch(0.965 0.011 84);
+  --paper-2: oklch(0.945 0.013 84);
+  --surface: oklch(0.995 0.004 84);
+  --surface-2: oklch(0.975 0.008 84);
+  --ink: oklch(0.24 0.018 60);
+  --ink-2: oklch(0.42 0.016 62);
+  --ink-3: oklch(0.56 0.014 64);
+  --line: oklch(0.26 0.02 60 / 0.16);
+  --line-strong: oklch(0.26 0.02 60 / 0.42);
+  --hard: oklch(0.24 0.018 60 / 0.9);
+  --hard-shadow: 3px 3px 0 oklch(0.24 0.018 60 / 0.14);
+  --hard-shadow-strong: 4px 4px 0 var(--ink);
+  --soft-shadow: 0 1px 2px oklch(0.24 0.02 60 / 0.08), 0 8px 24px oklch(0.24 0.02 60 / 0.07);
 
-:root {
-  --background: var(--color-bg);
-  --foreground: var(--color-text);
-  --card: var(--color-surface);
-  --card-foreground: var(--color-text);
-  --popover: var(--color-surface);
-  --popover-foreground: var(--color-text);
-  --primary: var(--color-primary);
-  --primary-foreground: var(--color-primary-fg);
-  --secondary: var(--color-surface-2);
-  --secondary-foreground: var(--color-text);
-  --muted: var(--color-surface-2);
-  --muted-foreground: var(--color-text-muted);
-  --accent: var(--color-accent);
-  --accent-foreground: var(--color-primary-fg);
-  --destructive: var(--color-danger);
-  --border: var(--color-border);
-  --input: var(--color-border);
-  --ring: var(--color-accent);
-  --radius: 0.625rem;
-  --sidebar: var(--color-surface);
-  --sidebar-foreground: var(--color-text);
-  --sidebar-primary: var(--color-primary);
-  --sidebar-primary-foreground: var(--color-primary-fg);
-  --sidebar-accent: var(--color-surface-2);
-  --sidebar-accent-foreground: var(--color-text);
-  --sidebar-border: var(--color-border);
-  --sidebar-ring: var(--color-accent);
+  /* accent: see the ACCENT PALETTES block below (keyed by [data-accent]) */
+
+  /* status */
+  --ok: oklch(0.6 0.13 150);
+  --ok-soft: oklch(0.6 0.13 150 / 0.14);
+  --warn: oklch(0.72 0.14 75);
+  --warn-soft: oklch(0.72 0.14 75 / 0.16);
+  --bad: oklch(0.6 0.2 25);
+  --bad-soft: oklch(0.6 0.2 25 / 0.14);
+  --info: oklch(0.6 0.12 240);
+  --info-soft: oklch(0.6 0.12 240 / 0.14);
+
+  color-scheme: light;
 }
 
+/* =============================================================================
+ * MERIDIAN tokens — DARK (warm near-black). Applies via next-themes `.dark`
+ * AND the design's data-theme="dark", whichever is present.
+ * ============================================================================= */
+.dark,
+:root[data-theme="dark"] {
+  --paper: oklch(0.185 0.012 60);
+  --paper-2: oklch(0.215 0.013 60);
+  --surface: oklch(0.235 0.014 62);
+  --surface-2: oklch(0.275 0.015 62);
+  --ink: oklch(0.95 0.01 84);
+  --ink-2: oklch(0.78 0.012 80);
+  --ink-3: oklch(0.62 0.012 76);
+  --line: oklch(0.92 0.01 84 / 0.14);
+  --line-strong: oklch(0.92 0.01 84 / 0.32);
+  --hard: oklch(0 0 0 / 0.5);
+  --hard-shadow: 3px 3px 0 oklch(0 0 0 / 0.3);
+  --hard-shadow-strong: 4px 4px 0 oklch(0 0 0 / 0.55);
+  --soft-shadow: 0 1px 2px oklch(0 0 0 / 0.4), 0 10px 30px oklch(0 0 0 / 0.5);
+
+  /* accent: see the ACCENT PALETTES block below (brightened per-palette in dark) */
+
+  --ok: oklch(0.74 0.13 152);
+  --ok-soft: oklch(0.74 0.13 152 / 0.16);
+  --warn: oklch(0.8 0.13 78);
+  --warn-soft: oklch(0.8 0.13 78 / 0.18);
+  --bad: oklch(0.7 0.18 25);
+  --bad-soft: oklch(0.7 0.18 25 / 0.16);
+  --info: oklch(0.72 0.12 242);
+  --info-soft: oklch(0.72 0.12 242 / 0.16);
+
+  color-scheme: dark;
+}
+
+/* =============================================================================
+ * ACCENT PALETTES — swappable via data-accent on <html> (the color toggle).
+ * Default (no attribute, or "clementine") = Clementine. Each works in both
+ * themes; dark variants are brightened for pop.
+ * ============================================================================= */
+/* LIGHT palettes — scoped :not(.dark) so they never bleed into dark mode. */
+:root:not(.dark) {
+  --accent: oklch(0.67 0.17 47);
+  --accent-deep: oklch(0.58 0.17 42);
+  --on-accent: oklch(0.99 0.01 80);
+  --accent-soft: oklch(0.67 0.17 47 / 0.13);
+  --accent-glow: oklch(0.67 0.17 47 / 0.32);
+}
+:root:not(.dark)[data-accent="cobalt"] {
+  --accent: oklch(0.56 0.16 256);
+  --accent-deep: oklch(0.48 0.16 256);
+  --on-accent: oklch(0.99 0.01 256);
+  --accent-soft: oklch(0.56 0.16 256 / 0.13);
+  --accent-glow: oklch(0.56 0.16 256 / 0.32);
+}
+:root:not(.dark)[data-accent="moss"] {
+  --accent: oklch(0.56 0.11 150);
+  --accent-deep: oklch(0.47 0.11 150);
+  --on-accent: oklch(0.99 0.01 150);
+  --accent-soft: oklch(0.56 0.11 150 / 0.14);
+  --accent-glow: oklch(0.56 0.11 150 / 0.3);
+}
+:root:not(.dark)[data-accent="plum"] {
+  --accent: oklch(0.55 0.16 330);
+  --accent-deep: oklch(0.47 0.16 330);
+  --on-accent: oklch(0.99 0.01 330);
+  --accent-soft: oklch(0.55 0.16 330 / 0.13);
+  --accent-glow: oklch(0.55 0.16 330 / 0.32);
+}
+:root:not(.dark)[data-accent="maroon"] {
+  --accent: oklch(0.5 0.15 22);
+  --accent-deep: oklch(0.42 0.15 22);
+  --on-accent: oklch(0.99 0.01 22);
+  --accent-soft: oklch(0.5 0.15 22 / 0.13);
+  --accent-glow: oklch(0.5 0.15 22 / 0.3);
+}
+/* DARK palettes — brightened. .dark (default) = Clementine. */
 .dark {
-  /* ---- COLOR (dark) ---------------------------------------------------------
-     "SOLID" dark: a deeper near-black canvas with clearly stepped surface tiers
-     and stronger borders, so panels read as distinct, substantial blocks.
-     Brighter emerald keeps the accent popping against the darker ground. */
-  --color-bg: oklch(0.145 0.009 260);
-  --color-surface: oklch(0.195 0.01 260);
-  --color-surface-2: oklch(0.235 0.011 260);
-  --color-surface-3: oklch(0.275 0.012 260);
-  --color-border: oklch(0.34 0.014 260);
-  --color-border-strong: oklch(0.46 0.016 260);
-  --color-text: oklch(0.97 0.003 250);
-  --color-text-muted: oklch(0.72 0.008 255);
-  --color-text-subtle: oklch(0.58 0.008 255);
-  --color-primary: oklch(0.97 0.003 250);
-  --color-primary-hover: oklch(0.9 0.004 250);
-  --color-primary-fg: oklch(0.18 0.008 260);
+  --accent: oklch(0.74 0.16 52);
+  --accent-deep: oklch(0.68 0.17 48);
+  --on-accent: oklch(0.99 0.01 80);
+  --accent-soft: oklch(0.74 0.16 52 / 0.16);
+  --accent-glow: oklch(0.74 0.16 52 / 0.32);
+}
+.dark[data-accent="cobalt"] {
+  --accent: oklch(0.68 0.15 256);
+  --accent-deep: oklch(0.6 0.16 256);
+  --accent-soft: oklch(0.68 0.15 256 / 0.16);
+  --accent-glow: oklch(0.68 0.15 256 / 0.32);
+}
+.dark[data-accent="moss"] {
+  --accent: oklch(0.7 0.12 152);
+  --accent-deep: oklch(0.62 0.12 152);
+  --accent-soft: oklch(0.7 0.12 152 / 0.16);
+  --accent-glow: oklch(0.7 0.12 152 / 0.3);
+}
+.dark[data-accent="plum"] {
+  --accent: oklch(0.68 0.16 332);
+  --accent-deep: oklch(0.6 0.16 332);
+  --accent-soft: oklch(0.68 0.16 332 / 0.16);
+  --accent-glow: oklch(0.68 0.16 332 / 0.32);
+}
+.dark[data-accent="maroon"] {
+  --accent: oklch(0.64 0.16 24);
+  --accent-deep: oklch(0.56 0.16 24);
+  --accent-soft: oklch(0.64 0.16 24 / 0.16);
+  --accent-glow: oklch(0.64 0.16 24 / 0.3);
+}
 
-  --color-accent: oklch(0.76 0.135 168);
-  --color-accent-hover: oklch(0.81 0.13 168);
-  --color-accent-2: oklch(0.78 0.115 196);
-  --color-accent-soft: oklch(0.3 0.06 170);
-  --color-accent-ring: oklch(0.76 0.135 168 / 0.45);
+/* =============================================================================
+ * LEGACY ALIASES — map every old Lumen token name onto Meridian values so all
+ * existing components/pages render in the new identity with no edits required.
+ * ============================================================================= */
+:root,
+.dark {
+  --color-bg: var(--paper);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-surface-3: var(--paper-2);
+  --color-border: var(--line);
+  --color-border-strong: var(--line-strong);
+  --color-text: var(--ink);
+  --color-text-muted: var(--ink-2);
+  --color-text-subtle: var(--ink-3);
+  --color-primary: var(--ink);
+  --color-primary-hover: var(--ink);
+  --color-primary-fg: var(--paper);
 
-  --color-iris: oklch(0.72 0.13 268);
-  --color-iris-soft: oklch(0.3 0.06 266);
+  --color-accent: var(--accent);
+  --color-accent-hover: var(--accent-deep);
+  --color-accent-2: var(--accent-deep);
+  --color-accent-soft: var(--accent-soft);
+  --color-accent-ring: var(--accent-glow);
+  --color-iris: var(--info);
+  --color-iris-soft: var(--info-soft);
 
-  --color-success: oklch(0.74 0.12 162);
-  --color-success-soft: oklch(0.3 0.05 162);
-  --color-warning: oklch(0.81 0.13 75);
-  --color-warning-soft: oklch(0.32 0.06 80);
-  --color-danger: oklch(0.7 0.18 22);
-  --color-danger-soft: oklch(0.32 0.07 22);
-  --color-info: oklch(0.72 0.12 232);
-  --color-info-soft: oklch(0.3 0.05 232);
+  --color-success: var(--ok);
+  --color-success-soft: var(--ok-soft);
+  --color-warning: var(--warn);
+  --color-warning-soft: var(--warn-soft);
+  --color-danger: var(--bad);
+  --color-danger-soft: var(--bad-soft);
+  --color-info: var(--info);
+  --color-info-soft: var(--info-soft);
 
-  /* Elevation tuned for dark — shadows lean black, glow leans bright. */
-  --shadow-xs: 0 1px 2px oklch(0 0 0 / 0.4);
-  --shadow-sm: 0 1px 2px oklch(0 0 0 / 0.4), 0 1px 3px oklch(0 0 0 / 0.36);
-  --shadow-md: 0 2px 4px oklch(0 0 0 / 0.36), 0 6px 16px oklch(0 0 0 / 0.44);
-  --shadow-lg: 0 4px 8px oklch(0 0 0 / 0.4), 0 16px 36px oklch(0 0 0 / 0.52);
-  --shadow-xl: 0 8px 16px oklch(0 0 0 / 0.44), 0 28px 64px oklch(0 0 0 / 0.6);
-  --shadow-glow: 0 0 0 1px oklch(0.76 0.135 168 / 0.22), 0 10px 32px oklch(0.76 0.135 168 / 0.18);
-  --shadow-inset: inset 0 1px 0 oklch(1 0 0 / 0.05);
+  /* Elevation: legacy soft-shadow names point at Meridian shadows. The signature
+     "solid" feel comes from --hard-shadow, surfaced via the .ring-hairline +
+     .lift utilities and the card/button primitives. */
+  --shadow-xs: var(--hard-shadow);
+  --shadow-sm: var(--hard-shadow);
+  --shadow-md: var(--soft-shadow);
+  --shadow-lg: var(--soft-shadow);
+  --shadow-xl: var(--soft-shadow);
+  --shadow-glow: 0 0 0 1.5px var(--accent), 0 6px 22px var(--accent-glow);
+  --shadow-inset: inset 0 1px 0 oklch(1 0 0 / 0.4);
 
-  --gradient-accent: linear-gradient(135deg, oklch(0.78 0.14 168), oklch(0.74 0.12 198));
-  --gradient-accent-bright: linear-gradient(135deg, oklch(0.82 0.15 165), oklch(0.78 0.13 200));
-  --gradient-accent-soft: linear-gradient(
-    135deg,
-    oklch(0.76 0.135 168 / 0.18),
-    oklch(0.7 0.12 200 / 0.06)
-  );
-  --gradient-primary: linear-gradient(180deg, oklch(0.99 0.002 250), oklch(0.9 0.004 250));
-  --gradient-surface: linear-gradient(180deg, oklch(0.222 0.01 260), oklch(0.196 0.009 260));
-  --gradient-hero: radial-gradient(
-      120% 120% at 0% 0%,
-      oklch(0.76 0.135 168 / 0.14) 0%,
-      transparent 45%
-    ), radial-gradient(120% 120% at 100% 0%, oklch(0.72 0.13 268 / 0.1) 0%, transparent 45%);
-  --glow-accent: radial-gradient(
-    60% 60% at 50% 0%,
-    oklch(0.76 0.135 168 / 0.22) 0%,
-    transparent 72%
-  );
+  /* Gradients: accent washes used by heroes/CTAs/insight cards. */
+  --gradient-accent: linear-gradient(135deg, var(--accent), var(--accent-deep));
+  --gradient-accent-bright: linear-gradient(135deg, var(--accent), var(--accent-deep));
+  --gradient-accent-soft: linear-gradient(120deg, var(--accent-soft), transparent 70%);
+  --gradient-primary: linear-gradient(180deg, var(--ink), var(--ink));
+  --gradient-surface: var(--surface);
+  --gradient-hero: linear-gradient(125deg, var(--accent-soft), transparent 60%);
+  --glow-accent: radial-gradient(60% 60% at 50% 0%, var(--accent-glow) 0%, transparent 72%);
   --sheen: linear-gradient(
     100deg,
     transparent 20%,
-    oklch(1 0 0 / 0.08) 48%,
-    oklch(1 0 0 / 0.03) 52%,
+    oklch(1 0 0 / 0.12) 48%,
+    oklch(1 0 0 / 0.04) 52%,
     transparent 78%
   );
-
-  /* shadcn semantic vars re-resolve through the updated --color-* above. */
-  --background: var(--color-bg);
-  --foreground: var(--color-text);
-  --card: var(--color-surface);
-  --card-foreground: var(--color-text);
-  --popover: var(--color-surface);
-  --popover-foreground: var(--color-text);
-  --primary: var(--color-primary);
-  --primary-foreground: var(--color-primary-fg);
-  --secondary: var(--color-surface-2);
-  --secondary-foreground: var(--color-text);
-  --muted: var(--color-surface-2);
-  --muted-foreground: var(--color-text-muted);
-  --accent: var(--color-accent);
-  --accent-foreground: var(--color-primary-fg);
-  --destructive: var(--color-danger);
-  --border: var(--color-border);
-  --input: var(--color-border);
-  --ring: var(--color-accent);
-  --sidebar: var(--color-surface);
-  --sidebar-foreground: var(--color-text);
-  --sidebar-primary: var(--color-primary);
-  --sidebar-primary-foreground: var(--color-primary-fg);
-  --sidebar-accent: var(--color-surface-2);
-  --sidebar-accent-foreground: var(--color-text);
-  --sidebar-border: var(--color-border);
-  --sidebar-ring: var(--color-accent);
 }
 
 /* =============================================================================
- * @theme inline — exposes shadcn semantic vars to Tailwind utilities.
+ * shadcn semantic variable mappings — point at Meridian tokens.
  * ============================================================================= */
+:root,
+.dark {
+  --background: var(--paper);
+  --foreground: var(--ink);
+  --card: var(--surface);
+  --card-foreground: var(--ink);
+  --popover: var(--surface);
+  --popover-foreground: var(--ink);
+  --primary: var(--ink);
+  --primary-foreground: var(--paper);
+  --secondary: var(--surface-2);
+  --secondary-foreground: var(--ink);
+  --muted: var(--surface-2);
+  --muted-foreground: var(--ink-2);
+  --accent-foreground: var(--on-accent);
+  --destructive: var(--bad);
+  --border: var(--line);
+  --input: var(--line-strong);
+  --ring: var(--accent);
+  --radius: 0.625rem;
+  --sidebar: var(--paper-2);
+  --sidebar-foreground: var(--ink);
+  --sidebar-primary: var(--ink);
+  --sidebar-primary-foreground: var(--paper);
+  --sidebar-accent: var(--surface);
+  --sidebar-accent-foreground: var(--ink);
+  --sidebar-border: var(--line);
+  --sidebar-ring: var(--accent);
+}
+/* `--accent` for shadcn must resolve to the accent color (not be shadowed). */
+:root,
+.dark {
+  --color-background: var(--background);
+}
 
 @theme inline {
   --color-background: var(--background);
@@ -376,50 +405,57 @@
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
-  --radius-sm: calc(var(--radius) - 4px);
-  --radius-md: calc(var(--radius) - 2px);
-  --radius-lg: var(--radius);
-  --radius-xl: calc(var(--radius) + 6px);
-  --font-heading: var(--font-sans);
+  --radius-sm: var(--r-sm);
+  --radius-md: var(--r-md);
+  --radius-lg: var(--r-lg);
+  --radius-xl: var(--r-xl);
 }
 
 /* =============================================================================
- * Numeric / type utilities
+ * Type utilities
  * ============================================================================= */
-
 .tnum {
   font-variant-numeric: tabular-nums slashed-zero;
 }
-
 .mono {
   font-family: var(--font-mono);
-  font-feature-settings: "ss01", "cv01";
+  font-feature-settings: "ss01";
+  font-variant-numeric: slashed-zero tabular-nums;
 }
-
 .text-display {
+  font-family: var(--font-display);
   font-size: var(--text-display);
   line-height: 1;
   letter-spacing: var(--tracking-tighter);
 }
 .text-display-sm {
+  font-family: var(--font-display);
   font-size: var(--text-display-sm);
   line-height: 1.04;
   letter-spacing: var(--tracking-tighter);
 }
-
-/* Eyebrow / kicker label above headings. */
+/* Eyebrow / kicker — mono, tracked, uppercase (Meridian signature). */
 .eyebrow {
-  font-size: var(--text-12);
-  font-weight: 600;
-  letter-spacing: 0.08em;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.14em;
   text-transform: uppercase;
-  color: var(--color-text-subtle);
+  color: var(--ink-3);
+}
+/* Boxed mono course code chip. */
+.chip-code {
+  font-family: var(--font-mono);
+  font-weight: 700;
+  font-size: 12px;
+  letter-spacing: 0.02em;
+  font-variant-numeric: slashed-zero;
+  white-space: nowrap;
 }
 
 /* =============================================================================
  * Base styles
  * ============================================================================= */
-
 @layer base {
   * {
     @apply border-border outline-ring/50;
@@ -430,34 +466,49 @@
     text-rendering: optimizeLegibility;
   }
   body {
-    @apply bg-background text-foreground font-sans;
+    @apply bg-background text-foreground;
+    font-family: var(--font-ui);
     letter-spacing: -0.006em;
+    transition: background 0.3s var(--ease), color 0.3s var(--ease);
   }
   ::selection {
-    background: var(--color-accent-soft);
-    color: var(--color-text);
+    background: var(--accent-soft);
+    color: var(--ink);
   }
-  /* "Solid" headings: heavier weight + tighter tracking for a confident,
-     substantial feel across every page. */
+  /* Headings: Bricolage display, tight tracking, confident weight. */
   h1,
   h2,
-  h3 {
+  h3,
+  h4 {
+    font-family: var(--font-display);
+    font-weight: 700;
     letter-spacing: var(--tracking-tight);
-    font-weight: 650;
+    line-height: 1.08;
   }
 }
 
-/* Focus ring — emerald 2px outline, :focus-visible only. */
+/* Focus ring. */
 :where(button, a, input, select, textarea, [role="button"], [tabindex]):focus-visible {
-  outline: 2px solid var(--color-accent);
+  outline: 2px solid var(--accent);
   outline-offset: 2px;
-  border-radius: var(--radius-sm);
+  border-radius: var(--r-sm);
 }
 
 /* =============================================================================
- * LUMEN utility layer — decorative, opt-in classes used across pages.
- * All motion degrades gracefully under prefers-reduced-motion (block at end).
+ * MERIDIAN utility layer
  * ============================================================================= */
+
+/* Card: ink-bordered paper surface. */
+.card {
+  background: var(--surface);
+  border: 1.5px solid var(--line);
+  border-radius: var(--r-lg);
+}
+/* Hard card: stronger border + signature offset hard-shadow. */
+.card-hard {
+  border: 1.5px solid var(--line-strong);
+  box-shadow: var(--hard-shadow);
+}
 
 /* Entrance animations. */
 .animate-fade-in {
@@ -466,27 +517,28 @@
 .animate-rise {
   animation: var(--animate-rise);
 }
-/* Stagger children: set --i on each child (inline) to offset its delay. */
+.rise {
+  animation: rise 0.5s var(--ease) both;
+}
+.fade {
+  animation: fade 0.4s var(--ease) both;
+}
 .stagger > * {
-  animation: var(--animate-rise);
+  animation: rise 0.5s var(--ease) both;
   animation-delay: calc(var(--i, 0) * 55ms);
 }
 
-/* Gradient text — emerald→teal wash on headings/numbers. */
+/* Gradient text — accent wash on display headings. */
 .text-gradient {
-  background: var(--gradient-accent);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
+  color: var(--accent-deep);
 }
 
-/* Soft accent surface (stat tiles, callouts). */
+/* Soft accent surface. */
 .surface-accent {
-  background: var(--gradient-accent-soft);
+  background: var(--accent-soft);
 }
 
-/* Explicit gradient-background utilities (Tailwind v4 won't emit
-   bg-[image:var(--…)] reliably for gradient vars, so we name them). */
+/* Named gradient-background utilities (used by buttons/CTAs/heroes). */
 .bg-gradient-accent {
   background-image: var(--gradient-accent);
 }
@@ -494,33 +546,49 @@
   background-image: var(--gradient-accent-bright);
 }
 .bg-gradient-primary {
-  background-image: var(--gradient-primary);
+  background: var(--ink);
 }
 .bg-gradient-surface {
-  background-image: var(--gradient-surface);
+  background: var(--surface);
 }
 .bg-gradient-hero {
   background-image: var(--gradient-hero);
 }
 
-/* "Solid" ring — a real, confidently visible 1px border on every card/panel
-   (kept named ring-hairline so all existing markup picks it up). */
+/* ring-hairline (legacy name) → Meridian: a real 1.5px ink border + hard-shadow,
+   the signature "solid print" treatment used across every card/panel. */
 .ring-hairline {
-  box-shadow: inset 0 0 0 1px var(--color-border);
-}
-.dark .ring-hairline {
-  box-shadow: inset 0 0 0 1px oklch(1 0 0 / 0.1);
+  border: 1.5px solid var(--line-strong);
+  box-shadow: var(--hard-shadow);
 }
 
-/* Frosted glass panel — for topbars, popovers, floating bars. Less transparent
-   now so it reads as a solid bar with a subtle blur, not a ghost. */
+/* glass → in Meridian, a frosted paper bar (topbars). */
 .glass {
-  background: color-mix(in oklch, var(--color-surface) 85%, transparent);
-  backdrop-filter: blur(14px) saturate(160%);
-  -webkit-backdrop-filter: blur(14px) saturate(160%);
+  background: color-mix(in oklch, var(--paper) 84%, transparent);
+  backdrop-filter: blur(12px) saturate(150%);
+  -webkit-backdrop-filter: blur(12px) saturate(150%);
 }
 
-/* Glow halo behind hero art / featured cards. */
+/* Card hover lift — translate up-left + reveal hard-shadow (print stack). */
+.lift {
+  transition: transform var(--duration-base) var(--ease), box-shadow var(--duration-base)
+    var(--ease), border-color var(--duration-base) var(--ease);
+}
+.lift:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: var(--hard-shadow-strong);
+  border-color: var(--line-strong);
+}
+
+/* Pressable — tactile press for buttons/tiles. */
+.pressable {
+  transition: transform var(--duration-fast) var(--ease);
+}
+.pressable:active {
+  transform: translate(1px, 1px);
+}
+
+/* glow-accent halo behind hero art / featured cards. */
 .glow-accent {
   position: relative;
 }
@@ -534,132 +602,76 @@
   z-index: 0;
 }
 
-/* Animated aurora mesh — large soft emerald/iris blobs for hero/auth bg. */
+/* Decorative aurora retained as a soft accent wash (no longer emerald blobs). */
 .aurora-bg {
   position: absolute;
   inset: 0;
   overflow: hidden;
   pointer-events: none;
   z-index: 0;
-}
-.aurora-bg::before,
-.aurora-bg::after {
-  content: "";
-  position: absolute;
-  width: 62vw;
-  height: 62vw;
-  border-radius: 9999px;
-  filter: blur(90px);
-  opacity: 0.55;
-  animation: var(--animate-aurora);
-}
-.aurora-bg::before {
-  top: -22%;
-  left: -12%;
-  background: radial-gradient(circle, oklch(0.66 0.135 168 / 0.55), transparent 62%);
-}
-.aurora-bg::after {
-  bottom: -28%;
-  right: -12%;
-  background: radial-gradient(circle, oklch(0.56 0.14 264 / 0.42), transparent 62%);
-  animation-delay: -11s;
+  background: var(--gradient-hero);
 }
 
-/* Card hover lift — depth + accent ring on hover. */
-.lift {
-  transition: transform var(--duration-base) var(--ease-out-soft), box-shadow var(--duration-base)
-    var(--ease-out-soft), border-color var(--duration-base) var(--ease-out-soft);
-  will-change: transform;
-}
-.lift:hover {
-  transform: translateY(-3px);
-  box-shadow: var(--shadow-lg);
-}
-
-/* Pressable — subtle scale-down on active for tactile buttons/tiles. */
-.pressable {
-  transition: transform var(--duration-fast) var(--ease-out-soft);
-}
-.pressable:active {
-  transform: scale(0.97);
-}
-
-/* Moving sheen highlight (run over a primary button / featured chip). */
-.sheen {
-  position: relative;
-  overflow: hidden;
-}
-.sheen::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: var(--sheen);
-  background-size: 250% 100%;
-  pointer-events: none;
-  animation: var(--animate-sheen);
-}
-
-/* Shimmer sheen for loading / "thinking" affordances. */
+/* Shimmer for loading affordances. */
 .shimmer {
-  background: linear-gradient(90deg, transparent 25%, var(--color-accent-soft) 50%, transparent 75%);
+  background: linear-gradient(90deg, transparent 25%, var(--accent-soft) 50%, transparent 75%);
   background-size: 200% 100%;
   animation: var(--animate-shimmer);
 }
 
-/* Pulsing ring for "live"/streaming indicators. */
-.pulse-ring {
-  animation: var(--animate-pulse-ring);
-}
-
-/* Grid + dot backdrops — faint texture for empty states & heroes. */
+/* Grid + line backdrops — faint texture for empty states & heroes. */
 .grid-backdrop {
-  background-image: radial-gradient(var(--color-border) 1px, transparent 1px);
+  background-image: radial-gradient(var(--line-strong) 1px, transparent 1px);
   background-size: 24px 24px;
   mask-image: radial-gradient(ellipse 80% 60% at 50% 0%, #000 30%, transparent 75%);
+  opacity: 0.5;
 }
 .lines-backdrop {
-  background-image: linear-gradient(var(--color-border) 1px, transparent 1px),
-    linear-gradient(90deg, var(--color-border) 1px, transparent 1px);
+  background-image: linear-gradient(var(--line) 1px, transparent 1px),
+    linear-gradient(90deg, var(--line) 1px, transparent 1px);
   background-size: 56px 56px;
   mask-image: radial-gradient(ellipse 70% 60% at 50% 0%, #000 20%, transparent 70%);
 }
 
-/* Custom scrollbar — slim, theme-aware. */
-.scroll-slim {
+/* Slim scrollbar. */
+.scroll-slim,
+.scroll {
   scrollbar-width: thin;
-  scrollbar-color: var(--color-border-strong) transparent;
+  scrollbar-color: var(--line-strong) transparent;
 }
-.scroll-slim::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+.scroll-slim::-webkit-scrollbar,
+.scroll::-webkit-scrollbar {
+  width: 9px;
+  height: 9px;
 }
-.scroll-slim::-webkit-scrollbar-thumb {
-  background: var(--color-border-strong);
-  border-radius: 9999px;
+.scroll-slim::-webkit-scrollbar-thumb,
+.scroll::-webkit-scrollbar-thumb {
+  background: var(--line-strong);
+  border-radius: 99px;
   border: 2px solid transparent;
   background-clip: padding-box;
 }
-.scroll-slim::-webkit-scrollbar-thumb:hover {
-  background: var(--color-text-subtle);
+.scroll-slim::-webkit-scrollbar-thumb:hover,
+.scroll::-webkit-scrollbar-thumb:hover {
+  background: var(--ink-3);
   background-clip: padding-box;
 }
 
-/* Respect reduced-motion: kill decorative animation + hover transforms. */
+/* Slide-over entrances. */
+.sheet-enter {
+  animation: sheetIn 0.34s var(--ease) both;
+}
+.backdrop-enter {
+  animation: fade 0.25s var(--ease) both;
+}
+
+/* Respect reduced-motion. */
 @media (prefers-reduced-motion: reduce) {
-  .animate-fade-in,
-  .animate-rise,
-  .stagger > *,
-  .aurora-bg::before,
-  .aurora-bg::after,
-  .shimmer,
-  .sheen::after,
-  .pulse-ring {
-    animation: none !important;
-  }
-  .stagger > *,
-  .animate-rise {
-    opacity: 1;
-    transform: none;
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
   }
   .lift:hover,
   .pressable:active {

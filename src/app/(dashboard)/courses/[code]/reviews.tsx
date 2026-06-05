@@ -9,6 +9,7 @@
  * /api/courses/[code]/reviews and optimistically refreshes the list.
  */
 
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import type { PublicReview, ReviewSummary } from "@/lib/community/reviews";
 import { useState, useTransition } from "react";
@@ -16,6 +17,28 @@ import { useState, useTransition } from "react";
 interface Props {
   courseCode: string;
   initial: ReviewSummary;
+}
+
+/** Meridian star rating — partial-fill via a clipped overlay (ported from the design source). */
+function Stars({ value, size = 15 }: { value: number; size?: number }): React.ReactElement {
+  return (
+    <span className="inline-flex" style={{ gap: 2, color: "var(--warn)" }} aria-hidden>
+      {[0, 1, 2, 3, 4].map((i) => {
+        const fill = Math.max(0, Math.min(1, value - i)) * 100;
+        return (
+          <span key={i} className="relative inline-flex" style={{ lineHeight: 1 }}>
+            <span style={{ fontSize: size, color: "var(--line-strong)" }}>★</span>
+            <span
+              className="absolute inset-0 overflow-hidden"
+              style={{ width: `${fill}%`, color: "var(--warn)" }}
+            >
+              <span style={{ fontSize: size, color: "var(--warn)" }}>★</span>
+            </span>
+          </span>
+        );
+      })}
+    </span>
+  );
 }
 
 export function ProfessorReviews({ courseCode, initial }: Props): React.ReactElement {
@@ -33,32 +56,47 @@ export function ProfessorReviews({ courseCode, initial }: Props): React.ReactEle
   return (
     <div className="space-y-4">
       {summary.count > 0 ? (
-        <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
-          <Stat label="Avg rating" value={fmt(summary.averageRating)} suffix="/5" />
-          <Stat label="Avg difficulty" value={fmt(summary.averageDifficulty)} suffix="/5" />
-          <Stat
+        <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-4">
+          <MetricStat
+            label="Avg rating"
+            value={fmt(summary.averageRating)}
+            sub="out of 5"
+            color="var(--warn)"
+          />
+          <MetricStat
+            label="Avg difficulty"
+            value={fmt(summary.averageDifficulty)}
+            sub="out of 5"
+            color="var(--bad)"
+          />
+          <MetricStat
             label="Would take again"
             value={
               summary.wouldTakeAgainPct == null
                 ? "—"
                 : `${Math.round(summary.wouldTakeAgainPct * 100)}%`
             }
+            color="var(--ok)"
           />
-          <Stat label="Reviews" value={String(summary.count)} />
+          <MetricStat label="Reviews" value={String(summary.count)} />
         </div>
       ) : (
         <div
-          className="flex flex-col items-center gap-3 rounded-xl border border-dashed px-6 py-10 text-center"
-          style={{ borderColor: "var(--color-border)" }}
+          className="flex flex-col items-center gap-3 rounded-[var(--r-md)] border-[1.5px] border-dashed px-6 py-10 text-center"
+          style={{ borderColor: "var(--line-strong)", background: "var(--surface-2)" }}
         >
           <span
-            className="inline-flex h-11 w-11 items-center justify-center rounded-xl ring-hairline"
-            style={{ background: "var(--gradient-accent-soft)", color: "var(--color-accent)" }}
+            className="inline-flex h-11 w-11 items-center justify-center rounded-[var(--r-md)] border-[1.5px]"
+            style={{
+              background: "var(--accent-soft)",
+              color: "var(--accent-deep)",
+              borderColor: "var(--line)",
+            }}
             aria-hidden
           >
             ★
           </span>
-          <p className="text-sm" style={{ color: "var(--color-text-muted)" }}>
+          <p className="text-sm" style={{ color: "var(--ink-2)" }}>
             No reviews yet. Be the first to share your experience.
           </p>
         </div>
@@ -88,31 +126,36 @@ export function ProfessorReviews({ courseCode, initial }: Props): React.ReactEle
   );
 }
 
-function Stat({
+function MetricStat({
   label,
   value,
-  suffix,
+  sub,
+  color,
 }: {
   label: string;
   value: string;
-  suffix?: string;
+  sub?: string;
+  color?: string;
 }): React.ReactElement {
   return (
     <div
-      className="rounded-xl p-3 ring-hairline shadow-[var(--shadow-sm)]"
-      style={{ background: "var(--color-surface)" }}
+      className="rounded-[var(--r-md)] border-[1.5px] px-2 py-3 text-center"
+      style={{ background: "var(--surface-2)", borderColor: "var(--line)" }}
     >
-      <div className="text-xs uppercase tracking-wide" style={{ color: "var(--color-text-muted)" }}>
+      <div
+        className="mono tnum text-[22px] font-bold leading-none"
+        style={{ color: color ?? "var(--ink)" }}
+      >
+        {value}
+      </div>
+      <div className="mt-1 text-[11px]" style={{ color: "var(--ink-3)" }}>
         {label}
       </div>
-      <div className="text-lg font-semibold mono tnum mt-0.5">
-        {value}
-        {suffix && value !== "—" ? (
-          <span className="text-sm font-normal" style={{ color: "var(--color-text-muted)" }}>
-            {suffix}
-          </span>
-        ) : null}
-      </div>
+      {sub && value !== "—" ? (
+        <div className="text-[10.5px]" style={{ color: "var(--ink-3)" }}>
+          {sub}
+        </div>
+      ) : null}
     </div>
   );
 }
@@ -144,41 +187,46 @@ function ReviewItem({
 
   return (
     <li
-      className="rounded-xl p-4 space-y-2 ring-hairline shadow-[var(--shadow-sm)] transition-colors hover:bg-[var(--color-surface-2)]"
-      style={{ ["--i" as string]: index, background: "var(--color-surface)" }}
+      className="card space-y-2 p-3.5 transition-shadow hover:shadow-[var(--hard-shadow)]"
+      style={{ ["--i" as string]: index, background: "var(--surface)" }}
     >
-      <div className="flex items-center justify-between gap-2 text-sm">
-        <span className="font-medium">{review.professorName}</span>
-        <span
-          className="inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-medium ring-hairline"
-          style={{ background: "var(--gradient-accent-soft)", color: "var(--color-accent)" }}
-        >
-          <span aria-hidden>★</span>
-          <span className="mono tnum">{review.rating}/5</span>
-          {review.difficulty ? (
-            <span style={{ color: "var(--color-text-muted)" }} className="mono tnum">
-              · {review.difficulty}/5 hard
-            </span>
-          ) : null}
+      <div className="flex items-center gap-2.5">
+        <span className="text-sm font-bold" style={{ color: "var(--ink)" }}>
+          {review.professorName}
+        </span>
+        <span className="ml-auto flex items-center gap-1.5">
+          <Stars value={review.rating} size={14} />
+          <span className="mono tnum text-[12.5px] font-bold" style={{ color: "var(--ink)" }}>
+            {review.rating}
+          </span>
         </span>
       </div>
       {review.comment && (
-        <p className="text-sm leading-relaxed" style={{ color: "var(--color-text)" }}>
+        <p className="text-[13px] leading-relaxed" style={{ color: "var(--ink-2)" }}>
           {review.comment}
         </p>
       )}
-      <div className="flex items-center gap-2 text-xs" style={{ color: "var(--color-text-muted)" }}>
+      <div className="flex flex-wrap items-center gap-1.5">
+        {review.difficulty ? (
+          <Badge variant="destructive">
+            Difficulty <span className="mono tnum">{review.difficulty}</span>
+          </Badge>
+        ) : null}
+        {review.wouldTakeAgain != null && (
+          <Badge variant={review.wouldTakeAgain ? "success" : "secondary"}>
+            {review.wouldTakeAgain ? "would take again" : "would not retake"}
+          </Badge>
+        )}
+      </div>
+      <div className="flex items-center gap-2 text-xs" style={{ color: "var(--ink-3)" }}>
         <span>Anonymous student</span>
         {review.term && <span>· {review.term}</span>}
-        {review.wouldTakeAgain != null && (
-          <span>· {review.wouldTakeAgain ? "would take again" : "would not retake"}</span>
-        )}
         <span className="mono tnum">
           · {review.createdAt ? new Date(review.createdAt).toISOString().slice(0, 10) : ""}
         </span>
         <button
           type="button"
-          className="ml-auto rounded-md px-2 py-0.5 transition-colors hover:text-[var(--color-danger)] disabled:opacity-50"
+          className="ml-auto rounded-md px-2 py-0.5 transition-colors hover:text-[var(--bad)] disabled:opacity-50"
           disabled={flagged || flagging}
           onClick={flag}
         >

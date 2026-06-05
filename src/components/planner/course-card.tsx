@@ -1,8 +1,9 @@
 "use client";
 
+import { CourseCode } from "@/components/ui/course-code";
 import { cn } from "@/lib/utils";
 import type { CourseCatalogEntry, PlannedCourse } from "@/lib/validation/plan";
-import { GripVertical } from "lucide-react";
+import { Check, GripVertical } from "lucide-react";
 
 interface CourseCardProps {
   planned: PlannedCourse;
@@ -11,71 +12,73 @@ interface CourseCardProps {
   dragging?: boolean;
 }
 
-const STATUS_STYLES: Record<PlannedCourse["status"], { dot: string; label: string }> = {
-  planned: { dot: "var(--color-text-subtle)", label: "Planned" },
-  enrolled: { dot: "var(--color-accent)", label: "Enrolled" },
-  completed: { dot: "var(--color-success)", label: "Done" },
-  transferred: { dot: "var(--color-success)", label: "Transferred" },
-  dropped: { dot: "var(--color-text-muted)", label: "Dropped" },
-  disc: { dot: "var(--color-warning)", label: "DISC" },
-  failed: { dot: "var(--color-danger)", label: "Failed" },
-};
-
 export function CourseCard({
   planned,
   course,
   hasViolation,
   dragging = false,
 }: CourseCardProps): React.ReactElement {
-  const statusStyle = STATUS_STYLES[planned.status];
+  const isDone = planned.status === "completed" || planned.status === "transferred";
+  const isEnrolled = planned.status === "enrolled";
+
+  // Border + shadow follow the Meridian print language: enrolled cards get the
+  // Clementine accent border + offset hard-shadow + accent dot; violations turn
+  // the border red; everything else is a plain ink hairline.
+  const borderColor = hasViolation
+    ? "color-mix(in oklch, var(--bad) 55%, var(--line))"
+    : isEnrolled
+      ? "color-mix(in oklch, var(--accent) 55%, transparent)"
+      : "var(--line)";
+
   return (
     <div
       data-violation={hasViolation || undefined}
       data-status={planned.status}
       className={cn(
-        "lift group relative flex items-start gap-2 rounded-lg border p-2.5 shadow-[var(--shadow-xs)] hover:border-accent/40 hover:shadow-[var(--shadow-md)]",
-        dragging && "opacity-50 rotate-2 shadow-[var(--shadow-lg)] cursor-grabbing",
+        "group relative rounded-[var(--r-md)] px-[11px] py-2.5 transition-all duration-150",
+        "border-[1.5px] hover:translate-x-0.5",
+        dragging && "rotate-2 cursor-grabbing opacity-50",
       )}
       style={{
-        background: "var(--gradient-surface)",
-        borderColor: hasViolation
-          ? "color-mix(in oklch, var(--color-danger) 45%, var(--color-border))"
-          : "var(--color-border)",
-        boxShadow: hasViolation ? "inset 3px 0 0 var(--color-danger)" : "inset 3px 0 0 transparent",
+        background: "var(--surface)",
+        borderColor,
+        boxShadow: isEnrolled ? "var(--hard-shadow)" : "none",
+        opacity: isDone ? 0.62 : 1,
       }}
     >
-      <button
-        type="button"
-        aria-label="Drag handle"
-        className="cursor-grab opacity-0 group-hover:opacity-100 transition-opacity touch-none focus-visible:opacity-100"
-        style={{ color: "var(--color-text-subtle)" }}
-      >
-        <GripVertical className="h-4 w-4" />
-      </button>
-      <div className="flex-1 min-w-0">
-        <div className="flex items-baseline gap-2 justify-between">
-          <span className="mono tnum text-sm font-semibold">{planned.courseCode}</span>
-          <span className="text-[10px] mono tnum" style={{ color: "var(--color-text-muted)" }}>
-            {course?.credits ?? "?"} cr
+      <div className="flex items-center gap-[7px]">
+        {isDone ? (
+          <span className="flex" style={{ color: "var(--ok)" }} aria-hidden>
+            <Check className="h-[15px] w-[15px]" />
           </span>
-        </div>
-        <div
-          className="text-xs leading-snug mt-0.5 line-clamp-2"
-          style={{ color: "var(--color-text-muted)" }}
-        >
-          {course?.title ?? "Course not in catalog"}
-        </div>
-        <div className="flex items-center gap-1.5 mt-1.5">
-          <span
-            className="inline-block w-1.5 h-1.5 rounded-full"
-            style={{ background: statusStyle.dot }}
-            aria-hidden
-          />
-          <span className="text-[10px]" style={{ color: "var(--color-text-muted)" }}>
-            {statusStyle.label}
-          </span>
-        </div>
+        ) : (
+          <button
+            type="button"
+            aria-label="Drag handle"
+            className="-ml-[3px] flex cursor-grab touch-none transition-colors group-hover:text-[var(--ink-2)] focus-visible:opacity-100"
+            style={{ color: "var(--ink-3)" }}
+          >
+            <GripVertical className="h-[15px] w-[15px]" />
+          </button>
+        )}
+        <CourseCode code={planned.courseCode} className="text-[11.5px]" />
+        <span className="mono ml-auto text-[11px]" style={{ color: "var(--ink-3)" }}>
+          {course?.credits ?? "?"}cr
+        </span>
       </div>
+      <div
+        className="mt-1.5 line-clamp-2 text-[12.5px] font-semibold leading-[1.25]"
+        style={{ color: "var(--ink)" }}
+      >
+        {course?.title ?? "Course not in catalog"}
+      </div>
+      {isEnrolled && (
+        <span
+          className="absolute right-[9px] top-2 block h-[7px] w-[7px] rounded-full"
+          style={{ background: "var(--accent)" }}
+          aria-hidden
+        />
+      )}
     </div>
   );
 }

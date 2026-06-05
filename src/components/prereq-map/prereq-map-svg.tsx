@@ -147,7 +147,7 @@ export function PrereqMapSVG({
         <div className="relative">
           <Search
             className="pointer-events-none absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2"
-            style={{ color: "var(--color-text-subtle)" }}
+            style={{ color: "var(--ink-3)" }}
           />
           <input
             value={query}
@@ -160,14 +160,17 @@ export function PrereqMapSVG({
             }}
             placeholder="Find a course…"
             aria-label="Search courses"
-            className="ring-hairline h-8 w-48 rounded-lg pl-8 pr-2 text-sm shadow-[var(--shadow-xs)] transition-shadow focus-visible:outline-none focus-visible:shadow-[var(--shadow-sm)]"
+            className="h-9 w-52 rounded-[var(--r-md)] border-[1.5px] border-[var(--line-strong)] pl-8 pr-2 text-sm transition-colors focus-visible:outline-none focus-visible:border-[var(--ink)]"
             style={{
-              background: "var(--color-surface)",
-              color: "var(--color-text)",
+              background: "var(--surface)",
+              color: "var(--ink)",
             }}
           />
           {matches.length > 0 && (
-            <ul className="glass ring-hairline absolute z-10 mt-1.5 w-64 overflow-hidden rounded-xl shadow-[var(--shadow-lg)] animate-fade-in">
+            <ul
+              className="absolute z-10 mt-1.5 w-64 overflow-hidden rounded-[var(--r-md)] border-[1.5px] border-[var(--line-strong)] shadow-[var(--hard-shadow)] animate-fade-in"
+              style={{ background: "var(--surface)" }}
+            >
               {matches.map((m) => (
                 <li key={m.code}>
                   <button
@@ -176,10 +179,10 @@ export function PrereqMapSVG({
                       focusNode(m.code);
                       setQuery("");
                     }}
-                    className="flex w-full items-baseline gap-2 px-3 py-2 text-left text-sm transition-colors hover:bg-[var(--color-surface-2)]"
+                    className="flex w-full items-baseline gap-2 px-3 py-2 text-left text-sm transition-colors hover:bg-[var(--surface-2)]"
                   >
                     <span className="mono tnum font-semibold">{m.code}</span>
-                    <span className="truncate text-xs" style={{ color: "var(--color-text-muted)" }}>
+                    <span className="truncate text-xs" style={{ color: "var(--ink-2)" }}>
                       {m.title}
                     </span>
                   </button>
@@ -190,28 +193,25 @@ export function PrereqMapSVG({
         </div>
 
         <div
-          className="ring-hairline flex items-center overflow-hidden rounded-lg shadow-[var(--shadow-xs)]"
-          style={{ background: "var(--color-surface)" }}
+          className="flex items-center overflow-hidden rounded-[var(--r-md)] border-[1.5px] border-[var(--line-strong)] shadow-[var(--hard-shadow)]"
+          style={{ background: "var(--surface)" }}
         >
           <button
             type="button"
             aria-label="Zoom out"
             onClick={() => setZoom((z) => clampZoom(z * 0.9))}
-            className="pressable flex h-8 w-8 items-center justify-center transition-colors hover:bg-[var(--color-surface-2)]"
+            className="pressable flex h-9 w-9 items-center justify-center transition-colors hover:bg-[var(--surface-2)]"
           >
             <Minus className="h-4 w-4" />
           </button>
-          <span
-            className="mono tnum w-12 text-center text-xs"
-            style={{ color: "var(--color-text-muted)" }}
-          >
+          <span className="mono tnum w-12 text-center text-xs" style={{ color: "var(--ink-2)" }}>
             {Math.round(zoom * 100)}%
           </span>
           <button
             type="button"
             aria-label="Zoom in"
             onClick={() => setZoom((z) => clampZoom(z * 1.1))}
-            className="pressable flex h-8 w-8 items-center justify-center transition-colors hover:bg-[var(--color-surface-2)]"
+            className="pressable flex h-9 w-9 items-center justify-center transition-colors hover:bg-[var(--surface-2)]"
           >
             <Plus className="h-4 w-4" />
           </button>
@@ -220,8 +220,8 @@ export function PrereqMapSVG({
         <button
           type="button"
           onClick={resetView}
-          className="ring-hairline pressable inline-flex h-8 items-center gap-1.5 rounded-lg px-2.5 text-xs shadow-[var(--shadow-xs)] transition-colors hover:bg-[var(--color-surface-2)]"
-          style={{ background: "var(--color-surface)", color: "var(--color-text-muted)" }}
+          className="pressable inline-flex h-9 items-center gap-1.5 rounded-[var(--r-md)] border-[1.5px] border-[var(--line-strong)] px-3 text-xs font-semibold shadow-[var(--hard-shadow)] transition-colors hover:bg-[var(--surface-2)]"
+          style={{ background: "var(--surface)", color: "var(--ink-2)" }}
         >
           <Maximize2 className="h-3.5 w-3.5" />
           Reset
@@ -231,11 +231,11 @@ export function PrereqMapSVG({
           <button
             type="button"
             onClick={() => setPinned(null)}
-            className="pressable inline-flex h-8 items-center gap-1.5 rounded-lg px-2.5 text-xs font-medium animate-fade-in"
+            className="pressable inline-flex h-9 items-center gap-1.5 rounded-[var(--r-full)] border-[1px] px-3 text-xs font-semibold animate-fade-in"
             style={{
-              background: "var(--gradient-accent-soft)",
-              color: "var(--color-accent)",
-              boxShadow: "0 0 14px var(--color-accent-ring)",
+              background: "var(--accent-soft)",
+              color: "var(--accent-deep)",
+              borderColor: "color-mix(in oklch, var(--accent) 40%, transparent)",
             }}
           >
             Focused: <span className="mono tnum">{pinned}</span>
@@ -243,7 +243,7 @@ export function PrereqMapSVG({
           </button>
         )}
 
-        <span className="ml-auto text-xs" style={{ color: "var(--color-text-subtle)" }}>
+        <span className="ml-auto text-xs" style={{ color: "var(--ink-3)" }}>
           Click a course to trace its path · drag to pan · ⌘/Ctrl+scroll to zoom
         </span>
       </div>
@@ -251,9 +251,9 @@ export function PrereqMapSVG({
       {/* Canvas */}
       <div
         ref={containerRef}
-        className="ring-hairline relative w-full overflow-hidden rounded-2xl shadow-[var(--shadow-md)]"
+        className="relative w-full overflow-hidden rounded-[var(--r-lg)] border-[1.5px] border-[var(--line-strong)] shadow-[var(--hard-shadow)]"
         style={{
-          background: "var(--gradient-surface)",
+          background: "var(--paper)",
           height: "75vh",
           cursor: dragRef.current ? "grabbing" : "grab",
           touchAction: "none",
@@ -263,9 +263,14 @@ export function PrereqMapSVG({
         onPointerMove={onPointerMove}
         onPointerUp={onPointerUp}
       >
+        {/* Radial-dot print texture (matches the Meridian map backdrop). */}
         <div
-          className="grid-backdrop pointer-events-none absolute inset-0 opacity-60"
+          className="pointer-events-none absolute inset-0 opacity-70"
           aria-hidden
+          style={{
+            backgroundImage: "radial-gradient(var(--line) 1px, transparent 1px)",
+            backgroundSize: "26px 26px",
+          }}
         />
         <svg
           width="100%"
@@ -284,7 +289,7 @@ export function PrereqMapSVG({
               markerHeight="6"
               orient="auto"
             >
-              <path d="M0,-5L10,0L0,5" fill="var(--color-text-muted)" />
+              <path d="M0,-5L10,0L0,5" fill="var(--line-strong)" />
             </marker>
             <marker
               id="arrow-active"
@@ -295,14 +300,14 @@ export function PrereqMapSVG({
               markerHeight="6"
               orient="auto"
             >
-              <path d="M0,-5L10,0L0,5" fill="var(--color-accent)" />
+              <path d="M0,-5L10,0L0,5" fill="var(--accent)" />
             </marker>
             <filter id="node-focus-glow" x="-40%" y="-40%" width="180%" height="180%">
               <feDropShadow
                 dx="0"
                 dy="2"
                 stdDeviation="6"
-                floodColor="var(--color-accent)"
+                floodColor="var(--accent)"
                 floodOpacity="0.45"
               />
             </filter>
@@ -326,28 +331,33 @@ export function PrereqMapSVG({
                     to.y + NODE_HEIGHT / 2,
                   )}
                   fill="none"
-                  stroke={isHL ? "var(--color-accent)" : "var(--color-border-strong)"}
-                  strokeWidth={isHL ? 2 : 1}
-                  strokeDasharray={e.kind === "concurrent" ? "4 3" : undefined}
+                  stroke={isHL ? "var(--accent)" : "var(--line-strong)"}
+                  strokeWidth={isHL ? 2.4 : 1.4}
+                  strokeDasharray={e.kind === "concurrent" ? "5 4" : undefined}
                   markerEnd={isHL ? "url(#arrow-active)" : "url(#arrow)"}
-                  opacity={dimmed ? 0.08 : isHL ? 1 : 0.55}
+                  opacity={dimmed ? 0.14 : isHL ? 1 : 0.5}
+                  style={{ transition: "all .25s var(--ease)" }}
                 />
               );
             })}
 
-            {/* Nodes */}
+            {/* Nodes — Meridian "print card": surface fill, ink border, a
+                category-colored left edge bar, and an offset hard-shadow plate. */}
             {graph.nodes.map((n) => {
               const isTaken = takenCodes.has(n.code);
               const isPlanned = plannedCodes.has(n.code);
               const inChain = active?.nodes.has(n.code) ?? false;
               const dimmed = !!active && !inChain;
               const isFocus = focus === n.code;
+              const cat = categoryColor(n.category);
               const fill = isTaken
-                ? "var(--color-success-soft)"
+                ? "var(--ok-soft)"
                 : isPlanned
-                  ? "var(--color-accent-soft)"
-                  : "var(--color-surface-2)";
-              const stroke = isFocus ? "var(--color-accent)" : categoryColor(n.category);
+                  ? "var(--accent-soft)"
+                  : "var(--surface)";
+              // Resting border is the confident ink line; focus/in-chain promote
+              // to the category color / Clementine accent.
+              const stroke = isFocus ? "var(--accent)" : inChain ? cat : "var(--line-strong)";
 
               return (
                 <g
@@ -366,8 +376,19 @@ export function PrereqMapSVG({
                       setPinned((p) => (p === n.code ? null : n.code));
                     }
                   }}
-                  style={{ cursor: "pointer", opacity: dimmed ? 0.25 : 1 }}
+                  style={{ cursor: "pointer", opacity: dimmed ? 0.32 : 1 }}
                 >
+                  {/* Offset shadow plate = the Meridian hard-shadow, brighter when focused. */}
+                  {(isFocus || inChain) && (
+                    <rect
+                      x={n.x + (isFocus ? 4 : 3)}
+                      y={n.y + (isFocus ? 4 : 3)}
+                      width={NODE_WIDTH}
+                      height={NODE_HEIGHT}
+                      rx={10}
+                      fill={isFocus ? "var(--accent-glow)" : "var(--line-strong)"}
+                    />
+                  )}
                   <rect
                     x={n.x}
                     y={n.y}
@@ -376,20 +397,35 @@ export function PrereqMapSVG({
                     rx={10}
                     fill={fill}
                     stroke={stroke}
-                    strokeWidth={isFocus ? 2.5 : inChain ? 2 : 1}
+                    strokeWidth={isFocus ? 2 : 1.5}
                     filter={isFocus ? "url(#node-focus-glow)" : undefined}
                   />
+                  {/* Category-colored left edge bar (clipped to the rounded corner). */}
+                  <path
+                    d={`M ${n.x + 10} ${n.y} h -1 a 10 10 0 0 0 -9 10 v ${NODE_HEIGHT - 20} a 10 10 0 0 0 9 10 h 1 v -${NODE_HEIGHT}`}
+                    fill={cat}
+                  />
                   <text
-                    x={n.x + 10}
-                    y={n.y + 18}
+                    x={n.x + 14}
+                    y={n.y + 19}
                     fontSize="11"
-                    fontWeight="600"
-                    fill="var(--color-text)"
+                    fontWeight="700"
+                    fill="var(--ink)"
                     fontFamily="var(--font-mono)"
                   >
                     {n.code}
                   </text>
-                  <text x={n.x + 10} y={n.y + 34} fontSize="9" fill="var(--color-text-muted)">
+                  {isTaken && (
+                    <path
+                      d={`M ${n.x + NODE_WIDTH - 22} ${n.y + 14} l 3 3 l 6 -6`}
+                      fill="none"
+                      stroke="var(--ok)"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                  )}
+                  <text x={n.x + 14} y={n.y + 34} fontSize="9" fontWeight="600" fill="var(--ink-2)">
                     {n.title.length > 22 ? `${n.title.slice(0, 22)}…` : n.title}
                   </text>
                 </g>
@@ -398,20 +434,48 @@ export function PrereqMapSVG({
           </g>
         </svg>
 
+        {/* Category legend — the Meridian swatch row, always visible. */}
+        <div
+          className="glass pointer-events-none absolute right-3 top-3 flex flex-wrap items-center gap-x-3.5 gap-y-1.5 rounded-[var(--r-md)] border-[1.5px] border-[var(--line-strong)] px-3 py-2 shadow-[var(--hard-shadow)]"
+          aria-hidden
+        >
+          {(
+            [
+              ["se_core", "SE Core"],
+              ["eng_core", "Eng Core"],
+              ["soen_elective", "Elective"],
+              ["nat_sci_elective", "Nat Sci"],
+              ["deficiency", "Deficiency"],
+            ] as const
+          ).map(([key, label]) => (
+            <span
+              key={key}
+              className="flex items-center gap-1.5 text-[11px]"
+              style={{ color: "var(--ink-2)" }}
+            >
+              <span
+                className="inline-block h-2.5 w-2.5 rounded-[3px]"
+                style={{ background: categoryColor(key) }}
+              />
+              {label}
+            </span>
+          ))}
+        </div>
+
         {/* Focus legend when a course is pinned */}
         {pinned && (
-          <div className="glass ring-hairline pointer-events-none absolute bottom-3 left-3 rounded-xl px-3.5 py-2.5 text-xs shadow-[var(--shadow-md)] animate-fade-in">
+          <div className="glass pointer-events-none absolute bottom-3 left-3 rounded-[var(--r-md)] border-[1.5px] border-[var(--line-strong)] px-3.5 py-2.5 text-xs shadow-[var(--hard-shadow)] animate-fade-in">
             <div className="flex items-center gap-1.5 font-semibold">
               <span
-                className="inline-block h-1.5 w-1.5 rounded-full"
+                className="inline-block h-2 w-2 rounded-full"
                 style={{
-                  background: "var(--color-accent)",
-                  boxShadow: "0 0 8px var(--color-accent-ring)",
+                  background: "var(--accent)",
+                  boxShadow: "0 0 8px var(--accent-glow)",
                 }}
               />
               <span className="mono tnum">{pinned}</span> path
             </div>
-            <div className="mt-0.5" style={{ color: "var(--color-text-muted)" }}>
+            <div className="mt-0.5" style={{ color: "var(--ink-2)" }}>
               {active ? (
                 <>
                   {[...active.nodes].length - 1} connected course

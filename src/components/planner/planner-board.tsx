@@ -10,6 +10,8 @@ import {
 import { CourseCard } from "@/components/planner/course-card";
 import { CoursePicker } from "@/components/planner/course-picker";
 import { WorkloadBadge } from "@/components/planner/workload-badge";
+import { Badge } from "@/components/ui/badge";
+import { CourseCode } from "@/components/ui/course-code";
 import { calculateTermWorkload } from "@/lib/domain/workload";
 import type { CourseCatalogEntry, PlannedCourse, ValidationIssue } from "@/lib/validation/plan";
 import { buildPlan, validatePlan } from "@/lib/validation/plan";
@@ -26,7 +28,17 @@ import {
   useSensor,
   useSensors,
 } from "@dnd-kit/core";
-import { ArrowRightLeft, Plus, Undo2, X } from "lucide-react";
+import {
+  ArrowRight,
+  ArrowRightLeft,
+  Check,
+  ChevronDown,
+  GripVertical,
+  Plus,
+  TriangleAlert,
+  Undo2,
+  X,
+} from "lucide-react";
 import { useEffect, useMemo, useState, useTransition } from "react";
 import { toast } from "sonner";
 
@@ -214,6 +226,12 @@ export function PlannerBoard({
   const plannedCodes = useMemo(() => new Set(courses.map((c) => c.courseCode)), [courses]);
   const activeCourse = activeId ? courses.find((c) => c.id === activeId) : undefined;
 
+  // Total credits mapped across every planned/enrolled/completed/transferred row.
+  const totalMapped = useMemo(
+    () => courses.reduce((sum, c) => sum + (catalog.get(c.courseCode)?.credits ?? 0), 0),
+    [courses, catalog],
+  );
+
   return (
     <DndContext
       sensors={sensors}
@@ -221,6 +239,19 @@ export function PlannerBoard({
       onDragStart={handleDragStart}
       onDragEnd={handleDragEnd}
     >
+      {/* Toolbar: hint chips + the live credit tally. */}
+      <div className="mb-4 flex flex-wrap items-center gap-3">
+        <Badge variant="secondary" className="gap-1.5">
+          <GripVertical className="h-3 w-3" />
+          Drag cards between terms
+        </Badge>
+        <Badge variant="secondary">
+          <span className="mono tnum">{totalMapped}</span> cr mapped of 120
+        </Badge>
+      </div>
+
+      <IssueList issues={issues} />
+
       <TransferLane
         courses={transferredCourses}
         catalog={catalog}
@@ -230,7 +261,7 @@ export function PlannerBoard({
         moveBackTerm={firstTerm}
       />
 
-      <div className="flex gap-3 overflow-x-auto scroll-slim pb-4 -mx-4 px-4 md:-mx-8 md:px-8 stagger">
+      <div className="scroll flex gap-3.5 overflow-x-auto overflow-y-hidden pb-2.5 -mx-4 px-4 md:-mx-8 md:px-8 stagger">
         {renderTerms.map((term, index) => (
           <DroppableTerm
             key={term}
@@ -276,8 +307,6 @@ export function PlannerBoard({
         )}
       </DragOverlay>
 
-      <IssueList issues={issues} />
-
       {/* Tiny status indicator for transitions. */}
       <span className="sr-only" aria-live="polite">
         {isPending ? "Saving…" : "Up to date"}
@@ -312,15 +341,17 @@ function TransferLane({
   const credits = courses.reduce((sum, c) => sum + (catalog.get(c.courseCode)?.credits ?? 0), 0);
   return (
     <section
-      className="animate-rise rounded-2xl ring-hairline shadow-[var(--shadow-sm)] p-4 mb-1"
-      style={{ background: "var(--gradient-surface)" }}
+      className="card-hard animate-rise mb-4 p-4"
+      style={{ borderColor: "var(--line-strong)" }}
       aria-label="Transferred credits"
     >
-      <header className="flex items-baseline justify-between gap-2 pb-3">
-        <h3 className="text-sm font-semibold tracking-[-0.01em]">Transfer credits</h3>
-        <span className="mono tnum text-xs" style={{ color: "var(--color-text-muted)" }}>
-          {credits} cr · CEGEP / transferred
-        </span>
+      <header className="flex items-center justify-between gap-2 pb-3">
+        <div className="flex items-center gap-2.5">
+          <span className="eyebrow">Transfer credits</span>
+          <Badge variant="secondary">
+            <span className="mono tnum">{credits}</span> cr · CEGEP / transferred
+          </Badge>
+        </div>
       </header>
       <div className="flex flex-wrap items-stretch gap-2">
         {courses.map((c) => (
@@ -332,8 +363,12 @@ function TransferLane({
                 aria-label={`Move ${c.courseCode} back to ${moveBackTerm}`}
                 title={`Move back to ${moveBackTerm}`}
                 onClick={() => onMoveBack(c.id)}
-                className="h-6 w-6 items-center justify-center rounded-lg ring-hairline text-xs transition-colors flex hover:bg-[var(--color-accent-soft)] focus-visible:outline-none"
-                style={{ background: "var(--color-surface)", color: "var(--color-text-muted)" }}
+                className="flex h-6 w-6 items-center justify-center rounded-[var(--r-sm)] border-[1.5px] text-xs transition-colors hover:bg-[var(--accent-soft)] focus-visible:outline-none"
+                style={{
+                  background: "var(--surface)",
+                  borderColor: "var(--line-strong)",
+                  color: "var(--ink-3)",
+                }}
               >
                 <Undo2 className="h-3.5 w-3.5" />
               </button>
@@ -342,8 +377,12 @@ function TransferLane({
                 aria-label={`Remove ${c.courseCode} from plan`}
                 title="Remove course"
                 onClick={() => onRemove(c.id)}
-                className="h-6 w-6 items-center justify-center rounded-lg ring-hairline text-xs transition-colors flex hover:bg-[var(--color-danger-soft)] focus-visible:outline-none"
-                style={{ background: "var(--color-surface)", color: "var(--color-text-muted)" }}
+                className="flex h-6 w-6 items-center justify-center rounded-[var(--r-sm)] border-[1.5px] text-xs transition-colors hover:bg-[var(--bad-soft)] focus-visible:outline-none"
+                style={{
+                  background: "var(--surface)",
+                  borderColor: "var(--line-strong)",
+                  color: "var(--ink-3)",
+                }}
               >
                 <X className="h-3.5 w-3.5" />
               </button>
@@ -354,15 +393,15 @@ function TransferLane({
           type="button"
           onClick={onAddClick}
           aria-label="Add a transfer credit"
-          className="pressable flex w-[220px] items-center justify-center gap-1.5 rounded-xl border border-dashed py-2.5 text-xs transition-colors hover:bg-[var(--color-surface-2)] hover:border-[var(--color-border-strong)] focus-visible:outline-none"
-          style={{ borderColor: "var(--color-border)", color: "var(--color-text-muted)" }}
+          className="flex w-[220px] items-center justify-center gap-1.5 rounded-[var(--r-md)] border-[1.5px] border-dashed py-2.5 text-[12.5px] font-semibold transition-colors hover:bg-[var(--surface-2)] hover:border-[var(--ink)] focus-visible:outline-none"
+          style={{ borderColor: "var(--line-strong)", color: "var(--ink-3)" }}
         >
           <Plus className="h-3.5 w-3.5" />
           Add transfer credit
         </button>
       </div>
       {courses.length === 0 && (
-        <p className="mt-3 text-xs" style={{ color: "var(--color-text-subtle)" }}>
+        <p className="mt-3 text-xs" style={{ color: "var(--ink-3)" }}>
           CEGEP / advanced-standing credits (e.g. MATH 204). Add them here, or hover a course in a
           term and click ⇄ to move it here.
         </p>
@@ -395,59 +434,72 @@ function DroppableTerm({
   const { setNodeRef, isOver } = useDroppable({ id: term });
   const workload = calculateTermWorkload(courses, catalog);
   const credits = workload.credits;
-  const isFullTime = credits >= 12;
+  // The first visible term is "now"; a term is "Done" once every course in it
+  // has been completed.
+  const isCurrent = index === 0;
+  const allDone = courses.length > 0 && courses.every((c) => c.status === "completed");
 
   return (
     <section
       ref={setNodeRef}
-      className="flex w-[280px] shrink-0 flex-col gap-2 rounded-2xl ring-hairline p-3.5 transition-all duration-200"
-      style={{
-        ["--i" as string]: index,
-        background: isOver
-          ? "color-mix(in oklch, var(--color-accent-soft) 60%, var(--color-surface-2))"
-          : "var(--gradient-surface)",
-        boxShadow: isOver ? "var(--shadow-glow)" : "var(--shadow-sm)",
-      }}
+      className="flex w-[252px] shrink-0 flex-col"
+      style={{ ["--i" as string]: index }}
       aria-label={`${term} courses`}
     >
+      {/* Ink header — Bricolage term name, status Badge, credits + workload. */}
       <header
-        className="flex flex-col gap-2 pb-2.5 border-b"
-        style={{ borderColor: "var(--color-border)" }}
+        className="flex flex-col gap-2 rounded-t-[var(--r-md)] border-[1.5px] border-b-0 px-[13px] py-3"
+        style={{
+          borderColor: "var(--line-strong)",
+          background: isCurrent ? "var(--accent-soft)" : "var(--paper-2)",
+        }}
       >
-        <div className="flex items-baseline justify-between gap-2">
-          <h3 className="text-sm font-semibold tracking-[-0.01em]">{term}</h3>
-          <span
-            className="mono tnum text-xs"
-            style={{ color: "var(--color-text-muted)" }}
-            title={isFullTime ? "Full-time load" : "Below full-time (12 cr)"}
+        <div className="flex items-center justify-between gap-2">
+          <h3
+            className="text-[14.5px] font-bold tracking-[-0.01em]"
+            style={{ fontFamily: "var(--font-display)" }}
           >
-            {credits} cr
-            {isFullTime && (
-              <span className="ml-1" style={{ color: "var(--color-success)" }}>
-                ●
-              </span>
-            )}
-          </span>
+            {term}
+          </h3>
+          {isCurrent ? (
+            <Badge variant="accent">Current</Badge>
+          ) : allDone ? (
+            <Badge variant="success" className="gap-1">
+              <Check className="h-3 w-3" />
+              Done
+            </Badge>
+          ) : (
+            <span className="mono tnum text-[11.5px]" style={{ color: "var(--ink-3)" }}>
+              {courses.length} crs
+            </span>
+          )}
         </div>
-        {workload.courseCount > 0 && (
-          <WorkloadBadge level={workload.level} hoursPerWeek={workload.hoursPerWeek} />
-        )}
+        <div className="flex items-center justify-between gap-2">
+          <span className="mono tnum text-[12.5px] font-bold">{credits} cr</span>
+          {workload.courseCount > 0 && !allDone && (
+            <WorkloadBadge level={workload.level} hoursPerWeek={workload.hoursPerWeek} />
+          )}
+        </div>
       </header>
 
-      <div className="flex flex-col gap-2 min-h-[80px]">
+      {/* Body — surface-2 drop area; accent-soft + dashed outline while dragging. */}
+      <div
+        className="scroll flex flex-1 flex-col gap-2 rounded-b-[var(--r-md)] border-[1.5px] border-t-0 p-2 transition-all duration-150"
+        style={{
+          borderColor: "var(--line-strong)",
+          background: isOver ? "var(--accent-soft)" : "var(--surface-2)",
+          outline: isOver ? "2px dashed var(--accent)" : "none",
+          outlineOffset: -4,
+        }}
+      >
         {courses.length === 0 ? (
           <div
-            className="flex flex-col items-center gap-2 rounded-xl border border-dashed py-8 text-center text-xs"
-            style={{ borderColor: "var(--color-border)", color: "var(--color-text-muted)" }}
+            className="grid min-h-[80px] flex-1 place-items-center rounded-[var(--r-md)] border-[1.5px] border-dashed text-center text-[12.5px] leading-tight"
+            style={{ borderColor: "var(--line-strong)", color: "var(--ink-3)" }}
           >
-            <span
-              className="inline-flex h-8 w-8 items-center justify-center rounded-xl ring-hairline"
-              style={{ background: "var(--gradient-accent-soft)", color: "var(--color-accent)" }}
-              aria-hidden
-            >
-              <Plus className="h-4 w-4" />
-            </span>
-            Drop a course here
+            Drop a course
+            <br />
+            here
           </div>
         ) : (
           courses.map((c) => (
@@ -466,13 +518,13 @@ function DroppableTerm({
           type="button"
           onClick={onAddClick}
           aria-label={`Add a course to ${term}`}
-          className="pressable flex items-center justify-center gap-1.5 rounded-xl border border-dashed py-2.5 text-xs transition-colors hover:bg-[var(--color-surface-2)] hover:border-[var(--color-border-strong)] focus-visible:outline-none"
+          className="flex items-center justify-center gap-1.5 rounded-[var(--r-md)] border-[1.5px] border-dashed py-2.5 text-[12.5px] font-semibold transition-colors hover:bg-[var(--surface)] hover:border-[var(--ink)] focus-visible:outline-none"
           style={{
-            borderColor: "var(--color-border)",
-            color: "var(--color-text-muted)",
+            borderColor: "var(--line-strong)",
+            color: "var(--ink-3)",
           }}
         >
-          <Plus className="h-3.5 w-3.5" />
+          <Plus className="h-[15px] w-[15px]" />
           Add course
         </button>
       </div>
@@ -518,8 +570,12 @@ function DraggableCourse({
             onMarkTransfer(course.id);
           }}
           onPointerDown={(e) => e.stopPropagation()}
-          className="h-6 w-6 items-center justify-center rounded-lg ring-hairline text-xs transition-colors flex hover:bg-[var(--color-accent-soft)] focus-visible:outline-none"
-          style={{ background: "var(--color-surface)", color: "var(--color-text-muted)" }}
+          className="flex h-6 w-6 items-center justify-center rounded-[var(--r-sm)] border-[1.5px] text-xs transition-colors hover:bg-[var(--accent-soft)] focus-visible:outline-none"
+          style={{
+            background: "var(--surface)",
+            borderColor: "var(--line-strong)",
+            color: "var(--ink-3)",
+          }}
         >
           <ArrowRightLeft className="h-3.5 w-3.5" />
         </button>
@@ -532,8 +588,12 @@ function DraggableCourse({
             onRemove(course.id);
           }}
           onPointerDown={(e) => e.stopPropagation()}
-          className="h-6 w-6 items-center justify-center rounded-lg ring-hairline text-xs transition-colors flex hover:bg-[var(--color-danger-soft)] focus-visible:outline-none"
-          style={{ background: "var(--color-surface)", color: "var(--color-text-muted)" }}
+          className="flex h-6 w-6 items-center justify-center rounded-[var(--r-sm)] border-[1.5px] text-xs transition-colors hover:bg-[var(--bad-soft)] focus-visible:outline-none"
+          style={{
+            background: "var(--surface)",
+            borderColor: "var(--line-strong)",
+            color: "var(--ink-3)",
+          }}
         >
           <X className="h-3.5 w-3.5" />
         </button>
@@ -542,54 +602,101 @@ function DraggableCourse({
   );
 }
 
+/** Maps a validation severity onto the Meridian colour pair (dot + Badge variant). */
+const SEVERITY_DOT: Record<ValidationIssue["severity"], string> = {
+  error: "var(--bad)",
+  warning: "color-mix(in oklch, var(--warn) 80%, var(--ink))",
+  info: "var(--info)",
+};
+const SEVERITY_BADGE: Record<ValidationIssue["severity"], "destructive" | "warning" | "info"> = {
+  error: "destructive",
+  warning: "warning",
+  info: "info",
+};
+
 function IssueList({ issues }: { issues: ValidationIssue[] }): React.ReactElement | null {
+  const [open, setOpen] = useState(true);
   if (issues.length === 0) return null;
   return (
-    <section className="animate-rise space-y-2.5 mt-5">
-      <p className="eyebrow">ISSUES ({issues.length})</p>
-      <ul className="space-y-2 stagger">
-        {issues.slice(0, 20).map((i, idx) => (
-          <li
-            key={`${i.rule}-${i.courseCode}-${i.term}-${idx}`}
-            style={{ ["--i" as string]: idx, background: "var(--color-surface)" }}
-            className="text-sm flex items-start gap-2.5 rounded-xl ring-hairline shadow-[var(--shadow-sm)] px-3.5 py-2.5"
-          >
-            <span
-              className="inline-block w-1.5 h-1.5 rounded-full mt-2 shrink-0"
-              style={{
-                background:
-                  i.severity === "error"
-                    ? "var(--color-danger)"
-                    : i.severity === "warning"
-                      ? "var(--color-warning)"
-                      : "var(--color-text-muted)",
-              }}
-              aria-hidden
-            />
-            <div className="flex-1 min-w-0">
-              <div className="flex flex-wrap items-baseline gap-2">
-                {i.courseCode && (
-                  <span className="mono tnum text-xs font-semibold">{i.courseCode}</span>
-                )}
-                <span className="text-xs" style={{ color: "var(--color-text-muted)" }}>
+    <div
+      className="card animate-rise mb-4 overflow-hidden"
+      style={{ borderColor: "var(--line-strong)" }}
+    >
+      <button
+        type="button"
+        onClick={() => setOpen((o) => !o)}
+        aria-expanded={open}
+        className="flex w-full items-center gap-[11px] px-4 py-[13px] text-left"
+        style={{
+          background: "var(--surface-2)",
+          borderBottom: open ? "1.5px solid var(--line)" : "none",
+        }}
+      >
+        <span
+          className="grid h-[26px] w-[26px] place-items-center rounded-[7px]"
+          style={{
+            background: "var(--warn-soft)",
+            color: "color-mix(in oklch, var(--warn) 78%, var(--ink))",
+          }}
+          aria-hidden
+        >
+          <TriangleAlert className="h-4 w-4" />
+        </span>
+        <span className="text-[14.5px] font-bold">Plan validation</span>
+        <Badge variant="warning">
+          {issues.length} {issues.length === 1 ? "issue" : "issues"}
+        </Badge>
+        <span
+          className="ml-auto flex transition-transform duration-200"
+          style={{ color: "var(--ink-3)", transform: open ? "none" : "rotate(-90deg)" }}
+          aria-hidden
+        >
+          <ChevronDown className="h-[18px] w-[18px]" />
+        </span>
+      </button>
+      {open && (
+        <div
+          className="grid grid-cols-1 gap-px sm:grid-cols-2 lg:grid-cols-3"
+          style={{ background: "var(--line)" }}
+        >
+          {issues.slice(0, 20).map((i, idx) => (
+            <div
+              key={`${i.rule}-${i.courseCode}-${i.term}-${idx}`}
+              className="flex flex-col gap-[7px] px-4 py-3.5"
+              style={{ background: "var(--surface)" }}
+            >
+              <div className="flex items-center gap-2">
+                <span
+                  className="h-2 w-2 shrink-0 rounded-full"
+                  style={{ background: SEVERITY_DOT[i.severity] }}
+                  aria-hidden
+                />
+                <span className="text-[13.5px] font-bold">{i.rule.replace(/_/g, " ")}</span>
+                <Badge variant={SEVERITY_BADGE[i.severity]} className="ml-auto">
                   {i.term}
-                </span>
+                </Badge>
               </div>
-              <p>{i.message}</p>
+              <p className="text-[12.5px] leading-[1.45]" style={{ color: "var(--ink-2)" }}>
+                {i.message}
+              </p>
               {i.suggestion && (
-                <p className="text-xs mt-0.5" style={{ color: "var(--color-text-muted)" }}>
+                <p className="text-[12px] leading-[1.45]" style={{ color: "var(--ink-3)" }}>
                   Suggestion: {i.suggestion}
                 </p>
               )}
+              {i.courseCode && (
+                <span className="flex items-center gap-1.5 self-start">
+                  <CourseCode code={i.courseCode} className="text-[11.5px]" />
+                  <ArrowRight
+                    className="h-[13px] w-[13px]"
+                    style={{ color: "var(--accent-deep)" }}
+                  />
+                </span>
+              )}
             </div>
-          </li>
-        ))}
-      </ul>
-      {issues.length > 20 && (
-        <p className="text-xs" style={{ color: "var(--color-text-muted)" }}>
-          + {issues.length - 20} more issues
-        </p>
+          ))}
+        </div>
       )}
-    </section>
+    </div>
   );
 }

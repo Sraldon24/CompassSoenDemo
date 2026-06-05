@@ -1,10 +1,10 @@
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import { DASHBOARD_INSIGHT_SYSTEM } from "@/lib/ai/prompts";
 import { AIError, generateResponse } from "@/lib/ai/provider";
 import { recordAIUsage } from "@/lib/ai/usage";
 import { getUserPlanSnapshot } from "@/lib/data/queries/plan";
 import { LRUCache } from "lru-cache";
-import { Sparkles } from "lucide-react";
+import { RefreshCw, Sparkles } from "lucide-react";
 
 // One-day per-user insight cache so we don't burn Groq quota on every dashboard hit.
 const insightCache = new LRUCache<string, { text: string; expires: number }>({
@@ -64,30 +64,57 @@ async function getOrGenerateInsight(userId: string): Promise<string> {
 export async function AIInsightWidget({ userId }: { userId: string }): Promise<React.ReactElement> {
   const insight = await getOrGenerateInsight(userId);
   return (
-    <Card featured className="animate-rise relative overflow-hidden">
+    <div
+      className="card card-hard animate-rise relative overflow-hidden px-[26px] py-6"
+      style={{
+        background: "linear-gradient(120deg, var(--accent-soft), transparent 70%)",
+        borderColor: "color-mix(in oklch, var(--accent) 34%, transparent)",
+      }}
+    >
+      {/* Rotated compass watermark */}
       <div
-        className="pointer-events-none absolute inset-0 bg-gradient-hero opacity-60"
+        className="pointer-events-none absolute -right-7 -top-7 rotate-[8deg] opacity-[0.1]"
+        style={{ color: "var(--accent)" }}
         aria-hidden
-      />
-      <CardHeader className="relative">
-        <CardTitle className="flex items-center gap-2.5 text-base">
-          <span
-            className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-xl ring-hairline shadow-[var(--shadow-xs)]"
-            style={{ background: "var(--gradient-accent-soft)" }}
-          >
-            <Sparkles className="h-4 w-4" style={{ color: "var(--color-accent)" }} aria-hidden />
-          </span>
-          AI Insight of the Day
-        </CardTitle>
-        <CardDescription className="pl-[2.625rem]">
-          Refreshes daily. Powered by Groq Llama 3.3 70B.
-        </CardDescription>
-      </CardHeader>
-      <CardContent className="relative">
-        <p className="text-sm leading-relaxed" style={{ color: "var(--color-text)" }}>
-          {insight}
-        </p>
-      </CardContent>
-    </Card>
+      >
+        <svg
+          width={150}
+          height={150}
+          viewBox="0 0 40 40"
+          fill="none"
+          role="img"
+          aria-label="Compass watermark"
+        >
+          <circle cx="20" cy="20" r="18" fill="currentColor" />
+          <path d="M20 8 L24 20 L20 32 L16 20 Z" fill="var(--on-accent)" opacity="0.95" />
+          <path d="M20 8 L24 20 L20 20 Z" fill="var(--ink)" opacity="0.35" />
+          <circle cx="20" cy="20" r="2.2" fill="var(--ink)" />
+        </svg>
+      </div>
+      <div className="relative mb-3 flex items-center gap-2.5">
+        <span
+          className="inline-grid h-[30px] w-[30px] shrink-0 place-items-center rounded-lg"
+          style={{ background: "var(--accent)", color: "var(--on-accent)" }}
+        >
+          <Sparkles className="h-[17px] w-[17px]" aria-hidden />
+        </span>
+        <span className="eyebrow" style={{ color: "var(--accent-deep)" }}>
+          Insight of the day
+        </span>
+        <Badge variant="secondary" className="ml-auto gap-1">
+          <RefreshCw className="size-3" aria-hidden />
+          Daily
+        </Badge>
+      </div>
+      <p
+        className="relative max-w-[760px] font-heading text-[17.5px] font-medium leading-[1.5] tracking-[-0.01em]"
+        style={{ color: "var(--color-text)" }}
+      >
+        {insight}
+      </p>
+      <p className="relative mt-3 text-xs" style={{ color: "var(--color-text-muted)" }}>
+        Refreshes daily. Powered by Groq Llama 3.3 70B.
+      </p>
+    </div>
   );
 }

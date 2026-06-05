@@ -1,5 +1,6 @@
 "use client";
 
+import { AccentPicker } from "@/components/providers/accent-picker";
 import { ThemeToggle } from "@/components/providers/theme-toggle";
 import {
   DropdownMenu,
@@ -53,7 +54,15 @@ export function Topbar({ userName, userEmail }: TopbarProps): React.ReactElement
         <span className="font-semibold text-foreground">Compass</span>
       </div>
       <div className="hidden md:block flex-1" />
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-2.5">
+        <div className="hidden sm:flex items-center">
+          <AccentPicker />
+        </div>
+        <span
+          className="hidden sm:block h-6 w-px"
+          style={{ background: "var(--line-strong)" }}
+          aria-hidden
+        />
         <ThemeToggle />
         <DropdownMenu>
           <DropdownMenuTrigger
