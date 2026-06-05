@@ -492,6 +492,32 @@ Total: **124 courses** with prereqs, credits, categories. Seeded into Postgres v
 
 ---
 
+### ADR-017: "Meridian" design system (token-driven, swappable accent)
+
+**Status:** Accepted
+**Date:** 2026-06-05
+**Supersedes:** the earlier "Graphite Greens" / Lumen design systems (their token *names* live on as aliases)
+
+**Context:** The UI went through three looks: the original Graphite Greens (`docs/design/HANDOFF.md`), a "Lumen" reskin, and a "solid" pass. A fresh Claude Design handoff bundle proposed **Meridian** — a warm editorial-almanac identity — as a total rethink. We adopted it as the canonical design system.
+
+**Decision:** Implement **Meridian** as the single design language, driven entirely by CSS custom properties in `src/app/globals.css`:
+- **Palette:** warm "bone paper" canvas (`--paper`/`--surface`), confident ink text/borders (`--ink`, `--line`/`--line-strong`), and **offset hard-shadows** (`--hard-shadow`) instead of soft floating cards — a risograph/print feel.
+- **Accent:** **Clementine** (orange) default, with a **5-palette runtime toggle** (Clementine/Cobalt/Moss/Plum/Maroon) via a `data-accent` attribute on `<html>`, persisted to `localStorage` and applied by a tiny no-flash bootstrap script before first paint. Each palette has light + (brightened) dark variants.
+- **Type:** Bricolage Grotesque (display), Hanken Grotesk (UI), JetBrains Mono (course codes + numerics) via `next/font`.
+- **Primitives:** `Button`/`Card`/`Badge` reskinned to the print feel; a boxed-mono `CourseCode` chip; utility classes `.card`/`.card-hard`/`.eyebrow`/`.chip-code`/`.lift`.
+- **Light/dark** via next-themes `.dark` (Meridian tokens also respond to `data-theme="dark"`).
+
+**Rationale:**
+- Token-driven means the whole app re-themes from one file; **every legacy token name (`--color-*`, `--gradient-*`, `--shadow-*`) is aliased** to a Meridian value, so the migration touched markup only where the *signature* treatment (boxed codes, hard-shadows, eyebrow kickers) needed bespoke layout.
+- The accent toggle was a cheap add (CSS `[data-accent]` blocks + a 30-line picker) and lets each self-hoster pick a look.
+
+**Consequences:**
+- `docs/design/HANDOFF.md` and the PRD §8 design tables are **historical** — `globals.css` is the source of truth.
+- New UI should use Meridian tokens/classes (ink borders, `.card-hard`, `.eyebrow`, `<CourseCode>`, Bricolage headings); never hardcode hex except text on accent fills.
+- Adding a 6th accent palette = one `[data-accent="…"]` block (light + dark) + one entry in the picker's `ACCENTS` array.
+
+---
+
 ## 🗂️ Data Flow Diagrams
 
 ### User adds a course to plan

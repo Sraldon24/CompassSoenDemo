@@ -1,334 +1,264 @@
+<div align="center">
+
 # 🧭 SOEN Compass
 
-> **Plan your Software Engineering degree the smart way.**
+### Plan your Concordia Software Engineering degree the smart way — and host it yourself.
 
-An AI-powered degree planner for **Concordia BEng Software Engineering** students. Drag-and-drop term planning, AI chatbot with citation-aware RAG, deterministic prerequisite map, real-time plan validation, workload prediction, and AI-assisted email drafting — all free, all open source.
+An open-source, AI-powered degree planner for **Concordia BEng Software Engineering** students:
+drag-and-drop term planning, an AI advisor with citation-grounded RAG, a deterministic
+prerequisite map, real-time plan validation, and community course insights — built to run on
+**$0/month** so any student can self-host it for their own degree journey.
 
+[![Live demo](https://img.shields.io/badge/▶_Live-compasssoen1.up.railway.app-d97333)](https://compasssoen1.up.railway.app)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
-[![Next.js](https://img.shields.io/badge/Next.js-16-black)](https://nextjs.org/)
-[![TypeScript](https://img.shields.io/badge/TypeScript-5-blue)](https://www.typescriptlang.org/)
-[![Tailwind](https://img.shields.io/badge/Tailwind-v4-38B2AC)](https://tailwindcss.com/)
-[![Tests](https://img.shields.io/badge/tests-370%20passing-success)](#testing)
-[![Groq](https://img.shields.io/badge/AI-Groq%20Llama%203.3%2070B-orange)](https://groq.com/)
+[![Next.js 16](https://img.shields.io/badge/Next.js-16-black)](https://nextjs.org/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5_strict-3178c6)](https://www.typescriptlang.org/)
+[![Tests](https://img.shields.io/badge/tests-388_passing-3f8f5f)](#-testing)
+[![Cost](https://img.shields.io/badge/cost-%240%2Fmonth-3f8f5f)](#-self-hosting)
 
-> 🚀 **Live** at [compasssoen1.up.railway.app](https://compasssoen1.up.railway.app) — currently **invite-only** (for the owner + approved friends).
+</div>
 
 ---
 
-## ✨ Features (current)
+## 💡 Why this exists
+
+Concordia's SOEN degree is a 120-credit maze of prerequisites, co-requisites, term-offering rules,
+and workload landmines. Existing tools are static PDFs or spreadsheets. **SOEN Compass** turns
+degree planning into an interactive, AI-assisted experience — and because every student's situation
+is different (transfers, deficiencies, part-time, accelerated), **it's fully open source and
+self-hostable on free tiers**. Clone it, point it at your own free Groq key, and own your plan.
+
+> 🚀 **Live (invite-only beta):** [compasssoen1.up.railway.app](https://compasssoen1.up.railway.app)
+> · 🧪 **Try it with no account:** the [`/demo`](https://compasssoen1.up.railway.app/demo) sandbox
+> (sample plan + live validation + an AI taste-test)
+
+---
+
+## 🛠️ Engineering highlights
+
+The parts I'm most proud of, for the curious / the hiring:
+
+| Area | What's interesting |
+|---|---|
+| **Citation-grounded RAG** | Query → regex force-include of named courses → pgvector cosine top-K (with a relevance floor) → assembled context → streamed answer with numbered `[E1]`/`[1]` citations. Hallucinated course codes are filtered against the valid catalog set. |
+| **Quality-first AI router + fallback chain** | A heuristic router sends quick lookups to a fast model and strategic questions to **Llama 3.3 70B**, racing its first token against an 8s timeout. Full fallback chain **Groq 70B → Gemini 2.5 Flash → Groq 8B → OpenRouter (free)** with retry/backoff + an 85%-of-daily-quota circuit breaker, so a single-provider outage degrades gracefully instead of failing. |
+| **Never-spend guardrails** | OpenRouter is `:free`-only with a model allowlist + a per-process $0-balance pre-flight check, so the fallback can never draw down credit. |
+| **Multi-step LangGraph pipelines** | Recommendations, email drafting, and Reddit-summarization run as explicit state-machine graphs. The summarizer fans out **1×70B + 4×8B in parallel per course** to spare the scarce 70B daily quota. |
+| **Deterministic rules engine** | Prereq/coreq/term-offering validation and the layered-DAG prereq map are **pure functions** — no LLM, fully unit-tested, reproducible. |
+| **Consistent API contract** | Every JSON route returns a `{ success, payload, error }` envelope via shared `apiOk`/`apiError` helpers; internal errors are logged server-side and never leaked to clients. |
+| **Typed data layer** | Postgres 16 + **pgvector** (HNSW, 384-dim) in the same DB; Drizzle ORM with a pre-commit guard that blocks the `sql\`… ANY(${array})\`` footgun in favor of typed `inArray()`. FK/status indexes on every hot path. |
+| **Swappable design system** | A token-driven "**Meridian**" identity (bone paper, ink borders, offset hard-shadows, boxed mono course codes) with **light/dark + a 5-palette accent toggle** that applies before first paint (no flash). |
+
+Decision records for all of the above live in [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md).
+
+---
+
+## ✨ Features
 
 ### 📅 Planning
-- **Drag-and-drop term planner** powered by @dnd-kit — move courses across Fall 2026 → Winter 2030
-- **Real-time plan validation** — prereq, coreq, and term-offering rules engine. Pure functions, 76 unit tests.
-- **Workload predictor** — buckets each term as light / moderate / heavy / burnout based on community-rated hours/week or a 2.5 hr/credit fallback heuristic
-- **Requirements checklist** — per-category progress against Concordia §71.70.9 (Eng Core 27.5, SE Core 73.5, Eng & Nat Sci 3, Nat Sci 6, SOEN Electives 16, Gen Ed 3, plus deficiencies)
-- **Transfer-credit lane + deadlines** — a dedicated planner lane for CEGEP / advanced-standing transfers (add by hand or via import), and an EWT / milestone checklist on `/deadlines`
-- **Excel import** — parses the user's hand-curated Concordia plan with per-row checkboxes to choose what to commit; routes transfers → the transfer lane and EWT/milestones → deadlines
-- **PDF + .ics export** — printable plan + iCalendar feed for Google/Apple calendars
+- **Drag-and-drop term planner** (@dnd-kit) — move courses across Fall 2026 → Winter 2030 with optimistic UI.
+- **Real-time validation** — a pure-function rules engine flags prereq / coreq / term-offering violations live.
+- **Workload predictor** — buckets each term *light / moderate / heavy / burnout* from community-rated hours, or a 2.5 hr/credit fallback.
+- **Requirements checklist** — per-category progress against Concordia §71.70.9 with a degree-completion ring.
+- **Transfer-credit lane** — a dedicated planner lane for CEGEP / advanced-standing credits.
+- **Excel import** — parse a hand-curated Concordia plan with per-row checkboxes; routes transfers and milestones automatically.
+- **PDF + .ics export** — printable plan + an iCalendar feed for Google/Apple calendars.
 
-### 🤖 AI (Groq Llama 3.3 70B + 3.1 8B + Gemini 2.5 Flash + local sentence-transformers)
-- **Ask Compass** chat with streaming responses and RAG over the catalog. A balanced router sends quick lookups to a fast model and strategic questions to 70B (with an 8s first-token race + Gemini/8B fallback, so it's never stuck on a slow free-tier call). A "Compass is thinking…" status shows during generation. Citations as numbered `[E1]`/`[1]` superscripts.
-- **Smart course recommendations** — multi-step pipeline: eligibility filter → semantic similarity → 0-1 scoring → LLM picks top 5 with personalized "why" rationale. Hallucinated codes are filtered out automatically.
-- **AI Review** (on `/plan`) — proactive workload / sequencing / elective suggestions grounded in your plan + detected issues. Cached per plan-hash so reloads cost nothing; Refresh forces a fresh pass.
-- **AI Insight of the Day** — cached daily per-user plan summary
-- **AI email drafting** — describe a situation, get a professional advisor/professor email
-- **⌘K command palette** with keyword + semantic search across the catalog
-- **`npm run research`** CLI — manual RAG + Concordia-calendar verification of any AI claim
+### 🤖 AI
+- **Ask Compass** — streaming RAG chat over the catalog + your plan, multi-turn, with verifiable citations.
+- **Smart recommendations** — eligibility filter → semantic similarity → 0–1 scoring → LLM picks the top 5 with a personalized "why".
+- **AI Review** (on `/plan`) — proactive workload/sequencing suggestions, cached per plan-hash (reloads cost $0 tokens).
+- **AI Insight of the Day**, **AI email drafting**, and a **⌘K** command palette with keyword + semantic search.
 
-### 👥 Community (Phase 4)
-- **Course insights** — per-course "What students are saying" summaries from three sources, tried in order: **concordia.courses** (dense structured reviews — rating/difficulty/instructor, no key) → `old.reddit.com/*.json` → Brave Search (budget-guarded). Summarized by a 5-step LangGraph chain run **in parallel** (1×70B + 4×8B per course) with verbatim citations. Cached 7 days per course. ~1,960 concordia.courses reviews across 84 courses seeded in prod.
-- **Difficulty votes** — easy / medium / hard per course, denormalized rolling average.
-- **Anonymous professor reviews** — rating + difficulty + would-take-again, anonymous by default (the author's name is *never* returned for anon reviews).
-- **Flag + moderation queue** — any user can flag a review (auto-hidden pending review); admins keep / remove / ban-author at `/admin/moderation`.
-- **Public profiles** at `/u/[slug]` — no-auth shareable degree progress with a dynamic OG image (via `next/og`). Off by default; opt in at Settings → Privacy.
-- **Demo mode** at `/demo` — no-auth sandbox with a sample plan + the live validation engine + a 5-message AI taste-test.
-- **Weekly Concordia scraper** — diffs the calendar against the catalog into a `/admin/scraped-changes` review queue (cheerio parser, prefix-scoped, Unicode-hyphen-aware).
+### 👥 Community
+- **Course insights** — "What students are saying" summaries from **concordia.courses** → `old.reddit.com` JSON → Brave Search (budget-guarded), summarized by a LangGraph chain and cached 7 days.
+- **Difficulty votes** + **anonymous professor reviews** (author name never returned for anon reviews).
+- **Flag + moderation queue**, **public profiles** at `/u/[slug]` (with a dynamic OG image), and a no-auth **`/demo`** sandbox.
 
-### 🔭 Observability + Privacy (Phase 4)
-- **Sentry** error tracking (client + server + edge) with source-map upload on prod builds.
-- **PostHog** analytics — 12 typed launch events, consent-gated + Do-Not-Track-respecting.
-- **Cookie banner** — analytics only initialize after explicit accept.
-- **GDPR controls** — one-click JSON data export + soft-delete with a 30-day grace window (hard purge via cron, cascade-wipes child rows).
-- **AI fallback chain** — Groq 70B → Groq 8B → OpenRouter free models, so a Groq outage degrades gracefully instead of failing. OpenRouter has hard never-spend guards (`:free`-only allowlist + pre-flight $0-balance check).
-
-### 🎨 Design + UX
-- **Graphite Greens** palette via Tailwind v4 `@theme` tokens
-- **Dark mode** via next-themes (persists per-user)
-- **shadcn/ui new-york** + Base UI primitives for accessibility
-- **Geist Sans + Geist Mono** with `ss01` + slashed-zero on all course codes / numerics
-
-### 🧱 Foundations
-- **Better Auth email/password** with Argon2id hashing, session cookies, 5-min cookie cache
-- **Invite-only access** — signup is gated by an `ALLOWED_EMAILS` allowlist; new accounts start `pending` and an admin approves/rejects them at `/admin/users` (with an "awaiting approval" holding screen)
-- **Postgres 16 + pgvector** (HNSW indexes, 384-dim embeddings)
-- **Drizzle ORM** with type-safe queries (typed `inArray` helpers, never raw `sql\`... ANY(${array})\`` — see [docs/ARCHITECTURE.md ADR-013](docs/ARCHITECTURE.md))
-- **Rate limiting** via lru-cache (50 chat / 20 recommend / 30 review / 30 email / 100 search per user per day) + an 85% Groq daily-quota circuit breaker
-- **Biome** for lint + format (no ESLint / no Prettier)
+### 🔭 Production-grade plumbing
+- **Better Auth** (email/password, Argon2id) with an **invite-only allowlist + admin approval** flow, plus per-IP auth rate limiting.
+- **Sentry** (client/server/edge + source maps) and **PostHog** analytics (consent-gated, DNT-respecting).
+- **GDPR controls** — one-click JSON export + soft-delete with a 30-day purge cron.
 
 ---
 
 ## 📸 Screenshots
 
-> Drop PNGs into `docs/screenshots/` with these names and they'll render here.
-
-| | |
-|---|---|
-| ![Term planner](docs/screenshots/planner.png) **Drag-and-drop planner** | ![Ask Compass](docs/screenshots/chat.png) **Ask Compass (RAG chat)** |
-| ![Prereq map](docs/screenshots/map.png) **Prerequisite map** | ![Course detail](docs/screenshots/course-detail.png) **Course detail + community** |
-| ![Dashboard](docs/screenshots/dashboard.png) **Dashboard + AI insight** | ![Public profile](docs/screenshots/public-profile.png) **Public profile** |
+> _Live captures coming soon._ In the meantime, see it running at the
+> **[live demo](https://compasssoen1.up.railway.app)** or the no-auth
+> **[`/demo` sandbox](https://compasssoen1.up.railway.app/demo)**.
+>
+> _Self-hosting? Drop PNGs into `docs/screenshots/` (`landing.png`, `dashboard.png`, `planner.png`,
+> `chat.png`, `map.png`, `course.png`) and they'll render here._
 
 ---
 
-## 🚀 Quick Start
+## 🏠 Self-hosting
+
+SOEN Compass is designed to run **end-to-end on free tiers** — the only thing you *need* is a free
+Groq API key. Everything else (Gemini, OpenRouter, Sentry, PostHog, Reddit, Brave) is optional.
 
 ### Prerequisites
-
-- Node.js 22 LTS (current default — `nvm install 22` works)
-- Docker + Docker Compose (for local Postgres + pgvector)
-- A [Groq API key](https://console.groq.com/keys) (free, no credit card)
-
-That's it for local dev. Google OAuth / Sentry / PostHog / Reddit are optional and only needed for production.
+- **Node.js 22 LTS** (`nvm install 22`)
+- **Docker + Docker Compose** (for local Postgres + pgvector)
+- A free **[Groq API key](https://console.groq.com/keys)** (no credit card)
 
 ### Setup
 
 ```bash
 git clone https://github.com/Sraldon24/CompassSoenDemo.git
 cd CompassSoenDemo
-
-# Use Node 22 LTS
 nvm use 22
-
-# Install deps
 npm install
 
-# Bring up Postgres + pgvector
+# Postgres + pgvector
 npm run db:up
-
-# Apply migrations
 npm run db:migrate
 
-# Seed the course catalog (124 courses from Concordia §71.70.9 + §71.70.10)
+# Seed the 124-course Concordia catalog + embeddings
 npm run seed:catalog
-npm run db:embed         # generates 384-dim embeddings via @xenova/transformers
+npm run db:embed
 
-# (Optional) Seed a demo plan
-npm run seed:user-plan -- --email you@example.com
-
-# Copy + fill the env template
+# Env: copy the template, then set GROQ_API_KEY (the only required key)
 cp .env.local.example .env.local
-# Required: GROQ_API_KEY. Optional but recommended:
-#   GEMINI_API_KEY              — fast free chat fallback (else Groq 8B is used)
-#   ADMIN_EMAIL                 — bootstrap admin (auto-approved; runs /admin/users)
-#   ALLOWED_EMAILS              — comma-separated signup allowlist (invite-only).
-#                                 Leave UNSET in local dev to keep signup open.
 
-# Run dev server
+# Run it
 npm run dev
 ```
 
-> **Access control:** with `ALLOWED_EMAILS`/`ADMIN_EMAIL` set, signup is invite-only and new users land on `/pending` until an admin approves them at `/admin/users`. Unset locally → open signup (so dev isn't bricked).
+Open **http://localhost:3000**, sign up, complete onboarding, and head to **/plan**.
 
-Open [http://localhost:3000](http://localhost:3000), sign up, complete onboarding, and go to **/plan**.
+> **Access control:** signup is open locally unless you set `ALLOWED_EMAILS` / `ADMIN_EMAIL` (then
+> it's invite-only with admin approval at `/admin/users`). Set `ADMIN_EMAIL` to yourself to become
+> the bootstrap admin.
 
-### Stack at a glance
+> **Want a pre-filled demo account fast?**
+> `npx tsx --import ./scripts/load-env.ts scripts/seed-demo-account.ts` creates an approved,
+> onboarded `demo@compass.local` (password `DemoCompass!2026`); then
+> `npm run seed:user-plan -- --email demo@compass.local` gives it a sample plan.
 
-| Layer | Choice | Why |
-|---|---|---|
-| Framework | Next.js 16 App Router | RSC + Server Actions in one codebase |
-| Language | TypeScript 5 strict | `noUncheckedIndexedAccess` everywhere |
-| Styling | Tailwind v4 + shadcn/ui + Graphite Greens tokens | Atomic, accessible, locked design system |
-| DB | Postgres 16 + pgvector (HNSW) | $0, vector search in the same DB |
-| ORM | Drizzle | Type-safe, edge-friendly, no codegen daemon |
-| Auth | Better Auth (email/password) + **invite-only allowlist + admin approval** | Self-hosted, Argon2id, no vendor lock-in |
-| AI | Groq Llama 3.1 8B + 3.3 70B, **Gemini 2.5 Flash** fast fallback, OpenRouter last resort | Fastest free-tier inference; quality-first chat router |
-| Embeddings | sentence-transformers `all-MiniLM-L6-v2` local | $0, runs in Node, 384 dims |
-| Lint + format | Biome | One Rust binary, no ESLint/Prettier split |
-| Testing | Vitest (unit + integration) + Playwright (E2E) | 370 tests passing |
-| Community sources | **concordia.courses** (primary) → old.reddit.com JSON → Brave Search | free, budget-guarded |
-| Observability | Sentry + PostHog | errors + consent-gated analytics |
-| Hosting | Railway | $5/mo credit covers app + Postgres |
+### Optional keys (all free, all degrade gracefully if unset)
 
-**Total cost: $0/month** (all free tiers).
+| Key | Unlocks |
+|---|---|
+| `GEMINI_API_KEY` | Fast free chat fallback (else Groq 8B is used) |
+| `OPENROUTER_API_KEY` | Last-resort AI fallback (`:free` models only, never-spend guarded) |
+| `BRAVE_SEARCH_API_KEY` | Community-insight web fallback |
+| `SENTRY_*` / `NEXT_PUBLIC_POSTHOG_KEY` | Error tracking + analytics |
 
-See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for decision records.
+Production deploy notes (Railway): see [`docs/DEPLOY.md`](docs/DEPLOY.md).
 
 ---
 
-## 📂 Project Structure
+## 🧰 Stack
+
+| Layer | Choice | Why |
+|---|---|---|
+| Framework | **Next.js 16** App Router | RSC + Server Actions in one codebase |
+| Language | **TypeScript 5** (strict, `noUncheckedIndexedAccess`) | Catch bugs at compile time |
+| Styling | **Tailwind v4** + shadcn/ui + the Meridian token system | Atomic, accessible, themeable |
+| DB | **Postgres 16 + pgvector** (HNSW) | $0, vector search in the same DB |
+| ORM | **Drizzle** | Type-safe, no codegen daemon |
+| Auth | **Better Auth** + invite allowlist + admin approval | Self-hosted, Argon2id, no lock-in |
+| AI | **Groq** Llama 3.1 8B / 3.3 70B · **Gemini 2.5 Flash** · OpenRouter (free) | Fastest free inference, quality-first routing |
+| Embeddings | sentence-transformers **all-MiniLM-L6-v2** (local) | $0, runs in Node, 384 dims |
+| Agents | **LangGraph** | Multi-step recommend / email / summarize pipelines |
+| Lint/format | **Biome** | One Rust binary, no ESLint/Prettier split |
+| Testing | **Vitest** + **Playwright** | 388 tests passing |
+| Fonts | **Bricolage Grotesque** · Hanken Grotesk · JetBrains Mono | Editorial display + mono numerics |
+| Hosting | **Railway** | $5/mo credit covers app + Postgres |
+
+**Total cost: $0/month** on free tiers.
+
+---
+
+## 🤖 AI request flow
 
 ```
-CompassSoenDemo/
-├── src/
-│   ├── app/
-│   │   ├── (auth)/             # /login, /signup, /onboarding (centered card layout)
-│   │   ├── (dashboard)/        # /dashboard, /plan, /map, /requirements,
-│   │   │                       # /chat, /emails, /settings/import (sidebar layout)
-│   │   ├── api/
-│   │   │   ├── ai/             # /chat (stream), /recommend, /draft-email
-│   │   │   ├── auth/           # Better Auth catch-all
-│   │   │   ├── search/         # ⌘K keyword + semantic
-│   │   │   ├── import/         # Excel parse + preview + commit
-│   │   │   └── export/         # PDF + .ics
-│   │   ├── page.tsx            # landing
-│   │   ├── layout.tsx          # ThemeProvider + Toaster + Tooltip
-│   │   └── globals.css         # Graphite Greens @theme block
-│   │   ├── (auth)/             # +/pending (awaiting approval), /onboarding
-│   │   ├── api/ai/             # /chat (stream), /recommend, /review, /draft-email
-│   │   └── admin/              # /users (approve/reject), /moderation, /scraped-changes
-│   ├── components/
-│   │   ├── ui/                 # shadcn primitives (Base UI under the hood)
-│   │   ├── planner/            # course-card, planner-board, course-picker, ai-review, workload-badge
-│   │   ├── prereq-map/         # SVG layered DAG renderer
-│   │   ├── chat/               # ChatUI w/ streaming + "thinking…" status + citation chips
-│   │   ├── dashboard/          # AI insight + recommendations widgets
-│   │   ├── emails/             # template list + AI draft assistant
-│   │   ├── nav/                # sidebar (admin link) + topbar
-│   │   ├── common/             # command-palette (⌘K), cookie-banner, keyboard-shortcuts
-│   │   └── providers/          # theme-provider, theme-toggle
-│   ├── lib/                    # ── organized by domain ──
-│   │   ├── auth/               # auth, auth-client, get-session, is-admin, access-control (allowlist)
-│   │   ├── ai/                 # provider (model router + fallback), graphs/, embeddings, rag, prompts, usage
-│   │   ├── community/          # concordia-courses, reddit, brave, fetch-posts, summaries, moderation, reviews
-│   │   ├── data/               # db, schema, repositories/, queries/  (one data layer)
-│   │   ├── domain/             # prereq-graph, requirements, term, workload
-│   │   ├── limits/             # user rate-limit + Groq quota (config, limiter, store)
-│   │   ├── api/                # route-guard (aiGuard + community guards), course-code
-│   │   ├── validation/         # plan + auth (Zod) rules
-│   │   ├── exports/ imports/ analytics/ account/ demo/ scraping/
-│   │   └── ip-rate-limit.ts    # IP lru-cache buckets (demo route)
-│   └── middleware.ts           # route protection (__Secure- cookie aware)
-├── data/seed/                  # courses.json, courses-supplementary.json, …
-├── seed/production-warmup.sql  # restorable community data dump (posts + summaries)
-├── scripts/                    # seed-*, embed-courses, scrape-reddit, summarize-reddit,
-│                               # ensure-pgvector (Railway start), purge-deleted-accounts (cron)
-├── tests/                      # unit/ + integration/ + e2e/ — 370 passing
-├── drizzle/                    # generated migrations + meta
-├── docs/                       # ARCHITECTURE, PRD, DEPLOY, SETUP, design/
-└── docker-compose.yml          # pgvector/pgvector:pg16
+User query
+  └─ extract explicit course codes (regex)
+  └─ buildRAGContext()
+       ├─ force-include named courses (catalog row + prereqs + your plan status)
+       ├─ embed query → pgvector cosine top-K (relevance-floored)
+       └─ community (concordia.courses / Reddit) semantic top-K
+  └─ router: simple → fast model · strategic → Groq 70B (8s first-token race)
+  └─ fallback: Groq 70B → Gemini 2.5 Flash → Groq 8B → OpenRouter (free)
+       with retry/backoff + 85% daily-quota circuit breaker
+  └─ stream to client (+ "thinking…") · persist conversation · record usage
 ```
 
 ---
 
 ## 🧪 Testing
 
-**370 tests passing** (Phase 1–4 + community expansion + architecture pass):
+**388 tests passing** (Vitest unit + integration, Playwright E2E):
 
 ```bash
 npm run test          # Vitest: unit + integration
 npm run test:e2e      # Playwright: E2E
-npm run lint          # Biome + SQL-pattern guard
+npm run lint          # Biome + a pre-commit SQL-pattern guard
 npm run typecheck     # tsc --noEmit
 ```
 
-Coverage spans the planner rules engine, workload predictor, recommend scoring, the deep-module refactor (term/excel/embedder/LLM-port/repos/limiter — see [docs/REFACTOR.md](docs/REFACTOR.md)), and the Phase 4 community layer: Reddit + Brave sources, the summarization graph (incl. prof-name dedupe regression), difficulty aggregates, anonymous-review privacy invariants, the moderation flag/keep/remove/ban flow, public-profile visibility rules, GDPR export/purge, the AI fallback chain, and the OpenRouter never-spend guards.
-
-Integration tests hit real Postgres + pgvector + Groq. Groq-heavy graph tests are opt-in (`RUN_SUMMARIZE_GROQ_TESTS=1` / `RUN_HEAVY_GROQ_TESTS=1`) so a normal `npm test` stays under the Groq per-minute rate limit. Live-network tests skip with `SKIP_LIVE_NETWORK=1`.
-
-### CI / pre-commit guard
-
-`scripts/check-sql-patterns.sh` runs on every `npm run lint` and blocks committing the "drizzle sql-tag + JS array" footgun (a real bug we caught in Phase 3 — see [ADR-013](docs/ARCHITECTURE.md)).
-
----
-
-## 🤖 AI architecture summary
-
-Full deep-dive in [docs/PRD.md §16](docs/PRD.md) and [docs/ARCHITECTURE.md ADRs 011-012](docs/ARCHITECTURE.md).
-
-```
-User query
-  │
-  ▼
-Extract explicit course codes (regex)
-  │
-  ▼
-buildRAGContext()  →  assembleRAGContext() (pure: rank, force-include, truncate)
-  ├── Force-include codes (catalog rows + prereqs + user plan status)
-  ├── Embed query → pgvector cosine search top 5 (excluding explicit)
-  └── Reddit/concordia.courses semantic top 5
-  │
-  ▼
-Chat router (isComplexQuery): simple → fast model now;
-  strategic → Groq 70B with an 8s first-token race
-  │
-  ▼
-Fallback chain: Groq 70B → Gemini 2.5 Flash → Groq 8B → OpenRouter (free)
-  with retry+backoff (1s/2s/4s) + an 85% daily-quota circuit breaker
-  │
-  ▼
-Stream → client ("thinking…" status) + persist conversation + record aiUsage
-```
-
-- **Recommendations** only show the LLM a pre-ranked top-12 candidate list (`recommend-core.ts`, pure scoring); hallucinated course codes are filtered against the valid set.
-- **AI Review** (on `/plan`) caches per user by plan-hash — re-loads cost $0 tokens; "Refresh" forces a fresh pass.
-- **Summarization graph** runs its 5 steps in parallel (1×70B + 4×8B per course) to spare the scarce 70B daily quota.
-- All `/ai/*` routes share `aiGuard` (auth → validate → rate-limit) + `runAiUsage` (usage accounting).
+Coverage spans the planner rules engine, workload predictor, recommend scoring, the API-envelope +
+route guards, the AI fallback chain + never-spend guards, the community layer (sources, the
+summarization graph incl. a prof-name-dedupe regression, difficulty aggregates, anonymous-review
+privacy invariants, moderation, public-profile visibility, GDPR export/purge), and the pure
+RAG-assembly relevance floor. Integration tests hit real Postgres + pgvector; Groq-heavy graph
+tests are opt-in to stay under the free rate limit.
 
 ---
 
-## 🛣️ Roadmap
+## 📂 Project structure
 
-- **Phase 1 — Foundation** ✅ (auth, DB, app shell, design system)
-- **Phase 2 — Core Planner** ✅ (DnD, validation, workload, requirements, Excel import, onboarding)
-- **Phase 3 — AI + Polish** ✅ (RAG, chat, recommendations, prereq map, email drafting, exports)
-- **Phase 4 — Community + Launch** ✅ (course insights via concordia.courses/Reddit/Brave, difficulty votes, prof reviews, moderation, public profiles, demo mode, Sentry/PostHog wiring, GDPR, AI fallback chain)
-- **Live on Railway** ✅ — deployed, invite-only (allowlist + admin approval), DB seeded. Post-launch: invite-only access control, AI Review, Gemini fast-fallback + chat router, concordia.courses data source, a deep-module architecture pass, and a domain-organized `src/lib` reorg.
+```
+src/
+├── app/
+│   ├── (auth)/          # login, signup, onboarding, pending
+│   ├── (dashboard)/     # dashboard, plan, map, requirements, chat, deadlines, emails, settings
+│   ├── admin/           # users (approve/reject), moderation, scraped-changes
+│   ├── api/             # ai/* (chat stream, recommend, review, draft-email), auth, search,
+│   │                    #   import (excel), export (pdf/ics), courses/*, account, moderation
+│   └── page.tsx         # marketing landing
+├── components/          # ui/ (primitives) · planner · prereq-map · chat · dashboard · nav · providers
+└── lib/                 # organized by domain:
+    ├── ai/              # provider (router + fallback), graphs/ (LangGraph), rag, embeddings, prompts
+    ├── auth/            # Better Auth, access-control (allowlist), get-session, is-admin
+    ├── data/            # db, schema, repositories/, queries/
+    ├── domain/          # prereq-graph, requirements, term, workload (pure)
+    ├── community/       # concordia-courses, reddit, brave, summaries, moderation, reviews
+    ├── limits/          # rate-limit + Groq quota
+    └── api/             # response (envelope), route-guard (aiGuard + community guards)
+```
 
 ---
 
-## 🛠️ Useful scripts
+## 🗺️ Roadmap
 
-```bash
-npm run dev               # Next dev server (port 3000)
-npm run build             # Production build
-npm run db:up             # Start Postgres + pgvector container
-npm run db:down           # Stop container
-npm run db:generate       # Generate Drizzle migration from schema
-npm run db:migrate        # Apply migrations
-npm run db:studio         # Drizzle Studio (visual DB browser)
-npm run db:seed           # Seed user's hand-curated Excel courses
-npm run seed:catalog      # Seed the full 124-course Concordia catalog
-npm run seed:user-plan    # Seed a demo plan for a specific email
-npm run db:embed          # Generate course embeddings (re-runs only on changed rows)
-npm run research -- "When can I take COMP 472?"   # Manual RAG + web verification
-npm run scrape:reddit     # Scrape r/Concordia for course mentions (Reddit JSON → Brave fallback)
-npm run summarize:reddit  # Summarize scraped posts per course via the LangGraph chain
-npm run scrape:courses    # Diff Concordia calendar → /admin/scraped-changes queue
-npm run purge:accounts    # Hard-delete accounts past the 30-day soft-delete grace
-npm run test              # Vitest
-npm run test:e2e          # Playwright
-npm run lint              # Biome + SQL pattern guard
-npm run lint:fix          # Auto-fix
-npm run format            # Format only
-npm run typecheck         # tsc --noEmit
-```
+- **Phase 1 — Foundation** ✅ auth, DB, app shell, design system
+- **Phase 2 — Core Planner** ✅ DnD, validation, workload, requirements, Excel import, onboarding
+- **Phase 3 — AI + Polish** ✅ RAG chat, recommendations, prereq map, email drafting, exports
+- **Phase 4 — Community + Launch** ✅ course insights, votes, reviews, moderation, public profiles, demo, Sentry/PostHog, GDPR, AI fallback chain
+- **Live on Railway** ✅ invite-only, DB seeded. Post-launch: consistent API envelope, DB index pass, multi-turn chat, the Meridian redesign + accent toggle.
 
 ---
 
 ## 📜 License
 
-[MIT](LICENSE) © 2026 Amir Ghadimi
-
-You can use this code freely. If you build something with it, a star ⭐ is appreciated but not required.
-
----
+[MIT](LICENSE) © 2026 Amir Ghadimi — use it freely for your own SOEN journey. A ⭐ is appreciated but never required.
 
 ## 🙏 Acknowledgments
 
-- **Concordia University** Gina Cody School calendar — the authoritative source for course data
-- **airi-14x** for the [Concordia Master Guide](https://airi-14x.github.io/Concordia-Master-Guide/) that inspired the ENCS tips
-- **stumash** for [ConU Course Planner](https://github.com/stumash/CoursePlanner) and its structured prereq data
-- **r/Concordia** community for student perspectives that informed the AI prompt design
-- **shadcn** + **Base UI** for accessible primitives
-- **Vercel** for Next.js + the Geist fonts
-- **Groq** for fast free-tier LLM inference
-- **Hugging Face / Xenova** for the all-MiniLM-L6-v2 ONNX build that runs the embeddings in Node
-
----
+Concordia's Gina Cody School calendar (authoritative course data) · the r/Concordia community ·
+shadcn + Base UI · Vercel (Next.js) · Groq (fast free inference) · Hugging Face / Xenova
+(the ONNX MiniLM build that runs embeddings in Node).
 
 ## ⚠️ Disclaimer
 
-SOEN Compass is **not affiliated with or endorsed by Concordia University**. Course information is sourced from publicly available Concordia calendar pages and a single student's hand-curated plan. Always verify with your academic advisor before making registration decisions. AI responses can be wrong even when cited — Compass is a planning aid, not an authority.
+**Not affiliated with or endorsed by Concordia University.** Course data comes from public calendar
+pages and a single student's hand-curated plan. Always verify with your academic advisor before
+registering — AI answers can be wrong even when cited. Compass is a planning aid, not an authority.
 
 ---
 
-**Built with ☕ + 🤖 by a Concordia SOEN student, for Concordia SOEN students.**
+<div align="center"><sub>Built with ☕ + 🤖 by a Concordia SOEN student, for Concordia SOEN students.</sub></div>

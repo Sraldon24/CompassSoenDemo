@@ -827,7 +827,7 @@ Natural-language Q&A with RAG over courses + Reddit + community data.
 
 ## 8. Design System
 
-> ⚠️ **SUPERSEDED.** The design tokens in this section are obsolete. The canonical design system is `docs/design/HANDOFF.md` (Claude Designs handoff bundle, **Graphite Greens** palette). Implementers should paste the `@theme` block from HANDOFF.md §1 directly into `app/globals.css`. The block below is preserved only for historical reference of the original PRD draft.
+> ⚠️ **SUPERSEDED (historical).** The design tokens in this section are obsolete. The **current** design system is **"Meridian"** — token-driven in `src/app/globals.css` (warm bone paper, ink borders, hard-shadows, Clementine accent + a 5-palette toggle, Bricolage/Hanken/JetBrains fonts). See [ARCHITECTURE.md ADR-017](ARCHITECTURE.md). `docs/design/HANDOFF.md` (Graphite Greens) and the block below are kept only for historical reference.
 
 ### 8.1 Colors (OKLCH) — _superseded by HANDOFF.md §1_
 
